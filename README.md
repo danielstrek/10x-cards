@@ -48,3 +48,8 @@ The project is in active development, with the current version at 0.0.1. It is s
 
 ## License
 This project is licensed under the MIT License (assumed based on common open-source practices; confirm and update in package.json if specified).
+
+
+## how to start...
+1. Run docker desktop.
+put supabase start 
