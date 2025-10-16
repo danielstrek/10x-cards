@@ -145,6 +145,9 @@
 - Validation:
   - `front.length` ≤ 200, `back.length` ≤ 500
   - `source` in ["ai-full","ai-edited","manual"]
+  - Max 100 flashcards per request
+
+**Status**: ✅ **IMPLEMENTED** - See [detailed documentation](flashcards-endpoint-documentation.md)
 
 #### List Flashcards
 - Method: GET
