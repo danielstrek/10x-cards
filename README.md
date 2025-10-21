@@ -50,6 +50,76 @@ The project is in active development, with the current version at 0.0.1. It is s
 This project is licensed under the MIT License (assumed based on common open-source practices; confirm and update in package.json if specified).
 
 
-## how to start...
-1. Run docker desktop.
-put supabase start 
+## How to Start
+
+### Prerequisites
+1. **Docker Desktop** - Required for running Supabase locally
+2. **Node.js 22.14.0** - Use `nvm use` to switch to correct version
+3. **Supabase CLI** - Will be used via npx
+
+### Setup Steps
+
+#### 1. Start Supabase
+```bash
+# Make sure Docker Desktop is running
+npx supabase start
+```
+
+This will output your local Supabase credentials. Save these!
+
+#### 2. Configure Environment Variables
+Create a `.env` file in project root:
+
+```env
+SUPABASE_URL=http://localhost:54321
+SUPABASE_KEY=your_anon_key_from_step_1
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_from_step_1
+OPENROUTER_API_KEY=your_openrouter_key
+```
+
+See `.ai/tests/ENV-SETUP.md` for detailed instructions.
+
+#### 3. Run Database Migrations
+```bash
+npx supabase db reset
+```
+
+Or apply specific migration to fix RLS:
+```bash
+npx supabase migration up
+```
+
+#### 4. Start Development Server
+```bash
+npm run dev
+```
+
+Visit `http://localhost:3000`
+
+## Testing
+
+### API Testing
+The project includes comprehensive testing scripts for the `/api/flashcards` endpoint.
+
+```bash
+cd .ai/tests
+
+# Get access token
+.\get-token.ps1
+
+# Run API tests
+.\test-quick.ps1
+```
+
+See `.ai/tests/README.md` for full testing documentation.
+
+### Test Scenarios
+- Success cases: Create flashcards, handle different sources
+- Error cases: Validation errors, auth errors, not found errors
+- Edge cases: Max length strings, max flashcards count
+
+### Troubleshooting
+If you get "Generation not found" errors:
+1. Run `.ai/tests/fix-rls.ps1` to disable RLS
+2. Create test data (see `.ai/tests/SETUP-TEST-DATA.md`)
+3. See `.ai/tests/ROZWIAZANIE.md` for detailed explanation (Polish) 

@@ -5,32 +5,32 @@ Write-Host "`n============================================" -ForegroundColor Cya
 Write-Host "   Quick Test - POST /api/flashcards" -ForegroundColor Cyan
 Write-Host "============================================`n" -ForegroundColor Cyan
 
-# Konfiguracja - UZUPEŁNIJ TE WARTOŚCI!
-$token = Read-Host "Podaj access token (lub naciśnij Enter aby użyć testowego)"
+# Configuration
+$token = Read-Host "Enter access token (or press Enter to use test token)"
 if ([string]::IsNullOrWhiteSpace($token)) {
-    $token = "test-token-123"  # Testowy token - nie zadziała, ale pokaże błąd auth
+    $token = "test-token-123"
 }
 
-$generationId = Read-Host "Podaj generation ID (lub naciśnij Enter aby użyć 1)"
+$generationId = Read-Host "Enter generation ID (or press Enter to use 1)"
 if ([string]::IsNullOrWhiteSpace($generationId)) {
     $generationId = 1
 }
 
-$apiUrl = "http://localhost:4321/api/flashcards"
+$apiUrl = "http://localhost:3000/api/flashcards"
 
-Write-Host "`nUżywam:" -ForegroundColor Yellow
+Write-Host "`nUsing:" -ForegroundColor Yellow
 Write-Host "  API URL: $apiUrl"
 Write-Host "  Generation ID: $generationId"
 Write-Host "  Token: $($token.Substring(0, [Math]::Min(20, $token.Length)))...`n"
 
-# Funkcja pomocnicza do wyświetlania odpowiedzi
+# Helper function to display response
 function Show-Response {
     param($Response, $StatusCode)
     
     if ($StatusCode -ge 200 -and $StatusCode -lt 300) {
-        Write-Host "✓ Status: $StatusCode" -ForegroundColor Green
+        Write-Host "[OK] Status: $StatusCode" -ForegroundColor Green
     } elseif ($StatusCode -ge 400) {
-        Write-Host "✗ Status: $StatusCode" -ForegroundColor Red
+        Write-Host "[ERROR] Status: $StatusCode" -ForegroundColor Red
     } else {
         Write-Host "Status: $StatusCode" -ForegroundColor Yellow
     }
@@ -44,25 +44,25 @@ function Show-Response {
 
 # Menu
 while ($true) {
-    Write-Host "`n--- Wybierz test ---" -ForegroundColor Cyan
-    Write-Host "1. Success - Utwórz 3 flashcards (różne source)"
-    Write-Host "2. Success - Utwórz 1 flashcard"
-    Write-Host "3. Error - Puste pole front (400)"
-    Write-Host "4. Error - Front za długie >200 chars (400)"
-    Write-Host "5. Error - Pusta tablica flashcards (400)"
-    Write-Host "6. Error - Brak tokena (401)"
-    Write-Host "7. Error - Nieprawidłowy token (401)"
-    Write-Host "8. Error - Nieistniejąca generacja (404)"
-    Write-Host "9. Edge Case - Max długość (200/500 chars)"
+    Write-Host "`n--- Select test ---" -ForegroundColor Cyan
+    Write-Host "1. Success - Create 3 flashcards (different sources)"
+    Write-Host "2. Success - Create 1 flashcard"
+    Write-Host "3. Error - Empty front field (400)"
+    Write-Host "4. Error - Front too long >200 chars (400)"
+    Write-Host "5. Error - Empty flashcards array (400)"
+    Write-Host "6. Error - No auth token (401)"
+    Write-Host "7. Error - Invalid token (401)"
+    Write-Host "8. Error - Non-existent generation (404)"
+    Write-Host "9. Edge Case - Max length (200/500 chars)"
     Write-Host "10. Edge Case - 100 flashcards (max)"
-    Write-Host "11. Własny request (JSON)"
-    Write-Host "0. Wyjście"
+    Write-Host "11. Custom request (JSON)"
+    Write-Host "0. Exit"
     
-    $choice = Read-Host "`nWybór"
+    $choice = Read-Host "`nChoice"
     
     switch ($choice) {
         "0" {
-            Write-Host "`nDo zobaczenia! 👋`n" -ForegroundColor Cyan
+            Write-Host "`nGoodbye!`n" -ForegroundColor Cyan
             exit
         }
         
@@ -83,10 +83,14 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
@@ -105,10 +109,14 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
@@ -125,10 +133,14 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
@@ -146,10 +158,14 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
@@ -166,10 +182,14 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
@@ -186,10 +206,14 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
@@ -206,10 +230,14 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
@@ -226,10 +254,14 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
@@ -246,10 +278,14 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
@@ -270,15 +306,19 @@ while ($true) {
                     -Body $body -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
         "11" {
-            Write-Host "`nWklej JSON body (Enter 2x aby zakończyć):" -ForegroundColor Yellow
+            Write-Host "`nPaste JSON body (press Enter twice to finish):" -ForegroundColor Yellow
             $lines = @()
             while ($true) {
                 $line = Read-Host
@@ -293,15 +333,19 @@ while ($true) {
                     -Body $customBody -UseBasicParsing
                 Show-Response -Response $response.Content -StatusCode $response.StatusCode
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
-                $body = $stream.ReadToEnd()
-                Show-Response -Response $body -StatusCode $statusCode
+                if ($_.Exception.Response) {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    $stream = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                    $body = $stream.ReadToEnd()
+                    Show-Response -Response $body -StatusCode $statusCode
+                } else {
+                    Write-Host "[ERROR] Request failed: $($_.Exception.Message)" -ForegroundColor Red
+                }
             }
         }
         
         default {
-            Write-Host "`nNieprawidłowy wybór. Spróbuj ponownie." -ForegroundColor Red
+            Write-Host "`nInvalid choice. Try again." -ForegroundColor Red
         }
     }
 }

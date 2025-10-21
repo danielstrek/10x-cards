@@ -1,9 +1,10 @@
 import { defineMiddleware } from 'astro:middleware';
 
-import { supabaseClient } from '../db/supabase.client.ts';
+import { supabaseServiceClient } from '../db/supabase.client.ts';
 
 export const onRequest = defineMiddleware((context, next) => {
-  context.locals.supabase = supabaseClient;
+  // Use service client to bypass RLS - we handle auth in API routes
+  context.locals.supabase = supabaseServiceClient;
   return next();
 });
 
