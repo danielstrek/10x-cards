@@ -1,9 +1,13 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import RegisterForm from "../../components/auth/RegisterForm";
+
+// Redirect if user is already logged in
+if (Astro.locals.user) {
+  return Astro.redirect('/generate');
+}
 ---
 
 <Layout title="Zarejestruj się - 10x Cards">
   <RegisterForm client:load />
 </Layout>
-

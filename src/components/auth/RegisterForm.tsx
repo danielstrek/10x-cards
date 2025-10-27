@@ -15,12 +15,6 @@ interface RegisterFormState {
   success: boolean;
 }
 
-interface PasswordStrength {
-  score: number; // 0-4
-  feedback: string;
-  color: string;
-}
-
 export default function RegisterForm() {
   const [state, setState] = React.useState<RegisterFormState>({
     email: '',
@@ -40,120 +34,121 @@ export default function RegisterForm() {
     return emailRegex.test(email);
   };
 
-  const calculatePasswordStrength = (password: string): PasswordStrength => {
-    if (password.length === 0) {
-      return { score: 0, feedback: '', color: 'bg-gray-200' };
+  const validatePassword = (password: string): {
+    valid: boolean;
+    errors: string[];
+  } => {
+    const errors: string[] = [];
+    
+    if (password.length < 8) {
+      errors.push('Hasło musi mieć co najmniej 8 znaków');
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Hasło musi zawierać wielką literę');
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push('Hasło musi zawierać cyfrę');
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      errors.push('Hasło musi zawierać znak specjalny');
     }
 
-    let score = 0;
-    const feedback: string[] = [];
-
-    // Length check
-    if (password.length >= 8) score++;
-    else feedback.push('min. 8 znaków');
-
-    // Uppercase check
-    if (/[A-Z]/.test(password)) score++;
-    else feedback.push('wielka litera');
-
-    // Number check
-    if (/[0-9]/.test(password)) score++;
-    else feedback.push('cyfra');
-
-    // Special character check
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-    else feedback.push('znak specjalny');
-
-    const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'];
-    const feedbackText = feedback.length > 0 ? `Brakuje: ${feedback.join(', ')}` : 'Silne hasło!';
-
     return {
-      score,
-      feedback: feedbackText,
-      color: colors[score],
+      valid: errors.length === 0,
+      errors,
     };
   };
 
-  const passwordStrength = calculatePasswordStrength(state.password);
-
-  const validatePassword = (password: string): boolean => {
-    return (
-      password.length >= 8 &&
-      /[A-Z]/.test(password) &&
-      /[0-9]/.test(password) &&
-      /[^A-Za-z0-9]/.test(password)
-    );
-  };
-
-  const isFormValid =
-    validateEmail(state.email) &&
-    validatePassword(state.password) &&
-    state.password === state.confirmPassword;
+  const passwordValidation = validatePassword(state.password);
+  const passwordsMatch = state.password === state.confirmPassword && state.confirmPassword.length > 0;
+  const isFormValid = 
+    validateEmail(state.email) && 
+    passwordValidation.valid && 
+    passwordsMatch;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
-    if (!validateEmail(state.email)) {
-      setState(prev => ({ ...prev, error: 'Podaj prawidłowy adres email' }));
-      return;
-    }
-
-    if (!validatePassword(state.password)) {
-      setState(prev => ({
-        ...prev,
-        error: 'Hasło musi mieć co najmniej 8 znaków, zawierać wielką literę, cyfrę i znak specjalny',
-      }));
-      return;
-    }
-
-    if (state.password !== state.confirmPassword) {
-      setState(prev => ({ ...prev, error: 'Hasła nie są identyczne' }));
+    if (!isFormValid) {
+      setState(prev => ({ ...prev, error: 'Popraw błędy formularza' }));
       return;
     }
 
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
-    // TODO: Implement API call to /api/auth/register
-    // This will be implemented in the backend phase
-    console.log('Register form submitted:', {
-      email: state.email,
-      password: '***',
-    });
+    try {
+      // Call register API endpoint
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: state.email,
+          password: state.password,
+        }),
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      setState(prev => ({ ...prev, isLoading: false, success: true }));
-    }, 1000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle error response
+        setState(prev => ({ 
+          ...prev, 
+          isLoading: false, 
+          error: data.message || 'Wystąpił błąd podczas rejestracji' 
+        }));
+        return;
+      }
+
+      // Success: check if we got tokens (auto-confirm enabled)
+      if (data.accessToken) {
+        // Auto-login: store tokens and redirect
+        localStorage.setItem('sb-access-token', data.accessToken);
+        localStorage.setItem('sb-refresh-token', data.refreshToken);
+        
+        window.location.href = '/generate';
+      } else {
+        // Email verification required
+        setState(prev => ({ 
+          ...prev, 
+          isLoading: false, 
+          success: true 
+        }));
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setState(prev => ({ 
+        ...prev, 
+        isLoading: false, 
+        error: 'Nie udało się połączyć z serwerem. Spróbuj ponownie.' 
+      }));
+    }
   };
 
-  // Success state
+  // Show success message if email verification required
   if (state.success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 p-4">
         <Card className="w-full max-w-md shadow-2xl">
           <CardHeader>
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-              <svg
-                className="h-6 w-6 text-green-600"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <CardTitle className="text-2xl text-center">Rejestracja zakończona!</CardTitle>
+            <CardTitle className="text-2xl text-center">✅ Rejestracja zakończona!</CardTitle>
             <CardDescription className="text-center">
-              Twoje konto zostało pomyślnie utworzone. Możesz teraz się zalogować.
+              Sprawdź swoją skrzynkę email
             </CardDescription>
           </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground text-center">
+              Wysłaliśmy link weryfikacyjny na adres <strong>{state.email}</strong>.
+              Kliknij link w wiadomości, aby aktywować swoje konto.
+            </p>
+          </CardContent>
           <CardFooter>
-            <Button asChild className="w-full">
-              <a href="/auth/login">Przejdź do logowania</a>
+            <Button
+              className="w-full"
+              onClick={() => window.location.href = '/auth/login'}
+            >
+              Przejdź do logowania
             </Button>
           </CardFooter>
         </Card>
@@ -168,7 +163,7 @@ export default function RegisterForm() {
           <CardHeader>
             <CardTitle className="text-2xl">Zarejestruj się</CardTitle>
             <CardDescription>
-              Utwórz konto, aby zacząć tworzyć fiszki z 10x Cards
+              Utwórz konto, aby korzystać z 10x Cards
             </CardDescription>
           </CardHeader>
 
@@ -213,8 +208,7 @@ export default function RegisterForm() {
                   value={state.password}
                   onChange={(e) => setState(prev => ({ ...prev, password: e.target.value }))}
                   disabled={state.isLoading}
-                  aria-invalid={state.error ? 'true' : 'false'}
-                  aria-describedby="password-strength"
+                  aria-invalid={state.password.length > 0 && !passwordValidation.valid ? 'true' : 'false'}
                   required
                 />
                 <button
@@ -257,31 +251,25 @@ export default function RegisterForm() {
                   )}
                 </button>
               </div>
-
+              
               {/* Password strength indicator */}
-              {state.password && (
-                <div className="space-y-2" id="password-strength">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((level) => (
-                      <div
-                        key={level}
-                        className={cn(
-                          'h-1 flex-1 rounded-full transition-colors',
-                          level <= passwordStrength.score
-                            ? passwordStrength.color
-                            : 'bg-gray-200 dark:bg-gray-700'
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {passwordStrength.feedback}
-                  </p>
+              {state.password.length > 0 && (
+                <div className="space-y-1">
+                  {passwordValidation.errors.map((error, index) => (
+                    <p key={index} className="text-xs text-destructive">
+                      • {error}
+                    </p>
+                  ))}
+                  {passwordValidation.valid && (
+                    <p className="text-xs text-green-600">
+                      ✓ Hasło spełnia wymagania
+                    </p>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* Confirm password input */}
+            {/* Confirm Password input */}
             <div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
@@ -297,11 +285,7 @@ export default function RegisterForm() {
                   value={state.confirmPassword}
                   onChange={(e) => setState(prev => ({ ...prev, confirmPassword: e.target.value }))}
                   disabled={state.isLoading}
-                  aria-invalid={
-                    state.confirmPassword && state.password !== state.confirmPassword
-                      ? 'true'
-                      : 'false'
-                  }
+                  aria-invalid={state.confirmPassword.length > 0 && !passwordsMatch ? 'true' : 'false'}
                   required
                 />
                 <button
@@ -344,8 +328,14 @@ export default function RegisterForm() {
                   )}
                 </button>
               </div>
-              {state.confirmPassword && state.password !== state.confirmPassword && (
-                <p className="text-xs text-destructive">Hasła nie są identyczne</p>
+              
+              {state.confirmPassword.length > 0 && (
+                <p className={cn(
+                  "text-xs",
+                  passwordsMatch ? "text-green-600" : "text-destructive"
+                )}>
+                  {passwordsMatch ? '✓ Hasła są identyczne' : '✗ Hasła nie są identyczne'}
+                </p>
               )}
             </div>
           </CardContent>
@@ -379,7 +369,7 @@ export default function RegisterForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Tworzenie konta...
+                  Rejestracja...
                 </>
               ) : (
                 'Zarejestruj się'
@@ -401,4 +391,3 @@ export default function RegisterForm() {
     </div>
   );
 }
-

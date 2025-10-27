@@ -48,8 +48,8 @@ export function useSaveFlashcards(): UseSaveFlashcardsResult {
     setSavedCount(null);
 
     try {
-      // Get auth token from localStorage
-      const token = localStorage.getItem('auth_token');
+      // Get auth token from localStorage or sessionStorage
+      const token = localStorage.getItem('sb-access-token') || sessionStorage.getItem('sb-access-token');
       
       if (!token) {
         throw new Error('Not authenticated. Please log in first.');

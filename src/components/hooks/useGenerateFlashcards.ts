@@ -34,8 +34,8 @@ export function useGenerateFlashcards(): UseGenerateFlashcardsResult {
     setGenerationId(null);
 
     try {
-      // Get auth token from localStorage (temporary - should use proper auth context)
-      const token = localStorage.getItem('auth_token');
+      // Get auth token from localStorage or sessionStorage
+      const token = localStorage.getItem('sb-access-token') || sessionStorage.getItem('sb-access-token');
       
       if (!token) {
         throw new Error('Not authenticated. Please log in first.');

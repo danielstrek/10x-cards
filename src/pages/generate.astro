@@ -1,9 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import FlashcardGenerationView from "../components/FlashcardGenerationView";
+import UserNav from "../components/auth/UserNav";
+
+// Protected route - require authentication
+if (!Astro.locals.user) {
+  // Redirect to login with redirect parameter
+  const redirectUrl = encodeURIComponent(Astro.url.pathname);
+  return Astro.redirect(`/auth/login?redirect=${redirectUrl}`);
+}
+
+const user = Astro.locals.user;
 ---
 
-<Layout title="Generate Flashcards - 10x Cards">
+<Layout title="Generuj Fiszki - 10x Cards">
+  <UserNav client:load user={user} />
   <FlashcardGenerationView client:load />
 </Layout>
 
