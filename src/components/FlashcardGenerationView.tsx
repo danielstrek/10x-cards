@@ -13,7 +13,7 @@ import type { FlashcardProposalViewModel } from './types';
 
 const MIN_TEXT_LENGTH = 1000;
 const MAX_TEXT_LENGTH = 10000;
-const DEFAULT_MODEL = 'gpt-4';
+const DEFAULT_MODEL = 'openai/gpt-4o-mini';
 
 export default function FlashcardGenerationView() {
   // State management
