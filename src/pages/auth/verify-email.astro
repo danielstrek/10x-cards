@@ -1,0 +1,59 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+
+// Get token from URL query params
+const token = Astro.url.searchParams.get('token') || '';
+
+// This page is optional in MVP - verification logic will be implemented in backend phase
+---
+
+<Layout title="Weryfikacja emaila - 10x Cards">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 p-4">
+    <Card className="w-full max-w-md shadow-2xl">
+      <CardHeader>
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <svg
+            class="h-6 w-6 text-blue-600 animate-spin"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+        </div>
+        <CardTitle className="text-2xl text-center">Weryfikacja emaila</CardTitle>
+        <CardDescription className="text-center">
+          Trwa weryfikacja Twojego adresu email...
+        </CardDescription>
+      </CardHeader>
+      <CardFooter>
+        <Button asChild className="w-full" variant="outline">
+          <a href="/auth/login">Przejdź do logowania</a>
+        </Button>
+      </CardFooter>
+    </Card>
+  </div>
+
+  <script define:vars={{ token }}>
+    // Auto-redirect after 3 seconds (placeholder logic)
+    setTimeout(() => {
+      window.location.href = '/auth/login?verified=true';
+    }, 3000);
+  </script>
+</Layout>
+

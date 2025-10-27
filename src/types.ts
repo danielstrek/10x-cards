@@ -29,7 +29,12 @@ import type {
   /** Response body after logging in */
   export interface LoginUserResponseDto {
     accessToken: string;
+    refreshToken: string;
     expiresIn: number;
+    user: {
+      id: string;
+      email: string;
+    };
   }
   
   // --- GENERATIONS DTOs ---
