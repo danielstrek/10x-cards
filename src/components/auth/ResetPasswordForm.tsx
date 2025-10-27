@@ -6,28 +6,18 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ErrorNotification } from '@/components/ErrorNotification';
 import { cn } from '@/lib/utils';
 
-interface ResetPasswordFormProps {
-  token: string;
-}
-
 interface ResetPasswordFormState {
-  newPassword: string;
-  confirmNewPassword: string;
+  password: string;
+  confirmPassword: string;
   isLoading: boolean;
   error: string | null;
   success: boolean;
 }
 
-interface PasswordStrength {
-  score: number;
-  feedback: string;
-  color: string;
-}
-
-export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+export default function ResetPasswordForm() {
   const [state, setState] = React.useState<ResetPasswordFormState>({
-    newPassword: '',
-    confirmNewPassword: '',
+    password: '',
+    confirmPassword: '',
     isLoading: false,
     error: null,
     success: false,
@@ -36,109 +26,124 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-  const calculatePasswordStrength = (password: string): PasswordStrength => {
-    if (password.length === 0) {
-      return { score: 0, feedback: '', color: 'bg-gray-200' };
+  // Client-side validation
+  const validatePassword = (password: string): {
+    valid: boolean;
+    errors: string[];
+  } => {
+    const errors: string[] = [];
+    
+    if (password.length < 8) {
+      errors.push('Hasło musi mieć co najmniej 8 znaków');
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Hasło musi zawierać wielką literę');
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push('Hasło musi zawierać cyfrę');
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      errors.push('Hasło musi zawierać znak specjalny');
     }
 
-    let score = 0;
-    const feedback: string[] = [];
-
-    if (password.length >= 8) score++;
-    else feedback.push('min. 8 znaków');
-
-    if (/[A-Z]/.test(password)) score++;
-    else feedback.push('wielka litera');
-
-    if (/[0-9]/.test(password)) score++;
-    else feedback.push('cyfra');
-
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-    else feedback.push('znak specjalny');
-
-    const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'];
-    const feedbackText = feedback.length > 0 ? `Brakuje: ${feedback.join(', ')}` : 'Silne hasło!';
-
     return {
-      score,
-      feedback: feedbackText,
-      color: colors[score],
+      valid: errors.length === 0,
+      errors,
     };
   };
 
-  const passwordStrength = calculatePasswordStrength(state.newPassword);
-
-  const validatePassword = (password: string): boolean => {
-    return (
-      password.length >= 8 &&
-      /[A-Z]/.test(password) &&
-      /[0-9]/.test(password) &&
-      /[^A-Za-z0-9]/.test(password)
-    );
-  };
-
-  const isFormValid =
-    validatePassword(state.newPassword) && state.newPassword === state.confirmNewPassword;
+  const passwordValidation = validatePassword(state.password);
+  const passwordsMatch = state.password === state.confirmPassword && state.confirmPassword.length > 0;
+  const isFormValid = passwordValidation.valid && passwordsMatch;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validatePassword(state.newPassword)) {
-      setState(prev => ({
-        ...prev,
-        error: 'Hasło musi mieć co najmniej 8 znaków, zawierać wielką literę, cyfrę i znak specjalny',
-      }));
-      return;
-    }
-
-    if (state.newPassword !== state.confirmNewPassword) {
-      setState(prev => ({ ...prev, error: 'Hasła nie są identyczne' }));
+    if (!isFormValid) {
+      setState(prev => ({ ...prev, error: 'Popraw błędy formularza' }));
       return;
     }
 
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
-    // TODO: Implement API call to /api/auth/reset-password
-    // This will be implemented in the backend phase
-    console.log('Reset password form submitted:', {
-      token,
-      newPassword: '***',
-    });
+    try {
+      // Call reset-password API endpoint
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          password: state.password,
+        }),
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      setState(prev => ({ ...prev, isLoading: false, success: true }));
-    }, 1000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle error response
+        let errorMessage = data.message || 'Wystąpił błąd podczas resetowania hasła';
+        
+        if (response.status === 401) {
+          errorMessage = 'Link resetujący wygasł lub jest nieprawidłowy. Spróbuj ponownie.';
+        }
+        
+        setState(prev => ({ 
+          ...prev, 
+          isLoading: false, 
+          error: errorMessage
+        }));
+        return;
+      }
+
+      // Success: show success message
+      setState(prev => ({ 
+        ...prev, 
+        isLoading: false, 
+        success: true 
+      }));
+
+      // Redirect to login after 3 seconds
+      setTimeout(() => {
+        window.location.href = '/auth/login';
+      }, 3000);
+    } catch (error) {
+      console.error('Reset password error:', error);
+      setState(prev => ({ 
+        ...prev, 
+        isLoading: false, 
+        error: 'Nie udało się połączyć z serwerem. Spróbuj ponownie.' 
+      }));
+    }
   };
 
-  // Success state
+  // Show success message
   if (state.success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 p-4">
         <Card className="w-full max-w-md shadow-2xl">
           <CardHeader>
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-              <svg
-                className="h-6 w-6 text-green-600"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <CardTitle className="text-2xl text-center">Hasło zostało zmienione</CardTitle>
+            <CardTitle className="text-2xl text-center">✅ Hasło zmienione!</CardTitle>
             <CardDescription className="text-center">
-              Twoje hasło zostało pomyślnie zmienione. Możesz teraz zalogować się używając nowego
-              hasła.
+              Twoje hasło zostało pomyślnie zmienione
             </CardDescription>
           </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p className="text-sm text-green-800 text-center">
+                Możesz teraz zalogować się używając nowego hasła
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              Przekierowanie za 3 sekundy...
+            </p>
+          </CardContent>
           <CardFooter>
-            <Button asChild className="w-full">
-              <a href="/auth/login">Przejdź do logowania</a>
+            <Button
+              className="w-full"
+              onClick={() => window.location.href = '/auth/login'}
+            >
+              Przejdź do logowania
             </Button>
           </CardFooter>
         </Card>
@@ -153,33 +158,32 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           <CardHeader>
             <CardTitle className="text-2xl">Ustaw nowe hasło</CardTitle>
             <CardDescription>
-              Wprowadź nowe hasło dla swojego konta
+              Wprowadź nowe, bezpieczne hasło dla swojego konta
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
             {state.error && (
-              <ErrorNotification message={state.error} title="Błąd" />
+              <ErrorNotification message={state.error} title="Błąd resetowania hasła" />
             )}
 
-            {/* New password input */}
+            {/* Password input */}
             <div className="space-y-2">
               <label
-                htmlFor="newPassword"
+                htmlFor="password"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Nowe hasło
               </label>
               <div className="relative">
                 <Input
-                  id="newPassword"
+                  id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
-                  value={state.newPassword}
-                  onChange={(e) => setState(prev => ({ ...prev, newPassword: e.target.value }))}
+                  value={state.password}
+                  onChange={(e) => setState(prev => ({ ...prev, password: e.target.value }))}
                   disabled={state.isLoading}
-                  aria-invalid={state.error ? 'true' : 'false'}
-                  aria-describedby="password-strength"
+                  aria-invalid={state.password.length > 0 && !passwordValidation.valid ? 'true' : 'false'}
                   required
                   autoFocus
                 />
@@ -223,53 +227,41 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   )}
                 </button>
               </div>
-
+              
               {/* Password strength indicator */}
-              {state.newPassword && (
-                <div className="space-y-2" id="password-strength">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((level) => (
-                      <div
-                        key={level}
-                        className={cn(
-                          'h-1 flex-1 rounded-full transition-colors',
-                          level <= passwordStrength.score
-                            ? passwordStrength.color
-                            : 'bg-gray-200 dark:bg-gray-700'
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {passwordStrength.feedback}
-                  </p>
+              {state.password.length > 0 && (
+                <div className="space-y-1">
+                  {passwordValidation.errors.map((error, index) => (
+                    <p key={index} className="text-xs text-destructive">
+                      • {error}
+                    </p>
+                  ))}
+                  {passwordValidation.valid && (
+                    <p className="text-xs text-green-600">
+                      ✓ Hasło spełnia wymagania
+                    </p>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* Confirm new password input */}
+            {/* Confirm Password input */}
             <div className="space-y-2">
               <label
-                htmlFor="confirmNewPassword"
+                htmlFor="confirmPassword"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Potwierdź nowe hasło
               </label>
               <div className="relative">
                 <Input
-                  id="confirmNewPassword"
+                  id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="••••••••"
-                  value={state.confirmNewPassword}
-                  onChange={(e) =>
-                    setState(prev => ({ ...prev, confirmNewPassword: e.target.value }))
-                  }
+                  value={state.confirmPassword}
+                  onChange={(e) => setState(prev => ({ ...prev, confirmPassword: e.target.value }))}
                   disabled={state.isLoading}
-                  aria-invalid={
-                    state.confirmNewPassword && state.newPassword !== state.confirmNewPassword
-                      ? 'true'
-                      : 'false'
-                  }
+                  aria-invalid={state.confirmPassword.length > 0 && !passwordsMatch ? 'true' : 'false'}
                   required
                 />
                 <button
@@ -312,8 +304,14 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   )}
                 </button>
               </div>
-              {state.confirmNewPassword && state.newPassword !== state.confirmNewPassword && (
-                <p className="text-xs text-destructive">Hasła nie są identyczne</p>
+              
+              {state.confirmPassword.length > 0 && (
+                <p className={cn(
+                  "text-xs",
+                  passwordsMatch ? "text-green-600" : "text-destructive"
+                )}>
+                  {passwordsMatch ? '✓ Hasła są identyczne' : '✗ Hasła nie są identyczne'}
+                </p>
               )}
             </div>
           </CardContent>
@@ -347,20 +345,25 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Zmienianie hasła...
+                  Resetowanie...
                 </>
               ) : (
-                'Zmień hasło'
+                'Ustaw nowe hasło'
               )}
             </Button>
 
-            <Button asChild variant="ghost" className="w-full">
-              <a href="/auth/login">Anuluj</a>
-            </Button>
+            <div className="text-sm text-center text-muted-foreground">
+              Pamiętasz hasło?{' '}
+              <a
+                href="/auth/login"
+                className="text-primary font-medium hover:underline underline-offset-4"
+              >
+                Zaloguj się
+              </a>
+            </div>
           </CardFooter>
         </form>
       </Card>
     </div>
   );
 }
-

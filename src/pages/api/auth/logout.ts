@@ -24,13 +24,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     cookies.delete('sb-access-token', { path: '/' });
     cookies.delete('sb-refresh-token', { path: '/' });
     
-    // Delete any other Supabase auth cookies that might exist
-    // (Supabase SSR might create additional cookies)
-    const allCookies = cookies.getAll();
-    allCookies.forEach(cookie => {
-      if (cookie.name.startsWith('sb-')) {
-        cookies.delete(cookie.name, { path: '/' });
-      }
+    // Delete any other known Supabase auth cookies
+    // Note: Astro cookies API doesn't have getAll(), so we delete known cookie names
+    const supabaseCookieNames = [
+      'sb-access-token',
+      'sb-refresh-token',
+      'sb-auth-token',
+      'sb-provider-token',
+    ];
+    
+    supabaseCookieNames.forEach(cookieName => {
+      cookies.delete(cookieName, { path: '/' });
     });
 
     return new Response(null, { status: 204 });

@@ -20,6 +20,7 @@ export default function ForgotPasswordForm() {
     emailSent: false,
   });
 
+  // Client-side validation
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -37,59 +38,87 @@ export default function ForgotPasswordForm() {
 
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
-    // TODO: Implement API call to /api/auth/forgot-password
-    // This will be implemented in the backend phase
-    console.log('Forgot password form submitted:', {
-      email: state.email,
-    });
+    try {
+      // Call forgot-password API endpoint
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: state.email,
+        }),
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      setState(prev => ({ ...prev, isLoading: false, emailSent: true }));
-    }, 1000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle error response
+        setState(prev => ({ 
+          ...prev, 
+          isLoading: false, 
+          error: data.message || 'Wystąpił błąd podczas wysyłania emaila' 
+        }));
+        return;
+      }
+
+      // Success: show confirmation message
+      setState(prev => ({ 
+        ...prev, 
+        isLoading: false, 
+        emailSent: true 
+      }));
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      setState(prev => ({ 
+        ...prev, 
+        isLoading: false, 
+        error: 'Nie udało się połączyć z serwerem. Spróbuj ponownie.' 
+      }));
+    }
   };
 
-  // Success state
+  // Show success message after email sent
   if (state.emailSent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 p-4">
         <Card className="w-full max-w-md shadow-2xl">
           <CardHeader>
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <svg
-                className="h-6 w-6 text-blue-600"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <CardTitle className="text-2xl text-center">Sprawdź swoją skrzynkę</CardTitle>
+            <CardTitle className="text-2xl text-center">📧 Email wysłany!</CardTitle>
             <CardDescription className="text-center">
-              Jeśli podany adres email istnieje w naszym systemie, wysłaliśmy na niego link do
-              resetowania hasła. Sprawdź swoją skrzynkę odbiorczą oraz folder ze spamem.
+              Sprawdź swoją skrzynkę pocztową
             </CardDescription>
           </CardHeader>
-          <CardFooter className="flex flex-col gap-3">
-            <Button asChild variant="outline" className="w-full">
-              <a href="/auth/login">Powrót do logowania</a>
+          <CardContent className="space-y-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p className="text-sm text-green-800">
+                Jeśli konto z adresem <strong>{state.email}</strong> istnieje,
+                wysłaliśmy link do resetowania hasła.
+              </p>
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Link jest ważny przez 60 minut. Sprawdź również folder spam.
+            </p>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-2">
+            <Button
+              className="w-full"
+              onClick={() => window.location.href = '/auth/login'}
+            >
+              Powrót do logowania
             </Button>
-            <button
-              onClick={() =>
-                setState({ email: '', isLoading: false, error: null, emailSent: false })
-              }
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setState({
+                email: '',
+                isLoading: false,
+                error: null,
+                emailSent: false,
+              })}
             >
               Wyślij ponownie
-            </button>
+            </Button>
           </CardFooter>
         </Card>
       </div>
@@ -103,7 +132,7 @@ export default function ForgotPasswordForm() {
           <CardHeader>
             <CardTitle className="text-2xl">Resetuj hasło</CardTitle>
             <CardDescription>
-              Wprowadź swój adres email, a my wyślemy Ci link do resetowania hasła
+              Podaj swój adres email, a wyślemy Ci link do resetowania hasła
             </CardDescription>
           </CardHeader>
 
@@ -118,7 +147,7 @@ export default function ForgotPasswordForm() {
                 htmlFor="email"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Email
+                Adres email
               </label>
               <Input
                 id="email"
@@ -131,6 +160,9 @@ export default function ForgotPasswordForm() {
                 required
                 autoFocus
               />
+              <p className="text-xs text-muted-foreground">
+                Wprowadź email użyty przy rejestracji
+              </p>
             </div>
           </CardContent>
 
@@ -170,13 +202,18 @@ export default function ForgotPasswordForm() {
               )}
             </Button>
 
-            <Button asChild variant="ghost" className="w-full">
-              <a href="/auth/login">Powrót do logowania</a>
-            </Button>
+            <div className="text-sm text-center text-muted-foreground">
+              Pamiętasz hasło?{' '}
+              <a
+                href="/auth/login"
+                className="text-primary font-medium hover:underline underline-offset-4"
+              >
+                Zaloguj się
+              </a>
+            </div>
           </CardFooter>
         </form>
       </Card>
     </div>
   );
 }
-
