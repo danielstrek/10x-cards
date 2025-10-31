@@ -98,28 +98,130 @@ Visit `http://localhost:3000`
 
 ## Testing
 
-### API Testing
-The project includes comprehensive testing scripts for the `/api/flashcards` endpoint.
+This project implements a comprehensive testing strategy covering unit, integration, E2E, security, performance, and accessibility tests.
 
+### Testing Framework & Tools
+
+**Unit & Integration Testing:**
+- **Vitest** - Fast, Vite-powered test framework
+- **React Testing Library** - User-centric component testing
+- **Testcontainers** - Supabase local for integration tests
+
+**E2E Testing:**
+- **Playwright** - Cross-browser testing (Chromium, Firefox, WebKit)
+- Auto-wait, retry logic, screenshot/video recording
+- Parallel test execution
+
+**API Testing:**
+- **PowerShell scripts** (`.ai/tests/`) - Quick manual tests
+- **Thunder Client / Postman** - Exploratory testing with collections
+
+**Performance Testing:**
+- **Lighthouse** - Web performance & accessibility scores
+- **Artillery** - Load and stress testing
+- **PostgreSQL EXPLAIN ANALYZE** - Query optimization
+
+**Security Testing:**
+- **OWASP ZAP** - Vulnerability scanning
+- **SQLMap** - SQL injection testing (staging only)
+- **axe DevTools** - WCAG 2.1 AA accessibility audit
+
+**Monitoring & Logging:**
+- **Sentry** - Error tracking (production)
+- **LogTail** - Structured logging
+- **Supabase Dashboard** - Database monitoring
+
+### Test Environments
+
+**Local (Development):**
+- Node.js 22.14.0 + Docker Desktop
+- Supabase local via CLI (`npx supabase start`)
+- PostgreSQL 15 in container
+- Purpose: Unit tests, integration tests, debugging
+
+**Staging (Testing):**
+- Supabase Cloud (staging project)
+- DigitalOcean Droplet
+- GitHub Actions CI/CD
+- Purpose: E2E tests, UAT, pre-release validation
+
+**Production:**
+- Supabase Cloud (production project)
+- DigitalOcean Droplet with monitoring
+- Sentry + LogTail for observability
+- Purpose: Smoke tests, production monitoring
+
+### Test Coverage Goals
+
+- **Unit tests:** >80% coverage for `/src/lib`, `/src/components/hooks`
+- **Integration tests:** >70% coverage for `/src/pages/api`
+- **E2E tests:** All user stories (US-001 to US-009)
+- **Performance:** Lighthouse score >90, API <200ms (p95)
+- **Accessibility:** WCAG 2.1 Level AA compliance
+
+### Running Tests
+
+#### Unit & Integration Tests
+```bash
+# Run all tests
+npm run test
+
+# Run with coverage
+npm run test:coverage
+
+# Watch mode
+npm run test:watch
+```
+
+#### E2E Tests
+```bash
+# Run Playwright tests
+npx playwright test
+
+# Run specific browser
+npx playwright test --project=chromium
+
+# Debug mode
+npx playwright test --debug
+```
+
+#### API Testing (Manual)
 ```bash
 cd .ai/tests
 
 # Get access token
 .\get-token.ps1
 
-# Run API tests
+# Run quick API tests
 .\test-quick.ps1
+
+# Run comprehensive tests
+.\test-flashcards-api.ps1
 ```
 
 See `.ai/tests/README.md` for full testing documentation.
 
 ### Test Scenarios
-- Success cases: Create flashcards, handle different sources
-- Error cases: Validation errors, auth errors, not found errors
-- Edge cases: Max length strings, max flashcards count
+
+**Critical Test Areas:**
+- **Authentication:** Register, login, logout, password reset, session management
+- **AI Generation:** Flashcard generation via OpenRouter API, validation, error handling
+- **Flashcard CRUD:** Create, read, update, delete with proper authorization
+- **Row Level Security (RLS):** Data isolation between users, GDPR compliance
+- **Performance:** Response times, concurrent users, bulk operations
+- **Accessibility:** Keyboard navigation, screen readers, ARIA labels
+
+**Test Types:**
+- Success cases: Happy path scenarios, valid inputs
+- Error cases: Validation errors, auth failures, API errors
+- Edge cases: Max lengths, limits, concurrent operations
+- Security: XSS, SQL injection, JWT validation, RLS bypass attempts
 
 ### Troubleshooting
+
 If you get "Generation not found" errors:
 1. Run `.ai/tests/fix-rls.ps1` to disable RLS
 2. Create test data (see `.ai/tests/SETUP-TEST-DATA.md`)
-3. See `.ai/tests/ROZWIAZANIE.md` for detailed explanation (Polish) 
+3. See `.ai/tests/ROZWIAZANIE.md` for detailed explanation (Polish)
+
+For detailed test plan, see `.cursor/rules/test-plan-generated.mdc` 

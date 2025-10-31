@@ -1,0 +1,879 @@
+# Plan Testów dla 10x-cards
+
+## 1. Wprowadzenie i Cele Testowania
+
+### 1.1 Cel dokumentu
+Plan testów definiuje strategię i zakres testowania aplikacji 10x-cards - systemu do automatycznego generowania i zarządzania fiszkami edukacyjnymi z wykorzystaniem AI.
+
+### 1.2 Cele testowania
+- Weryfikacja poprawności działania kluczowych funkcjonalności (generowanie fiszek AI, autentykacja, CRUD)
+- Zapewnienie bezpieczeństwa danych użytkowników zgodnie z RODO
+- Walidacja integracji z usługami zewnętrznymi (Supabase Auth, OpenRouter AI)
+- Potwierdzenie wydajności i stabilności aplikacji
+- Weryfikacja responsywności i dostępności interfejsu
+
+---
+
+## 2. Zakres Testów
+
+### 2.1 W zakresie testów
+
+**Frontend:**
+- Komponenty React (formularze auth, generowanie fiszek, lista fiszek)
+- Strony Astro (SSR routing, middleware)
+- Walidacja formularzy
+- Responsywność UI (desktop, tablet, mobile)
+- Dostępność (WCAG 2.1 AA)
+
+**Backend:**
+- API endpoints (auth, generations, flashcards)
+- Serwisy domenowe (flashcards.service, generations.service, openrouter.service)
+- Walidacja danych (Zod schemas)
+- Middleware autentykacji
+- Obsługa błędów
+
+**Baza danych:**
+- Migracje PostgreSQL
+- RLS policies (izolacja danych użytkowników)
+- Triggery i constraints
+- Integralność referencyjna
+
+**Integracje:**
+- Supabase Auth (rejestracja, logowanie, sesje)
+- OpenRouter API (generowanie fiszek)
+- Cookies i localStorage (hybrid auth storage)
+
+### 2.2 Poza zakresem testów
+- Algorytm powtórek (zewnętrzna biblioteka open-source)
+- Mobilne aplikacje natywne (MVP to web app)
+- Import dokumentów (PDF, DOCX)
+- Współdzielenie fiszek między użytkownikami
+- Zaawansowana gamifikacja
+
+---
+
+## 3. Typy Testów
+
+### 3.1 Testy Jednostkowe (Unit Tests)
+**Cel:** Weryfikacja izolowanych jednostek kodu
+
+**Zakres:**
+- Serwisy: `flashcards.service.ts`, `generations.service.ts`, `openrouter.service.ts`
+- Utility functions: walidacja, hashowanie, parsowanie
+- Custom hooks: `useGenerateFlashcards`, `useSaveFlashcards`
+- Komponenty UI: `Button`, `Input`, `Card`, `Dialog`
+
+**Narzędzia:** Vitest, React Testing Library
+
+**Priorytetowe przypadki:**
+- `OpenRouterService`: walidacja messages, response format, retry logic, error handling
+- `createGeneration()`: hashowanie tekstu, walidacja długości, obsługa błędów LLM
+- `bulkCreateFlashcards()`: walidacja source, limity 1-100 fiszek
+- Custom hooks: obsługa stanów loading/error/success
+
+### 3.2 Testy Integracyjne (Integration Tests)
+**Cel:** Weryfikacja współpracy między komponentami
+
+**Zakres:**
+- API endpoints z serwisami i bazą danych
+- Frontend z backend API
+- Middleware + endpoints + Supabase
+- OpenRouter service + generations service
+
+**Narzędzia:** Vitest, Supertest/fetch, Testcontainers (Supabase local)
+
+**Priorytetowe przypadki:**
+- Flow: POST /api/generations → OpenRouter → createGeneration() → DB insert
+- Flow: POST /api/flashcards → bulkCreateFlashcards() → DB insert + generation update
+- Middleware: weryfikacja tokenu → locals.user → endpoint protection
+- Auth flow: register → verify email → login → protected endpoint
+
+### 3.3 Testy End-to-End (E2E)
+**Cel:** Weryfikacja pełnych przepływów użytkownika
+
+**Zakres:**
+- User stories z PRD (US-001 do US-009)
+- Krytyczne ścieżki biznesowe
+- Cross-browser compatibility
+
+**Narzędzia:** Playwright
+
+**Scenariusze:**
+1. **Rejestracja i pierwsze logowanie**
+   - Wypełnienie formularza rejestracji
+   - Potwierdzenie email (jeśli włączone)
+   - Logowanie i redirect do /generate
+   
+2. **Generowanie fiszek AI**
+   - Wklejenie tekstu (1000-10000 znaków)
+   - Kliknięcie "Generuj"
+   - Wyświetlenie propozycji (5-20 fiszek)
+   - Edycja wybranych fiszek
+   - Zapis zaakceptowanych
+
+3. **Zarządzanie fiszkami**
+   - Przeglądanie listy "Moje fiszki"
+   - Edycja fiszki
+   - Usuwanie fiszki
+   - Ręczne tworzenie fiszki
+
+4. **Wylogowanie i ponowne logowanie**
+   - Wylogowanie (clear cookies + localStorage)
+   - Redirect do /login
+   - Ponowne logowanie
+   - Weryfikacja persistencji danych
+
+### 3.4 Testy API (Manual + Automated)
+**Cel:** Weryfikacja kontraktów API zgodnie z DTOs
+
+**Zakres:**
+- Wszystkie endpointy w `/api/*`
+- Request/response validation
+- Kody HTTP
+- Error responses
+
+**Narzędzia:** PowerShell scripts (existing), Postman/Thunder Client, Vitest
+
+**Endpointy do przetestowania:**
+
+#### Auth endpoints:
+- `POST /api/auth/register`
+  - ✅ 201: Poprawna rejestracja
+  - ⚠️ 400: Słabe hasło, nieprawidłowy email
+  - ⚠️ 409: Email już istnieje
+  
+- `POST /api/auth/login`
+  - ✅ 200: Poprawne logowanie + tokeny
+  - ⚠️ 401: Nieprawidłowe dane
+  
+- `POST /api/auth/logout`
+  - ✅ 204: Wylogowanie + clear cookies
+
+#### Generations endpoint:
+- `POST /api/generations`
+  - ✅ 201: Wygenerowane fiszki (5-20)
+  - ⚠️ 400: Tekst poza zakresem 1000-10000 znaków
+  - ⚠️ 401: Brak tokenu
+  - ⚠️ 429: Rate limit OpenRouter
+  - ⚠️ 500: Błąd LLM
+
+#### Flashcards endpoint:
+- `POST /api/flashcards`
+  - ✅ 201: Utworzono fiszki (1-100)
+  - ⚠️ 400: Front > 200 chars, Back > 500 chars
+  - ⚠️ 401: Brak autoryzacji
+  - ⚠️ 404: Nieistniejący generation_id
+
+### 3.5 Testy Bezpieczeństwa (Security Tests)
+**Cel:** Weryfikacja ochrony przed atakami i wyciekom danych
+
+**Zakres:**
+- Autentykacja i autoryzacja
+- RLS policies w PostgreSQL
+- Input validation (XSS, SQL injection)
+- CORS configuration
+- Cookie security (httpOnly, sameSite)
+
+**Scenariusze:**
+1. **Row Level Security (RLS)**
+   - User A nie może odczytać fiszek User B
+   - User A nie może modyfikować generations User B
+   - Próba obejścia RLS przez manipulację user_id w request
+
+2. **JWT Token Security**
+   - Próba dostępu z wygasłym tokenem
+   - Próba modyfikacji tokenu (signature validation)
+   - Próba użycia tokenu innego użytkownika
+
+3. **Input Validation**
+   - XSS: `<script>alert('xss')</script>` w polach fiszek
+   - SQL Injection: `'; DROP TABLE flashcards; --`
+   - Oversized payloads (DoS): 10MB JSON body
+
+4. **RODO Compliance**
+   - Usunięcie konta usuwa wszystkie dane (cascade delete)
+   - Brak logowania wrażliwych danych (hasła, tokeny)
+
+### 3.6 Testy Wydajnościowe (Performance Tests)
+**Cel:** Weryfikacja czasów odpowiedzi i skalowalności
+
+**Zakres:**
+- Czasy odpowiedzi API
+- Czas generowania fiszek przez LLM
+- Rendering UI (Lighthouse, Core Web Vitals)
+- Database query performance
+
+**Narzędzia:** Artillery, Lighthouse, PostgreSQL EXPLAIN
+
+**Benchmarki:**
+- API endpoints: < 200ms (bez OpenRouter)
+- POST /api/generations: < 10s (z OpenRouter)
+- Lighthouse Score: > 90 (Performance, Accessibility)
+- First Contentful Paint: < 1.5s
+- Time to Interactive: < 3.5s
+
+**Scenariusze obciążenia:**
+- 10 równoczesnych użytkowników generujących fiszki
+- 100 równoczesnych requestów do /api/flashcards
+- Bulk insert 100 fiszek jednocześnie
+
+### 3.7 Testy Dostępności (Accessibility Tests)
+**Cel:** WCAG 2.1 Level AA compliance
+
+**Zakres:**
+- Nawigacja klawiaturą (Tab, Enter, Escape)
+- Screen reader compatibility
+- Kontrast kolorów (min 4.5:1)
+- Opisy alternatywne (ARIA labels)
+- Focus management
+
+**Narzędzia:** axe DevTools, Lighthouse, NVDA/JAWS
+
+**Kluczowe obszary:**
+- Formularze (login, register, generate)
+- Przyciski i linki
+- Komunikaty błędów (aria-live)
+- Modalne dialogi (trap focus)
+
+### 3.8 Testy Kompatybilności (Compatibility Tests)
+**Cel:** Weryfikacja działania w różnych środowiskach
+
+**Przeglądarki:**
+- Chrome 110+
+- Firefox 110+
+- Safari 16+
+- Edge 110+
+
+**Urządzenia:**
+- Desktop: 1920x1080, 1366x768
+- Tablet: iPad (1024x768)
+- Mobile: iPhone 14 (390x844), Android (360x800)
+
+---
+
+## 4. Scenariusze Testowe dla Kluczowych Funkcjonalności
+
+### 4.1 Generowanie Fiszek AI (US-003)
+
+**TC-GEN-001: Pomyślne generowanie fiszek**
+- **Warunki początkowe:** Użytkownik zalogowany, na stronie /generate
+- **Kroki:**
+  1. Wklej tekst 5000 znaków do textarea
+  2. Kliknij "Generuj fiszki"
+  3. Obserwuj skeleton loader
+- **Oczekiwany rezultat:**
+  - HTTP 201 Created
+  - Lista 5-20 fiszek
+  - Każda fiszka: front (max 200 chars), back (max 500 chars)
+  - Buttons: "Zapisz wszystkie", "Zapisz zaznaczone"
+- **Priorytet:** Krytyczny
+
+**TC-GEN-002: Walidacja długości tekstu**
+- **Kroki:**
+  1. Wklej tekst 500 znaków (za krótki)
+  2. Kliknij "Generuj"
+- **Oczekiwany rezultat:**
+  - Komunikat błędu: "Tekst musi mieć 1000-10000 znaków"
+  - HTTP 400 Bad Request
+- **Priorytet:** Wysoki
+
+**TC-GEN-003: Obsługa błędu OpenRouter**
+- **Warunki:** Nieprawidłowy OPENROUTER_API_KEY
+- **Kroki:**
+  1. Wklej poprawny tekst
+  2. Kliknij "Generuj"
+- **Oczekiwany rezultat:**
+  - HTTP 500 lub 401
+  - Komunikat: "Błąd serwisu AI"
+  - Błąd zalogowany w generation_error_logs
+- **Priorytet:** Wysoki
+
+**TC-GEN-004: Rate limit OpenRouter**
+- **Warunki:** Przekroczony limit OpenRouter
+- **Kroki:**
+  1. Wywołaj POST /api/generations 10x w 1s
+- **Oczekiwany rezultat:**
+  - HTTP 429 Too Many Requests
+  - Retry-After header
+  - Komunikat: "Zbyt wiele zapytań. Spróbuj za X sekund."
+- **Priorytet:** Średni
+
+### 4.2 Zapisywanie Fiszek (US-004)
+
+**TC-SAVE-001: Zapis zaakceptowanych fiszek**
+- **Warunki:** Użytkownik ma 10 wygenerowanych propozycji
+- **Kroki:**
+  1. Zaznacz checkboxy 5 fiszek (3x ai-full, 2x ai-edited)
+  2. Kliknij "Zapisz zaznaczone"
+- **Oczekiwany rezultat:**
+  - HTTP 201 Created
+  - 5 fiszek w DB (user_id = current_user)
+  - Generation updated: accepted_unedited_count=3, accepted_edited_count=2
+  - Success dialog: "Zapisano 5 fiszek"
+- **Priorytet:** Krytyczny
+
+**TC-SAVE-002: Zapis wszystkich fiszek**
+- **Kroki:**
+  1. Kliknij "Zapisz wszystkie"
+- **Oczekiwany rezultat:**
+  - Wszystkie fiszki zapisane z source="ai-full"
+  - Generation updated: accepted_unedited_count = generated_count
+- **Priorytet:** Krytyczny
+
+**TC-SAVE-003: Walidacja długości fiszki**
+- **Kroki:**
+  1. Edytuj front fiszki na 250 znaków
+  2. Kliknij "Zapisz zaznaczone"
+- **Oczekiwany rezultat:**
+  - HTTP 400 Bad Request
+  - Komunikat: "Front fiszki nie może przekraczać 200 znaków"
+- **Priorytet:** Wysoki
+
+**TC-SAVE-004: Bulk insert 100 fiszek**
+- **Kroki:**
+  1. Przygotuj payload z 100 fiszkami
+  2. POST /api/flashcards
+- **Oczekiwany rezultat:**
+  - HTTP 201 Created
+  - 100 rekordów w DB
+  - Czas odpowiedzi < 2s
+- **Priorytet:** Średni
+
+### 4.3 Autentykacja (US-001, US-002)
+
+**TC-AUTH-001: Rejestracja nowego użytkownika**
+- **Kroki:**
+  1. Otwórz /auth/register
+  2. Wprowadź email: test@example.com
+  3. Wprowadź hasło: SecurePass123!
+  4. Kliknij "Zarejestruj się"
+- **Oczekiwany rezultat:**
+  - HTTP 201 Created
+  - User ID w odpowiedzi
+  - Rekord w auth.users (Supabase)
+  - Auto-login (jeśli email confirmation wyłączona)
+  - Redirect do /generate
+- **Priorytet:** Krytyczny
+
+**TC-AUTH-002: Słabe hasło**
+- **Kroki:**
+  1. Wprowadź hasło: "123456"
+  2. Kliknij "Zarejestruj się"
+- **Oczekiwany rezultat:**
+  - HTTP 400 Bad Request
+  - Komunikat: "Hasło musi mieć min. 8 znaków, 1 wielką literę, 1 cyfrę, 1 znak specjalny"
+- **Priorytet:** Wysoki
+
+**TC-AUTH-003: Email już zarejestrowany**
+- **Warunki:** test@example.com już istnieje
+- **Kroki:**
+  1. Próba rejestracji z tym samym emailem
+- **Oczekiwany rezultat:**
+  - HTTP 409 Conflict
+  - Komunikat: "Ten adres email jest już zarejestrowany"
+- **Priorytet:** Wysoki
+
+**TC-AUTH-004: Pomyślne logowanie**
+- **Kroki:**
+  1. Otwórz /auth/login
+  2. Wprowadź poprawne dane
+  3. Kliknij "Zaloguj się"
+- **Oczekiwany rezultat:**
+  - HTTP 200 OK
+  - accessToken, refreshToken w odpowiedzi
+  - Cookies ustawione (sb-*)
+  - localStorage.setItem('sb-access-token')
+  - Redirect do /generate
+- **Priorytet:** Krytyczny
+
+**TC-AUTH-005: Nieprawidłowe dane logowania**
+- **Kroki:**
+  1. Wprowadź niepoprawne hasło
+  2. Kliknij "Zaloguj się"
+- **Oczekiwany rezultat:**
+  - HTTP 401 Unauthorized
+  - Komunikat: "Nieprawidłowy email lub hasło"
+  - Brak tokenu w odpowiedzi
+- **Priorytet:** Wysoki
+
+**TC-AUTH-006: Dostęp do chronionej strony bez logowania**
+- **Kroki:**
+  1. Clear cookies i localStorage
+  2. Próba otwarcia /generate
+- **Oczekiwany rezultat:**
+  - Redirect do /auth/login
+  - Query param: ?redirect=/generate
+- **Priorytet:** Krytyczny
+
+**TC-AUTH-007: Wylogowanie**
+- **Warunki:** Użytkownik zalogowany
+- **Kroki:**
+  1. Kliknij UserNav → "Wyloguj"
+  2. POST /api/auth/logout
+- **Oczekiwany rezultat:**
+  - HTTP 204 No Content
+  - Wszystkie cookies sb-* usunięte
+  - localStorage cleared
+  - Redirect do /auth/login
+- **Priorytet:** Krytyczny
+
+### 4.4 Row Level Security (US-009)
+
+**TC-RLS-001: Izolacja fiszek między użytkownikami**
+- **Warunki:** User A (ID=123), User B (ID=456)
+- **Kroki:**
+  1. User A tworzy fiszki
+  2. User B próbuje GET /api/flashcards?userId=123
+- **Oczekiwany rezultat:**
+  - User B widzi tylko swoje fiszki (empty array)
+  - RLS policy blokuje dostęp do fiszek User A
+- **Priorytet:** Krytyczny
+
+**TC-RLS-002: Próba modyfikacji fiszki innego użytkownika**
+- **Kroki:**
+  1. User B próbuje PATCH /api/flashcards/{flashcard_id_user_A}
+- **Oczekiwany rezultat:**
+  - HTTP 404 Not Found (lub 403 Forbidden)
+  - Brak modyfikacji w DB
+- **Priorytet:** Krytyczny
+
+**TC-RLS-003: Kaskadowe usunięcie danych (RODO)**
+- **Kroki:**
+  1. User A ma 50 fiszek i 10 generations
+  2. DELETE /api/auth/account (User A)
+- **Oczekiwany rezultat:**
+  - auth.users: rekord usunięty
+  - flashcards: wszystkie rekordy User A usunięte (ON DELETE CASCADE)
+  - generations: wszystkie rekordy User A usunięte
+  - generation_error_logs: powiązane logi usunięte
+- **Priorytet:** Krytyczny (RODO compliance)
+
+---
+
+## 5. Środowisko Testowe
+
+### 5.1 Środowisko lokalne (Development)
+**Przeznaczenie:** Testy deweloperskie, unit tests, debugging
+
+**Komponenty:**
+- Node.js 22.14.0
+- Docker Desktop (Supabase local)
+- Supabase CLI (`npx supabase start`)
+- PostgreSQL 15 (via Supabase)
+- Local OpenRouter API (mock lub prawdziwy klucz z limitem)
+
+**Setup:**
+```bash
+# 1. Start Supabase
+npx supabase start
+
+# 2. Configure .env
+SUPABASE_URL=http://localhost:54321
+SUPABASE_KEY=<anon_key>
+OPENROUTER_API_KEY=<test_key>
+
+# 3. Run migrations
+npx supabase db reset
+
+# 4. Start dev server
+npm run dev
+```
+
+### 5.2 Środowisko testowe (Testing/Staging)
+**Przeznaczenie:** Integration tests, E2E tests, UAT
+
+**Komponenty:**
+- Supabase Cloud (projekt staging)
+- OpenRouter API (ograniczony budget)
+- DigitalOcean Droplet (staging deployment)
+- CI/CD: GitHub Actions
+
+**Konfiguracja:**
+- Separate database z test fixtures
+- Rate limiting wyłączony dla testów
+- Email confirmation wyłączona (auto-confirm)
+- Logging level: DEBUG
+
+### 5.3 Środowisko produkcyjne (Production)
+**Przeznaczenie:** Smoke tests, monitoring, sanity checks
+
+**Komponenty:**
+- Supabase Cloud (projekt production)
+- OpenRouter API (pełny budget z limitami)
+- DigitalOcean Droplet (production)
+- Monitoring: Sentry, LogTail
+
+**Ograniczenia testów:**
+- Tylko smoke tests na produkcji
+- Brak testów obciążenia
+- Test user: test@10xcards.com (nie wolno usuwać)
+
+---
+
+## 6. Narzędzia do Testowania
+
+### 6.1 Framework testowy
+- **Vitest** - Unit i Integration tests
+  - Fast (Vite-powered)
+  - Compatible z Astro + React
+  - Inline snapshots
+  
+- **React Testing Library** - Komponenty React
+  - User-centric testing
+  - Accessibility-first
+
+### 6.2 E2E Testing
+- **Playwright** - End-to-end tests
+  - Cross-browser (Chromium, Firefox, WebKit)
+  - Auto-wait, retry logic
+  - Screenshot/video recording
+  - Parallel execution
+
+### 6.3 API Testing
+- **PowerShell scripts** (istniejące w `.ai/tests/`)
+  - Szybkie manualne testy
+  - CI/CD friendly
+  
+- **Thunder Client / Postman** - Manual exploratory testing
+  - Collections dla wszystkich endpoints
+  - Environment variables (local, staging, prod)
+
+### 6.4 Performance Testing
+- **Lighthouse** - Web performance, accessibility
+- **Artillery** - Load testing, stress testing
+- **PostgreSQL EXPLAIN ANALYZE** - Query optimization
+
+### 6.5 Security Testing
+- **OWASP ZAP** - Vulnerability scanning
+- **SQLMap** - SQL injection testing (on staging only)
+- **axe DevTools** - Accessibility audit
+
+### 6.6 Monitoring i Logging
+- **Sentry** - Error tracking (production)
+- **LogTail** - Structured logging
+- **Supabase Dashboard** - Database monitoring
+
+---
+
+## 7. Harmonogram Testów
+
+### Faza 1: Setup i Przygotowanie (Tydzień 1)
+- [ ] Konfiguracja Vitest + React Testing Library
+- [ ] Konfiguracja Playwright (browsers, baseURL)
+- [ ] Utworzenie test fixtures (seed data)
+- [ ] Setup CI/CD pipeline (GitHub Actions)
+- [ ] Dokumentacja środowisk testowych
+
+### Faza 2: Testy Jednostkowe (Tydzień 2-3)
+- [ ] Serwisy: openrouter.service, flashcards.service, generations.service
+- [ ] Custom hooks: useGenerateFlashcards, useSaveFlashcards
+- [ ] UI components: Button, Input, Card, Dialog, Alert
+- [ ] Utility functions: validation, hashing
+- [ ] **Coverage target:** > 80% dla /src/lib, /src/components/hooks
+
+### Faza 3: Testy Integracyjne (Tydzień 3-4)
+- [ ] API endpoints: auth, generations, flashcards
+- [ ] Middleware + protected routes
+- [ ] OpenRouter service + generations flow
+- [ ] Database operations (CRUD, RLS)
+- [ ] **Coverage target:** > 70% dla /src/pages/api
+
+### Faza 4: Testy E2E (Tydzień 4-5)
+- [ ] User stories: US-001 do US-009
+- [ ] Critical paths: register → login → generate → save → logout
+- [ ] Error handling flows
+- [ ] Cross-browser testing (Chrome, Firefox, Safari)
+- [ ] **Test suites:** Minimum 15 scenarios
+
+### Faza 5: Testy Specjalistyczne (Tydzień 5-6)
+- [ ] Security testing: RLS, JWT, XSS, SQL injection
+- [ ] Performance testing: Lighthouse, Artillery load tests
+- [ ] Accessibility audit: axe DevTools, WCAG 2.1 AA
+- [ ] Compatibility testing: browsers, devices
+- [ ] RODO compliance verification
+
+### Faza 6: Regression i UAT (Tydzień 7)
+- [ ] Regression test suite (automated)
+- [ ] UAT z rzeczywistymi użytkownikami (5-10 osób)
+- [ ] Bug fixing i retesting
+- [ ] Final smoke tests na staging
+
+### Faza 7: Deployment i Monitoring (Tydzień 8)
+- [ ] Production deployment
+- [ ] Smoke tests na produkcji
+- [ ] Monitoring setup (Sentry, LogTail)
+- [ ] Post-deployment verification
+
+---
+
+## 8. Kryteria Akceptacji Testów
+
+### 8.1 Kryteria funkcjonalne
+- ✅ Wszystkie testy krytyczne (priorytet: Krytyczny) przeszły pomyślnie
+- ✅ Min. 95% testów wysokiego priorytetu przeszło
+- ✅ Min. 90% testów średniego priorytetu przeszło
+- ✅ Zero krytycznych bugów (Severity: Critical)
+- ✅ Max 5 bugów wysokiej wagi (Severity: High) - z planem naprawy
+
+### 8.2 Kryteria pokrycia kodu
+- ✅ Unit tests: > 80% coverage dla /src/lib
+- ✅ Integration tests: > 70% coverage dla /src/pages/api
+- ✅ E2E tests: Pokrycie wszystkich user stories (US-001 do US-009)
+
+### 8.3 Kryteria wydajnościowe
+- ✅ API endpoints (bez AI): < 200ms (p95)
+- ✅ POST /api/generations: < 10s (p95)
+- ✅ Lighthouse Performance Score: > 90
+- ✅ Lighthouse Accessibility Score: > 90
+- ✅ First Contentful Paint: < 1.5s
+- ✅ Time to Interactive: < 3.5s
+- ✅ Load test: 10 concurrent users bez błędów
+
+### 8.4 Kryteria bezpieczeństwa
+- ✅ RLS policies działają poprawnie (100% skuteczność)
+- ✅ JWT validation na wszystkich protected endpoints
+- ✅ Brak podatności XSS, SQL injection (OWASP Top 10)
+- ✅ Kaskadowe usunięcie danych użytkownika (RODO)
+- ✅ Sensitive data (hasła, tokeny) nie logowane
+
+### 8.5 Kryteria dostępności
+- ✅ WCAG 2.1 Level AA compliance (axe DevTools: 0 violations)
+- ✅ Nawigacja klawiaturą działa na wszystkich stronach
+- ✅ Screen reader compatibility (NVDA/JAWS)
+- ✅ Kontrast kolorów > 4.5:1
+
+### 8.6 Kryteria kompatybilności
+- ✅ Działa w Chrome 110+, Firefox 110+, Safari 16+, Edge 110+
+- ✅ Responsywność: desktop (1920x1080), tablet (1024x768), mobile (390x844)
+- ✅ Zero layout shift na wszystkich rozdzielczościach
+
+---
+
+## 9. Role i Odpowiedzialności
+
+### 9.1 QA Lead
+**Odpowiedzialności:**
+- Planowanie i koordynacja testów
+- Definiowanie strategii testowej
+- Review test cases
+- Raportowanie postępów do stakeholders
+- Final sign-off dla release
+
+### 9.2 QA Engineer (Automation)
+**Odpowiedzialności:**
+- Implementacja unit tests (Vitest)
+- Implementacja E2E tests (Playwright)
+- Setup CI/CD pipeline
+- Maintenance test suites
+- Code reviews test code
+
+### 9.3 QA Engineer (Manual)
+**Odpowiedzialności:**
+- Exploratory testing
+- Manual API testing (PowerShell scripts, Postman)
+- UAT facilitation
+- Bug reporting i retesting
+- Accessibility testing (manual checks)
+
+### 9.4 Developer (Backend)
+**Odpowiedzialności:**
+- Code review dla testów integracyjnych
+- Support dla test setup (fixtures, mocks)
+- Fixing bugs High/Critical priority
+- Writing unit tests dla nowych serwisów
+
+### 9.5 Developer (Frontend)
+**Odpowiedzialności:**
+- Unit tests dla React components
+- Custom hooks testing
+- Fixing UI bugs
+- Accessibility implementation (ARIA labels)
+
+### 9.6 DevOps Engineer
+**Odpowiedzialności:**
+- Setup środowisk testowych (staging)
+- CI/CD pipeline maintenance
+- Monitoring setup (Sentry, LogTail)
+- Performance testing infrastructure (Artillery)
+
+---
+
+## 10. Procedury Raportowania Błędów
+
+### 10.1 Klasyfikacja błędów
+
+**Severity (Waga błędu):**
+- **Critical:** Aplikacja nie działa, brak workaround (np. nie można zalogować)
+- **High:** Główna funkcjonalność nie działa, workaround trudny (np. generowanie fiszek failuje zawsze)
+- **Medium:** Funkcjonalność działa nieprawidłowo, workaround istnieje (np. edycja fiszki nie zapisuje źródła)
+- **Low:** Problemy kosmetyczne, UX (np. zły kontrast przycisku)
+
+**Priority (Priorytet naprawy):**
+- **P0 (Blocker):** Natychmiastowa naprawa, blokuje release
+- **P1 (High):** Naprawa przed release
+- **P2 (Medium):** Naprawa w następnym sprint
+- **P3 (Low):** Naprawa gdy czas pozwoli
+
+### 10.2 Format raportu błędu
+
+**Szablon (GitHub Issue):**
+```markdown
+## 🐛 Bug Report
+
+**ID:** BUG-{YYYYMMDD}-{NR}
+**Severity:** Critical / High / Medium / Low
+**Priority:** P0 / P1 / P2 / P3
+**Environment:** Local / Staging / Production
+**Browser:** Chrome 120 / Firefox 121 / Safari 17
+**Device:** Desktop / Tablet / Mobile
+
+### 📝 Description
+Krótki opis problemu (1-2 zdania)
+
+### 📍 Steps to Reproduce
+1. Otwórz /auth/login
+2. Wprowadź email: test@example.com
+3. Kliknij "Zaloguj się"
+
+### ✅ Expected Behavior
+Użytkownik zostaje zalogowany i przekierowany do /generate
+
+### ❌ Actual Behavior
+HTTP 500 Internal Server Error, komunikat: "Supabase connection failed"
+
+### 📸 Screenshots / Logs
+[Attach screenshots, console logs, network tab]
+
+### 🔍 Additional Context
+- Występuje tylko w przeglądarce Safari
+- Działa poprawnie w Chrome i Firefox
+- Supabase URL w .env: http://localhost:54321
+
+### 🛠️ Possible Fix
+Suspected issue: CORS configuration for Safari
+```
+
+### 10.3 Workflow raportowania
+
+1. **Discovery:** QA/Developer odkrywa bug
+2. **Report:** Utworzenie GitHub Issue z szablonem
+3. **Triage:** QA Lead przypisuje Severity i Priority
+4. **Assignment:** Bug przypisany do Developer
+5. **Fix:** Developer naprawia i tworzy PR
+6. **Retest:** QA weryfikuje fix na staging
+7. **Close:** QA zamyka issue po weryfikacji
+
+### 10.4 Bug tracking board (GitHub Projects)
+
+**Kolumny:**
+- **Backlog:** Nowe bugi, nie ocenione
+- **To Do:** Ocenione, gotowe do naprawy
+- **In Progress:** Developer pracuje nad fix
+- **Ready for Test:** Fix wdrożony na staging, czeka na retest
+- **Done:** Zweryfikowane przez QA, zamknięte
+
+**Filters:**
+- Critical bugs (Severity: Critical)
+- Blocker bugs (Priority: P0)
+- Pre-release bugs (must fix before launch)
+
+---
+
+## 11. Wskaźniki i Metryki
+
+### 11.1 Metryki testowania
+- **Test Execution Rate:** (Tests executed / Total tests) × 100
+- **Pass Rate:** (Tests passed / Tests executed) × 100
+- **Defect Density:** Bugs found / KLOC (1000 lines of code)
+- **Code Coverage:** Branches covered / Total branches
+- **Automation Rate:** (Automated tests / Total tests) × 100
+
+### 11.2 Metryki jakości
+- **Defect Leakage:** Bugs found in production / Total bugs
+- **Mean Time to Detect (MTTD):** Avg time from bug introduction to detection
+- **Mean Time to Resolve (MTTR):** Avg time from bug report to fix deployed
+- **Escaped Defects:** Critical bugs found post-release
+
+### 11.3 Cele (Targets)
+- Pass Rate: > 95%
+- Code Coverage: > 80% (unit), > 70% (integration)
+- Automation Rate: > 70%
+- Defect Leakage: < 5%
+- MTTR (Critical): < 4 hours
+- MTTR (High): < 24 hours
+
+---
+
+## 12. Zarządzanie Ryzykiem
+
+### 12.1 Zidentyfikowane ryzyka
+
+**RISK-001: OpenRouter API Unavailable**
+- **Prawdopodobieństwo:** Średnie
+- **Wpływ:** Krytyczny (core feature)
+- **Mitigation:** Implementacja circuit breaker, fallback na inny model/providera, user-friendly error messages
+- **Contingency:** Manual flashcard creation jako workaround
+
+**RISK-002: Supabase Auth Rate Limiting**
+- **Prawdopodobieństwo:** Niskie
+- **Wpływ:** Wysoki
+- **Mitigation:** Implementacja local rate limiting, exponential backoff, caching session tokens
+- **Contingency:** Upgrade Supabase plan
+
+**RISK-003: RLS Policy Bypass**
+- **Prawdopodobieństwo:** Bardzo niskie
+- **Wpływ:** Krytyczny (data leak)
+- **Mitigation:** Comprehensive RLS testing, penetration testing, code review security-critical paths
+- **Contingency:** Incident response plan, RODO breach notification
+
+**RISK-004: Insufficient Test Coverage**
+- **Prawdopodobieństwo:** Średnie
+- **Wpływ:** Wysoki (bugs in production)
+- **Mitigation:** Enforce coverage thresholds w CI/CD, mandatory code reviews, TDD practices
+- **Contingency:** Post-launch bug fixing sprint
+
+**RISK-005: Performance Degradation**
+- **Prawdopodobieństwo:** Średnie
+- **Wpływ:** Średni (poor UX)
+- **Mitigation:** Load testing przed release, database indexing, CDN dla assets, monitoring
+- **Contingency:** Vertical scaling (DigitalOcean), query optimization
+
+### 12.2 Plan awaryjny (Contingency)
+- **Rollback plan:** Git revert, redeploy previous version
+- **Hotfix process:** Fast-track PR review, deploy poza normalnym cyklem
+- **Communication plan:** Statuspage.io dla user notifications, Discord/Slack dla internal comms
+
+---
+
+## 13. Załączniki
+
+### 13.1 Linki do dokumentacji
+- PRD: `.ai/prd.md`
+- Auth Spec: `.ai/auth-spec.md`
+- API Plan: `.ai/api-plan.md`
+- OpenRouter Service: `.ai/openrouter-service-implementation-plan.md`
+- Test Scripts: `.ai/tests/`
+
+### 13.2 Test fixtures
+- **Location:** `.ai/tests/fixtures/`
+- **seed-users.sql:** Testowi użytkownicy (test@10xcards.com)
+- **seed-flashcards.sql:** Sample flashcards dla manual testing
+- **mock-openrouter.json:** Mock responses dla unit tests
+
+### 13.3 CI/CD Configuration
+- **Location:** `.github/workflows/test.yml`
+- **Triggers:** Push do main, PR
+- **Jobs:** lint, unit-test, integration-test, e2e-test (on staging)
+- **Coverage report:** Codecov integration
+
+---
+
+## Wersjonowanie
+
+**Wersja:** 1.0  
+**Data:** 2025-10-31  
+**Autor:** QA Team  
+**Zatwierdził:** Tech Lead  
+
+**Historia zmian:**
+- 1.0 (2025-10-31): Pierwsza wersja planu testów
