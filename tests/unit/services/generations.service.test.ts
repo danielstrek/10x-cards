@@ -273,7 +273,7 @@ describe('generations.service', () => {
       );
 
       expect(result.proposals[0].front).toHaveLength(200);
-      expect(result.proposals[0].front).toEndWith('...');
+      expect(result.proposals[0].front.endsWith('...')).toBe(true);
     });
 
     it('should truncate flashcard back if exceeds 500 characters', async () => {
@@ -311,7 +311,7 @@ describe('generations.service', () => {
       );
 
       expect(result.proposals[0].back).toHaveLength(500);
-      expect(result.proposals[0].back).toEndWith('...');
+      expect(result.proposals[0].back.endsWith('...')).toBe(true);
     });
 
     it('should create unique proposal IDs based on generation ID and index', async () => {
