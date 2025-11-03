@@ -1,8 +1,11 @@
 // src/pages/api/flashcards.ts
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
-import type { BulkCreateFlashcardsResponseDto } from '../../types';
-import { bulkCreateFlashcards } from '../../lib/services/flashcards.service';
+import type { BulkCreateFlashcardsResponseDto, FlashcardListResponseDto } from '../../types';
+import { 
+  bulkCreateFlashcards, 
+  getUserFlashcards 
+} from '../../lib/services/flashcards.service';
 
 // Disable prerendering for API routes
 export const prerender = false;
@@ -153,3 +156,58 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 };
 
+/**
+ * GET /api/flashcards
+ * 
+ * Retrieves all flashcards for the authenticated user
+ * Requires authentication via session
+ * 
+ * @returns 200 OK with paginated list of flashcards
+ * @returns 401 Unauthorized if not authenticated
+ * @returns 500 Internal Server Error for server errors
+ */
+export const GET: APIRoute = async ({ locals, url }) => {
+  try {
+    // Check authentication
+    if (!locals.user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', message: 'Not authenticated' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = locals.user.id;
+
+    // Parse query parameters for pagination
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '50');
+
+    // Validate pagination parameters
+    if (page < 1 || limit < 1 || limit > 100) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Bad Request', 
+          message: 'Invalid pagination parameters' 
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Call service to get flashcards
+    const response = await getUserFlashcards(locals.supabase, userId, page, limit);
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('Error fetching flashcards:', error);
+    return new Response(
+      JSON.stringify({
+        error: 'Internal Server Error',
+        message: 'Failed to fetch flashcards',
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+};

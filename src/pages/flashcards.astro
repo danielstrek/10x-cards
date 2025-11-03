@@ -1,0 +1,20 @@
+---
+import Layout from "../layouts/Layout.astro";
+import FlashcardsView from "../components/FlashcardsView";
+import UserNav from "../components/auth/UserNav";
+
+// Protected route - require authentication
+if (!Astro.locals.user) {
+  // Redirect to login with redirect parameter
+  const redirectUrl = encodeURIComponent(Astro.url.pathname);
+  return Astro.redirect(`/auth/login?redirect=${redirectUrl}`);
+}
+
+const user = Astro.locals.user;
+---
+
+<Layout title="Moje Fiszki - 10x Cards">
+  <UserNav client:load user={user} />
+  <FlashcardsView client:load />
+</Layout>
+
