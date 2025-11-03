@@ -161,3 +161,38 @@ import type {
   export type SessionReviewResponseDto =
     | FlashcardDetailDto
     | SessionSummaryDto;
+
+  // --- STUDY SESSION DTOs ---
+
+  /** Flashcard with SRS data for study session */
+  export interface StudyFlashcardDto {
+    id: number;
+    front: string;
+    back: string;
+    easinessFactor: number;
+    interval: number;
+    repetitions: number;
+    nextReviewDate: string;
+  }
+
+  /** Request body for reviewing a flashcard */
+  export interface ReviewFlashcardDto {
+    flashcardId: number;
+    rating: 'again' | 'hard' | 'good' | 'easy';
+  }
+
+  /** Response after reviewing a flashcard */
+  export interface ReviewFlashcardResponseDto {
+    easinessFactor: number;
+    interval: number;
+    repetitions: number;
+    nextReviewDate: string;
+    quality: number;
+  }
+
+  /** Study session statistics */
+  export interface StudyStatisticsDto {
+    total: number;
+    due: number;
+    reviewedToday: number;
+  }

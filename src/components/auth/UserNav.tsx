@@ -90,6 +90,12 @@ export default function UserNav({ user }: UserNavProps) {
               >
                 Moje Fiszki
               </a>
+              <a 
+                href="/study"
+                className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
+                Nauka
+              </a>
             </nav>
           </div>
           

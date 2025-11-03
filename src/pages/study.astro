@@ -1,0 +1,20 @@
+---
+import Layout from "../layouts/Layout.astro";
+import StudyView from "../components/StudyView";
+import UserNav from "../components/auth/UserNav";
+
+// Protected route - require authentication
+if (!Astro.locals.user) {
+  // Redirect to login with redirect parameter
+  const redirectUrl = encodeURIComponent(Astro.url.pathname);
+  return Astro.redirect(`/auth/login?redirect=${redirectUrl}`);
+}
+
+const user = Astro.locals.user;
+---
+
+<Layout title="Sesja Nauki - 10x Cards">
+  <UserNav client:load user={user} />
+  <StudyView client:load />
+</Layout>
+
