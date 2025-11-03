@@ -102,7 +102,9 @@ export default function LoginForm() {
 
           <CardContent className="space-y-4">
             {state.error && (
-              <ErrorNotification message={state.error} title="Błąd logowania" />
+              <div data-test-id="login-error-notification">
+                <ErrorNotification message={state.error} title="Błąd logowania" />
+              </div>
             )}
 
             {/* Email input */}
@@ -123,6 +125,7 @@ export default function LoginForm() {
                 aria-invalid={state.error ? 'true' : 'false'}
                 aria-describedby={state.error ? 'email-error' : undefined}
                 required
+                data-test-id="login-email-input"
               />
             </div>
 
@@ -144,6 +147,7 @@ export default function LoginForm() {
                   disabled={state.isLoading}
                   aria-invalid={state.error ? 'true' : 'false'}
                   required
+                  data-test-id="login-password-input"
                 />
                 <button
                   type="button"
@@ -151,6 +155,7 @@ export default function LoginForm() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
                   disabled={state.isLoading}
+                  data-test-id="login-password-toggle"
                 >
                   {showPassword ? (
                     <svg
@@ -196,6 +201,7 @@ export default function LoginForm() {
                 onChange={(e) => setState(prev => ({ ...prev, rememberMe: e.target.checked }))}
                 disabled={state.isLoading}
                 className="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                data-test-id="login-remember-me-checkbox"
               />
               <label
                 htmlFor="remember"
@@ -210,6 +216,7 @@ export default function LoginForm() {
               <a
                 href="/auth/forgot-password"
                 className="text-sm text-primary hover:underline underline-offset-4"
+                data-test-id="login-forgot-password-link"
               >
                 Zapomniałeś hasła?
               </a>
@@ -221,6 +228,7 @@ export default function LoginForm() {
               type="submit"
               className="w-full"
               disabled={!isFormValid || state.isLoading}
+              data-test-id="login-submit-button"
             >
               {state.isLoading ? (
                 <>
@@ -257,6 +265,7 @@ export default function LoginForm() {
               <a
                 href="/auth/register"
                 className="text-primary font-medium hover:underline underline-offset-4"
+                data-test-id="login-register-link"
               >
                 Zarejestruj się
               </a>

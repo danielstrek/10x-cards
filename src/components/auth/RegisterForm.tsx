@@ -169,7 +169,9 @@ export default function RegisterForm() {
 
           <CardContent className="space-y-4">
             {state.error && (
-              <ErrorNotification message={state.error} title="Błąd rejestracji" />
+              <div data-test-id="register-error-notification">
+                <ErrorNotification message={state.error} title="Błąd rejestracji" />
+              </div>
             )}
 
             {/* Email input */}
@@ -189,6 +191,7 @@ export default function RegisterForm() {
                 disabled={state.isLoading}
                 aria-invalid={state.error ? 'true' : 'false'}
                 required
+                data-test-id="register-email-input"
               />
             </div>
 
@@ -210,6 +213,7 @@ export default function RegisterForm() {
                   disabled={state.isLoading}
                   aria-invalid={state.password.length > 0 && !passwordValidation.valid ? 'true' : 'false'}
                   required
+                  data-test-id="register-password-input"
                 />
                 <button
                   type="button"
@@ -217,6 +221,7 @@ export default function RegisterForm() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
                   disabled={state.isLoading}
+                  data-test-id="register-password-toggle"
                 >
                   {showPassword ? (
                     <svg
@@ -287,6 +292,7 @@ export default function RegisterForm() {
                   disabled={state.isLoading}
                   aria-invalid={state.confirmPassword.length > 0 && !passwordsMatch ? 'true' : 'false'}
                   required
+                  data-test-id="register-confirm-password-input"
                 />
                 <button
                   type="button"
@@ -294,6 +300,7 @@ export default function RegisterForm() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   aria-label={showConfirmPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
                   disabled={state.isLoading}
+                  data-test-id="register-confirm-password-toggle"
                 >
                   {showConfirmPassword ? (
                     <svg
@@ -345,6 +352,7 @@ export default function RegisterForm() {
               type="submit"
               className="w-full"
               disabled={!isFormValid || state.isLoading}
+              data-test-id="register-submit-button"
             >
               {state.isLoading ? (
                 <>
@@ -381,6 +389,7 @@ export default function RegisterForm() {
               <a
                 href="/auth/login"
                 className="text-primary font-medium hover:underline underline-offset-4"
+                data-test-id="register-login-link"
               >
                 Zaloguj się
               </a>

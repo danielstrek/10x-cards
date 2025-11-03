@@ -46,6 +46,7 @@ export function BulkSaveButton({
           aria-busy={isSaving}
           aria-label={`Save ${acceptedCount} accepted flashcard${acceptedCount !== 1 ? 's' : ''} to database`}
           className="w-full sm:w-auto"
+          data-test-id="save-accepted-button"
         >
           {isSaving ? (
             <>
@@ -100,6 +101,7 @@ export function BulkSaveButton({
           aria-busy={isSaving}
           aria-label={`Save all ${totalCount} flashcard${totalCount !== 1 ? 's' : ''} to database`}
           className="w-full sm:w-auto"
+          data-test-id="save-all-button"
         >
           {isSaving ? (
             'Saving...'

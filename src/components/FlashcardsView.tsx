@@ -95,11 +95,11 @@ export default function FlashcardsView() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">My Flashcards</h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-muted-foreground mt-1" data-test-id="flashcards-total-count">
               {total > 0 ? `${total} flashcard${total !== 1 ? 's' : ''} total` : 'No flashcards yet'}
             </p>
           </div>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
+          <Button onClick={() => setIsAddDialogOpen(true)} data-test-id="flashcards-add-button">
             <PlusIcon className="mr-2 h-4 w-4" />
             Add Flashcard
           </Button>
@@ -107,20 +107,23 @@ export default function FlashcardsView() {
 
         {/* Error notification */}
         {error && (
-          <ErrorNotification 
-            message={error} 
-            onDismiss={clearAllErrors}
-          />
+          <div data-test-id="flashcards-error-notification">
+            <ErrorNotification 
+              message={error}
+            />
+          </div>
         )}
 
         {/* Loading state */}
         {isLoading && (
-          <SkeletonLoader count={3} />
+          <div data-test-id="flashcards-loading-indicator">
+            <SkeletonLoader count={3} />
+          </div>
         )}
 
         {/* Empty state */}
         {!isLoading && flashcards.length === 0 && (
-          <div className="text-center py-12">
+          <div className="text-center py-12" data-test-id="flashcards-empty-state">
             <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
               <PlusIcon className="h-8 w-8 text-muted-foreground" />
             </div>
@@ -132,7 +135,7 @@ export default function FlashcardsView() {
               </a>
               .
             </p>
-            <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Button onClick={() => setIsAddDialogOpen(true)} data-test-id="flashcards-empty-create-button">
               <PlusIcon className="mr-2 h-4 w-4" />
               Create First Flashcard
             </Button>
@@ -141,7 +144,7 @@ export default function FlashcardsView() {
 
         {/* Flashcards list */}
         {!isLoading && flashcards.length > 0 && (
-          <div className="space-y-4" role="list" aria-label="Flashcards list">
+          <div className="space-y-4" role="list" aria-label="Flashcards list" data-test-id="flashcards-list">
             {flashcards.map((flashcard) => (
               <div key={flashcard.id} role="listitem">
                 <FlashcardItem

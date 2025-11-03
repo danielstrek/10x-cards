@@ -25,7 +25,7 @@ export function FlashcardList({
   }
 
   return (
-    <div className="space-y-4" role="list" aria-label="Generated flashcards">
+    <div className="space-y-4" role="list" aria-label="Generated flashcards" data-test-id="flashcard-list">
       {flashcards.map((flashcard) => (
         <div key={flashcard.proposalId} role="listitem">
           <FlashcardListItem

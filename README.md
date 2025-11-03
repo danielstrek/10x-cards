@@ -32,13 +32,88 @@ To set up and run the project locally:
 
 ## Available Scripts
 In the project, you can use the following npm scripts:
+
+### Development
 - `npm run dev`: Starts the development server.
 - `npm run build`: Builds the project for production.
 - `npm run preview`: Previews the production build.
 - `npm run astro`: Runs Astro CLI commands.
+
+### Code Quality
 - `npm run lint`: Lints the code for errors.
 - `npm run lint:fix`: Automatically fixes linting issues.
 - `npm run format`: Formats the code using Prettier.
+
+### Testing
+- `npm run test`: Run unit tests in watch mode.
+- `npm run test:unit`: Run unit tests once.
+- `npm run test:unit:watch`: Run unit tests in watch mode.
+- `npm run test:unit:ui`: Run unit tests with UI.
+- `npm run test:unit:coverage`: Run unit tests with coverage report.
+- `npm run test:e2e`: Run E2E tests with Playwright.
+- `npm run test:e2e:ui`: Run E2E tests in UI mode (recommended for development).
+- `npm run test:e2e:debug`: Debug E2E tests.
+- `npm run test:e2e:codegen`: Generate E2E test code.
+- `npm run test:e2e:report`: View E2E test report.
+- `npm run test:all`: Run all tests (unit + E2E).
+
+## Testing
+
+The project includes comprehensive test coverage:
+
+### Unit Tests (Vitest)
+- Located in `tests/unit/` directory
+- Test individual components, services, and utility functions
+- Run with `npm run test:unit`
+- Coverage reports available with `npm run test:unit:coverage`
+
+### E2E Tests (Playwright)
+- Located in `e2e/` directory
+- Test complete user workflows and scenarios
+- **40+ test cases** covering:
+  - Authentication (registration, login, logout)
+  - Flashcard generation with AI
+  - Flashcard management (CRUD operations)
+  - Data persistence across sessions
+  - Multi-user isolation (Row Level Security)
+
+#### Running E2E Tests
+
+1. **Setup:**
+   ```bash
+   # Install Playwright browsers
+   npx playwright install
+
+   # Create environment file for tests
+   cp .env .env.test
+   # Edit .env.test with test-specific values
+   ```
+
+2. **Run tests:**
+   ```bash
+   # Run all E2E tests
+   npm run test:e2e
+
+   # Run in UI mode (recommended for development)
+   npm run test:e2e:ui
+
+   # Run specific test file
+   npx playwright test auth/01-registration-and-login.spec.ts
+
+   # Debug tests
+   npm run test:e2e:debug
+   ```
+
+3. **View reports:**
+   ```bash
+   npm run test:e2e:report
+   ```
+
+For detailed documentation, see:
+- [E2E Test Documentation](./e2e/README.md)
+- [Test Examples](./e2e/EXAMPLES.md)
+- [Test IDs Reference](./e2e/test-ids.md)
+- [Complete Test Plan](./.ai/test-plan-generated.mdc)
 
 ## Project Scope
 The project focuses on providing a starter template for Astro applications, including basic pages, components, and API endpoints. It covers core features like automatic flashcard generation, manual creation, user authentication, and integration with a spaced repetition algorithm (using an open-source library). Boundaries include no advanced features in the MVP, such as gamification, mobile apps, or public API sharing.
@@ -96,27 +171,14 @@ npm run dev
 
 Visit `http://localhost:3000`
 
-## Testing
+## Additional Testing Information
 
-This project implements a comprehensive testing strategy covering unit, integration, E2E, security, performance, and accessibility tests.
+For complete testing documentation, including unit, integration, E2E, security, performance, and accessibility tests, please refer to the [Testing section](#testing) above and the following resources:
 
-### Testing Framework & Tools
-
-**Unit & Integration Testing:**
-- **Vitest** - Fast, Vite-powered test framework
+**Testing Framework & Tools:**
+- **Vitest** - Fast, Vite-powered test framework for unit tests
 - **React Testing Library** - User-centric component testing
-- **Testcontainers** - Supabase local for integration tests
-
-**E2E Testing:**
-- **Playwright** - Cross-browser testing (Chromium, Firefox, WebKit)
-- Auto-wait, retry logic, screenshot/video recording
-- Parallel test execution
-
-**API Testing:**
-- **PowerShell scripts** (`.ai/tests/`) - Quick manual tests
-- **Thunder Client / Postman** - Exploratory testing with collections
-
-**Performance Testing:**
+- **Playwright** - Cross-browser E2E testing (Chromium, Firefox, WebKit)
 - **Lighthouse** - Web performance & accessibility scores
 - **Artillery** - Load and stress testing
 - **PostgreSQL EXPLAIN ANALYZE** - Query optimization

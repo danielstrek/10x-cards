@@ -61,6 +61,7 @@ export function TextInputArea({
         )}
         aria-invalid={!isValid && characterCount > 0}
         aria-describedby="character-count-help"
+        data-test-id="generate-source-text-input"
       />
       
       {isTooShort && (

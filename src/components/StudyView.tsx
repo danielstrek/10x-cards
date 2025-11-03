@@ -83,23 +83,23 @@ export default function StudyView() {
           <h1 className="text-3xl font-bold tracking-tight">Sesja Nauki</h1>
           
           {statistics && (
-            <div className="flex justify-center gap-6 text-sm">
+            <div className="flex justify-center gap-6 text-sm" data-test-id="study-statistics">
               <div className="flex items-center gap-2">
                 <BookOpenIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">
-                  Do nauki: <strong className="text-foreground">{statistics.due}</strong>
+                  Do nauki: <strong className="text-foreground" data-test-id="study-due-count">{statistics.due}</strong>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircleIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">
-                  Dzisiaj: <strong className="text-foreground">{statistics.reviewedToday}</strong>
+                  Dzisiaj: <strong className="text-foreground" data-test-id="study-reviewed-today-count">{statistics.reviewedToday}</strong>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <TrophyIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">
-                  Łącznie: <strong className="text-foreground">{statistics.total}</strong>
+                  Łącznie: <strong className="text-foreground" data-test-id="study-total-count">{statistics.total}</strong>
                 </span>
               </div>
             </div>
@@ -108,7 +108,7 @@ export default function StudyView() {
           {/* Progress */}
           {sessionFlashcards.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground" data-test-id="study-progress-text">
                 Fiszka {currentIndex + 1} z {sessionFlashcards.length}
               </p>
               <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
@@ -117,6 +117,7 @@ export default function StudyView() {
                   style={{
                     width: `${((currentIndex + 1) / sessionFlashcards.length) * 100}%`,
                   }}
+                  data-test-id="study-progress-bar"
                 />
               </div>
             </div>
@@ -125,19 +126,21 @@ export default function StudyView() {
 
         {/* Error notification */}
         {error && (
-          <ErrorNotification message={error} onDismiss={clearAllErrors} />
+          <div data-test-id="study-error-notification">
+            <ErrorNotification message={error} />
+          </div>
         )}
 
         {/* Loading state */}
         {isLoading && (
-          <div className="space-y-4">
+          <div className="space-y-4" data-test-id="study-loading-indicator">
             <SkeletonLoader count={1} />
           </div>
         )}
 
         {/* No cards state */}
         {!isLoading && sessionFlashcards.length === 0 && (
-          <div className="text-center py-12">
+          <div className="text-center py-12" data-test-id="study-empty-state">
             <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
               <CheckCircleIcon className="h-8 w-8 text-muted-foreground" />
             </div>
@@ -146,7 +149,7 @@ export default function StudyView() {
               Nie masz fiszek do powtórki. Wróć później lub dodaj nowe fiszki.
             </p>
             <div className="flex gap-3 justify-center">
-              <Button onClick={handleRestartSession}>
+              <Button onClick={handleRestartSession} data-test-id="study-refresh-button">
                 Odśwież
               </Button>
               <Button variant="outline" asChild>
@@ -170,7 +173,7 @@ export default function StudyView() {
 
         {/* Session complete */}
         {!isLoading && reviewedCount > 0 && currentIndex >= sessionFlashcards.length && (
-          <div className="text-center py-12">
+          <div className="text-center py-12" data-test-id="study-session-complete">
             <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mb-4">
               <TrophyIcon className="h-8 w-8 text-green-600" />
             </div>
@@ -178,7 +181,7 @@ export default function StudyView() {
             <p className="text-muted-foreground mb-6">
               Przejrzałeś {reviewedCount} fiszek. Świetna robota!
             </p>
-            <Button onClick={handleRestartSession}>
+            <Button onClick={handleRestartSession} data-test-id="study-restart-button">
               Rozpocznij nową sesję
             </Button>
           </div>

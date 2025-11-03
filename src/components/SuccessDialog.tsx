@@ -19,7 +19,7 @@ interface SuccessDialogProps {
 export function SuccessDialog({ open, onClose, savedCount }: SuccessDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent data-test-id="success-dialog">
         <DialogHeader>
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
             <svg
@@ -43,7 +43,7 @@ export function SuccessDialog({ open, onClose, savedCount }: SuccessDialogProps)
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-center">
-          <Button onClick={onClose} className="w-full sm:w-auto">
+          <Button onClick={onClose} className="w-full sm:w-auto" data-test-id="success-dialog-continue-button">
             Continue
           </Button>
         </DialogFooter>

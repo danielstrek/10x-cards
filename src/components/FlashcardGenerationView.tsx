@@ -145,11 +145,15 @@ export default function FlashcardGenerationView() {
 
         {/* Error notifications */}
         {errorMessage && (
-          <ErrorNotification message={errorMessage} title="Generation Error" />
+          <div data-test-id="generate-error-notification">
+            <ErrorNotification message={errorMessage} title="Generation Error" />
+          </div>
         )}
         
         {saveError && (
-          <ErrorNotification message={saveError} title="Save Error" />
+          <div data-test-id="generate-save-error-notification">
+            <ErrorNotification message={saveError} title="Save Error" />
+          </div>
         )}
 
         {/* Input section */}
@@ -171,7 +175,7 @@ export default function FlashcardGenerationView() {
 
         {/* Loading state */}
         {isLoading && (
-          <div className="space-y-4">
+          <div className="space-y-4" data-test-id="generate-loading-indicator">
             <h2 className="text-xl font-semibold">Generating flashcards...</h2>
             <SkeletonLoader count={5} />
           </div>
@@ -179,12 +183,12 @@ export default function FlashcardGenerationView() {
 
         {/* Results section */}
         {!isLoading && localFlashcards.length > 0 && (
-          <div className="space-y-6">
+          <div className="space-y-6" data-test-id="generate-flashcards-results">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">
+              <h2 className="text-xl font-semibold" data-test-id="generate-flashcards-count">
                 Generated Flashcards ({localFlashcards.length})
               </h2>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground" data-test-id="generate-accepted-count">
                 Accepted: {localFlashcards.filter(f => f.accepted).length}
               </div>
             </div>

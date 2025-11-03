@@ -65,7 +65,7 @@ export function AddFlashcardDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent data-test-id="add-flashcard-dialog">
         <DialogHeader>
           <DialogTitle>Create New Flashcard</DialogTitle>
           <DialogDescription>
@@ -87,6 +87,7 @@ export function AddFlashcardDialog({
               className="resize-none"
               placeholder="Enter the question or prompt..."
               aria-label="Front of flashcard"
+              data-test-id="add-flashcard-front-input"
             />
           </div>
           <div>
@@ -102,12 +103,13 @@ export function AddFlashcardDialog({
               className="resize-none"
               placeholder="Enter the answer or explanation..."
               aria-label="Back of flashcard"
+              data-test-id="add-flashcard-back-input"
             />
           </div>
 
           {/* Validation error */}
           {validationError && (
-            <p className="text-sm text-red-600" role="alert">
+            <p className="text-sm text-red-600" role="alert" data-test-id="add-flashcard-error">
               {validationError}
             </p>
           )}
@@ -118,12 +120,14 @@ export function AddFlashcardDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isCreating}
+            data-test-id="add-flashcard-cancel-button"
           >
             Cancel
           </Button>
           <Button
             onClick={handleCreate}
             disabled={isCreating}
+            data-test-id="add-flashcard-create-button"
           >
             <PlusIcon className="mr-2 h-4 w-4" />
             {isCreating ? 'Creating...' : 'Create Flashcard'}

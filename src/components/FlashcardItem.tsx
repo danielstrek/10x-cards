@@ -87,7 +87,7 @@ export function FlashcardItem({
   };
 
   return (
-    <Card className="relative">
+    <Card className="relative" data-test-id="flashcard-card">
       <CardContent className="pt-6">
         {/* Source badge */}
         <div className="absolute top-3 right-3">
@@ -113,6 +113,7 @@ export function FlashcardItem({
                 size="sm"
                 onClick={handleEdit}
                 disabled={isUpdating || isDeleting}
+                data-test-id="flashcard-card-edit-button"
               >
                 <PencilIcon className="mr-2 h-4 w-4" />
                 Edit
@@ -123,6 +124,7 @@ export function FlashcardItem({
                 onClick={handleDelete}
                 disabled={isUpdating || isDeleting}
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                data-test-id="flashcard-card-delete-button"
               >
                 <TrashIcon className="mr-2 h-4 w-4" />
                 Delete
@@ -144,6 +146,7 @@ export function FlashcardItem({
                 rows={3}
                 className="resize-none"
                 aria-label="Front of flashcard"
+                data-test-id="flashcard-card-edit-front-input"
               />
             </div>
             <div>
@@ -158,6 +161,7 @@ export function FlashcardItem({
                 rows={4}
                 className="resize-none"
                 aria-label="Back of flashcard"
+                data-test-id="flashcard-card-edit-back-input"
               />
             </div>
 
@@ -174,6 +178,7 @@ export function FlashcardItem({
                 size="sm"
                 onClick={handleSave}
                 disabled={isUpdating}
+                data-test-id="flashcard-card-save-button"
               >
                 <SaveIcon className="mr-2 h-4 w-4" />
                 {isUpdating ? 'Saving...' : 'Save'}
@@ -183,6 +188,7 @@ export function FlashcardItem({
                 size="sm"
                 onClick={handleCancel}
                 disabled={isUpdating}
+                data-test-id="flashcard-card-cancel-button"
               >
                 <XIcon className="mr-2 h-4 w-4" />
                 Cancel

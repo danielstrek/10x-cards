@@ -20,6 +20,7 @@ export function GenerateButton({
       size="lg"
       className="w-full sm:w-auto"
       aria-busy={isLoading}
+      data-test-id="generate-flashcards-button"
     >
       {isLoading ? (
         <>

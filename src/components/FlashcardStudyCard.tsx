@@ -30,12 +30,12 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
   return (
     <div className="w-full max-w-2xl mx-auto">
       {/* Flashcard */}
-      <Card className="mb-6">
+      <Card className="mb-6" data-test-id="study-flashcard-card">
         <CardContent className="pt-12 pb-12 px-8 min-h-[300px] flex flex-col justify-center items-center">
           <div className="w-full text-center">
             {!isFlipped ? (
               /* Front side */
-              <div className="space-y-6">
+              <div className="space-y-6" data-test-id="study-flashcard-front">
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                   Pytanie
                 </h2>
@@ -45,7 +45,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
               </div>
             ) : (
               /* Back side */
-              <div className="space-y-6">
+              <div className="space-y-6" data-test-id="study-flashcard-back">
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                   Odpowiedź
                 </h2>
@@ -74,13 +74,14 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
             size="lg"
             className="w-full"
             disabled={isRating}
+            data-test-id="study-show-answer-button"
           >
             <RotateCcwIcon className="mr-2 h-5 w-5" />
             Pokaż odpowiedź
           </Button>
         ) : (
           /* Rating buttons */
-          <div className="space-y-3">
+          <div className="space-y-3" data-test-id="study-rating-buttons">
             <p className="text-center text-sm text-muted-foreground mb-4">
               Jak dobrze pamiętałeś tę fiszkę?
             </p>
@@ -91,6 +92,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
                 size="lg"
                 disabled={isRating}
                 className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                data-test-id="study-rate-again-button"
               >
                 Wcale
               </Button>
@@ -100,6 +102,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
                 size="lg"
                 disabled={isRating}
                 className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200"
+                data-test-id="study-rate-hard-button"
               >
                 Trudno
               </Button>
@@ -109,6 +112,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
                 size="lg"
                 disabled={isRating}
                 className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                data-test-id="study-rate-good-button"
               >
                 Dobrze
               </Button>
@@ -118,6 +122,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
                 size="lg"
                 disabled={isRating}
                 className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+                data-test-id="study-rate-easy-button"
               >
                 Łatwo
               </Button>
@@ -128,7 +133,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
 
       {/* Metadata */}
       {isFlipped && (
-        <div className="mt-6 text-center text-xs text-muted-foreground space-y-1">
+        <div className="mt-6 text-center text-xs text-muted-foreground space-y-1" data-test-id="study-flashcard-metadata">
           <p>Powtórzenia: {flashcard.repetitions} | Interwał: {flashcard.interval} dni</p>
           <p>Współczynnik łatwości: {flashcard.easinessFactor.toFixed(2)}</p>
         </div>

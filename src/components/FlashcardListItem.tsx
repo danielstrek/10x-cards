@@ -73,6 +73,7 @@ export function FlashcardListItem({
       )}
       role="article"
       aria-label={`Flashcard: ${flashcard.front.substring(0, 50)}${flashcard.front.length > 50 ? '...' : ''}`}
+      data-test-id="flashcard-item"
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
@@ -136,6 +137,7 @@ export function FlashcardListItem({
                 )}
                 aria-invalid={!isFrontValid}
                 aria-describedby={`front-char-count-${flashcard.proposalId}`}
+                data-test-id="flashcard-edit-front-input"
               />
               <p
                 id={`front-char-count-${flashcard.proposalId}`}
@@ -171,6 +173,7 @@ export function FlashcardListItem({
                 )}
                 aria-invalid={!isBackValid}
                 aria-describedby={`back-char-count-${flashcard.proposalId}`}
+                data-test-id="flashcard-edit-back-input"
               />
               <p
                 id={`back-char-count-${flashcard.proposalId}`}
@@ -198,6 +201,7 @@ export function FlashcardListItem({
                 size="sm"
                 variant="default"
                 aria-label="Save edited flashcard"
+                data-test-id="flashcard-save-edit-button"
               >
                 Save Changes
               </Button>
@@ -206,6 +210,7 @@ export function FlashcardListItem({
                 size="sm"
                 variant="outline"
                 aria-label="Cancel editing"
+                data-test-id="flashcard-cancel-edit-button"
               >
                 Cancel
               </Button>
@@ -219,6 +224,7 @@ export function FlashcardListItem({
                 disabled={flashcard.accepted}
                 aria-label={flashcard.accepted ? 'Flashcard already accepted' : 'Accept this flashcard'}
                 aria-pressed={flashcard.accepted}
+                data-test-id="flashcard-accept-button"
               >
                 {flashcard.accepted ? 'Accepted' : 'Accept'}
               </Button>
@@ -227,6 +233,7 @@ export function FlashcardListItem({
                 size="sm"
                 variant="outline"
                 aria-label="Edit this flashcard"
+                data-test-id="flashcard-edit-button"
               >
                 Edit
               </Button>
@@ -235,6 +242,7 @@ export function FlashcardListItem({
                 size="sm"
                 variant="destructive"
                 aria-label="Reject and remove this flashcard"
+                data-test-id="flashcard-reject-button"
               >
                 Reject
               </Button>
