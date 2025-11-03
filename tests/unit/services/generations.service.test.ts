@@ -347,6 +347,34 @@ describe('generations.service', () => {
     it('should throw error when LLM call fails', async () => {
       const mockError = new Error('OpenRouter API error');
 
+      const mockGenerationsInsert = vi.fn().mockReturnThis();
+      const mockGenerationsSelect = vi.fn().mockReturnThis();
+      const mockGenerationsSingle = vi.fn().mockResolvedValue({
+        data: {
+          id: mockGenerationId,
+          model: validDto.model,
+          generated_count: 0,
+        },
+        error: null,
+      });
+
+      const mockErrorLogsInsert = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      (mockSupabase.from as Mock).mockImplementation((table: string) => {
+        if (table === 'generations') {
+          return {
+            insert: mockGenerationsInsert,
+            select: mockGenerationsSelect,
+            single: mockGenerationsSingle,
+          };
+        }
+        if (table === 'generation_error_logs') {
+          return {
+            insert: mockErrorLogsInsert,
+          };
+        }
+      });
+
       (mockOpenRouterService.chat as Mock).mockRejectedValue(mockError);
 
       await expect(

@@ -206,14 +206,57 @@ export class OpenRouterService {
 
         // Obsługa błędów HTTP
         if (!response.ok) {
+          // Check if we should retry for retryable status codes
+          const statusCode = response.status;
+          const shouldRetry = this.shouldRetry(statusCode, attempt);
+          
+          if (shouldRetry) {
+            // Store error info for retry
+            try {
+              const errorData = await response.json();
+              const errorMessage = errorData.error?.message || errorData.message || 'Unknown error';
+              console.error('[OpenRouter] HTTP Error:', {
+                statusCode,
+                errorMessage,
+                attempt
+              });
+              lastError = new OpenRouterAPIError(errorMessage, statusCode, errorData);
+            } catch {
+              const errorMessage = await response.text();
+              console.error('[OpenRouter] HTTP Error (text):', {
+                statusCode,
+                errorMessage,
+                attempt
+              });
+              lastError = new OpenRouterAPIError(errorMessage, statusCode, errorMessage);
+            }
+            
+            // Wait and retry
+            const delay = this.calculateRetryDelay(attempt, statusCode);
+            await this.sleep(delay);
+            continue;
+          }
+          
+          // Non-retryable error or max retries reached - throw immediately
           await this.handleHttpError(response, attempt);
-          continue; // Retry
         }
 
         // Parsuj odpowiedź
         const data = await response.json();
         return data as T;
       } catch (error) {
+        // Re-throw if it's one of our custom errors (from handleHttpError)
+        if (
+          error instanceof OpenRouterAuthError ||
+          error instanceof OpenRouterRateLimitError ||
+          error instanceof OpenRouterModelError ||
+          error instanceof OpenRouterAPIError ||
+          error instanceof OpenRouterParseError ||
+          error instanceof OpenRouterValidationError
+        ) {
+          throw error;
+        }
+
         lastError = error as Error;
 
         // Obsługa timeout
@@ -239,8 +282,11 @@ export class OpenRouterService {
       }
     }
 
-    // Wszystkie próby zawiodły
-    throw lastError || new OpenRouterNetworkError('All retry attempts failed');
+    // Wszystkie próby zawiodły - throw the last error we stored
+    if (lastError) {
+      throw lastError;
+    }
+    throw new OpenRouterNetworkError('All retry attempts failed');
   }
 
   /**
@@ -249,7 +295,7 @@ export class OpenRouterService {
   private async handleHttpError(
     response: Response,
     attempt: number
-  ): Promise<void> {
+  ): Promise<never> {
     const statusCode = response.status;
     let errorMessage: string;
     let errorDetails: unknown;
@@ -283,34 +329,18 @@ export class OpenRouterService {
       throw new OpenRouterAuthError(errorMessage);
     }
 
-    // Rate limit
-    if (statusCode === 429) {
-      const retryAfter = this.parseRetryAfter(response.headers);
-
-      if (attempt < this.retryConfig.maxRetries) {
-        const delay = retryAfter
-          ? retryAfter * 1000
-          : this.calculateRetryDelay(attempt, statusCode);
-        await this.sleep(delay);
-        return; // Retry
-      }
-
-      throw new OpenRouterRateLimitError(errorMessage, retryAfter);
-    }
-
     // Błędy modelu
     if (statusCode === 400 && errorMessage.toLowerCase().includes('model')) {
       throw new OpenRouterModelError(errorMessage);
     }
 
-    // Błędy serwera - retry
-    if (this.shouldRetry(statusCode, attempt)) {
-      const delay = this.calculateRetryDelay(attempt, statusCode);
-      await this.sleep(delay);
-      return; // Retry
+    // Rate limit
+    if (statusCode === 429) {
+      const retryAfter = this.parseRetryAfter(response.headers);
+      throw new OpenRouterRateLimitError(errorMessage, retryAfter);
     }
 
-    // Inne błędy API
+    // Błędy serwera - throw jako APIError
     throw new OpenRouterAPIError(errorMessage, statusCode, errorDetails);
   }
 

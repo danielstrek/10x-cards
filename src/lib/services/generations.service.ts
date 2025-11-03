@@ -54,7 +54,6 @@ const FLASHCARDS_RESPONSE_SCHEMA: OpenRouterResponseFormat = {
       required: ['flashcards'],
       additionalProperties: false,
     },
-    description: 'Structured response containing flashcards generated from source text',
   },
 };
 
