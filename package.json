@@ -44,6 +44,9 @@
     "tailwindcss": "^4.1.13",
     "zod": "^3.25.76"
   },
+  "optionalDependencies": {
+    "@astrojs/cloudflare": "^11.1.0"
+  },
   "devDependencies": {
     "@eslint/compat": "1.2.7",
     "@eslint/js": "9.23.0",
