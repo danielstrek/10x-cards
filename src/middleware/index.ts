@@ -1,11 +1,11 @@
-import { defineMiddleware } from 'astro:middleware';
+import { defineMiddleware } from "astro:middleware";
 
-import { supabaseServiceClient, createSupabaseServerInstance } from '../db/supabase.client.ts';
+import { supabaseServiceClient, createSupabaseServerInstance } from "../db/supabase.client.ts";
 
 export const onRequest = defineMiddleware(async (context, next) => {
   // Use service client to bypass RLS - we handle auth in API routes
   context.locals.supabase = supabaseServiceClient;
-  
+
   // Check user session from cookies (for SSR)
   const supabase = createSupabaseServerInstance({
     cookies: context.cookies,
@@ -23,8 +23,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
       email: user.email!,
     };
   }
-  
+
   return next();
 });
-
-

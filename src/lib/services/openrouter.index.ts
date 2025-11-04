@@ -1,7 +1,7 @@
 // src/lib/services/openrouter.index.ts
 
 // Eksport głównej klasy usługi
-export { OpenRouterService } from './openrouter.service';
+export { OpenRouterService } from "./openrouter.service";
 
 // Eksport wszystkich typów
 export type {
@@ -14,7 +14,7 @@ export type {
   OpenRouterModel,
   OpenRouterAPIResponse,
   OpenRouterAPIRequestBody,
-} from './openrouter.types';
+} from "./openrouter.types";
 
 // Eksport wszystkich błędów
 export {
@@ -26,5 +26,4 @@ export {
   OpenRouterAPIError,
   OpenRouterNetworkError,
   OpenRouterParseError,
-} from './openrouter.errors';
-
+} from "./openrouter.errors";

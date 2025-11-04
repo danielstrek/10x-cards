@@ -1,13 +1,13 @@
-import { test as base, Page } from '@playwright/test';
-import { registerAndLogin, clearAuth } from '../helpers/auth.helper';
+import { test as base, Page } from "@playwright/test";
+import { registerAndLogin, clearAuth } from "../helpers/auth.helper";
 
 /**
  * Extended test context with authenticated user
  */
-type AuthFixtures = {
+interface AuthFixtures {
   authenticatedPage: Page;
   userCredentials: { email: string; password: string };
-};
+}
 
 /**
  * Test fixture for authentication
@@ -39,12 +39,11 @@ export const test = base.extend<AuthFixtures>({
   userCredentials: async ({ page }, use) => {
     const credentials = {
       email: `test-${Date.now()}@10xcards-test.com`,
-      password: 'TestPassword123!@#',
+      password: "TestPassword123!@#",
     };
 
     await use(credentials);
   },
 });
 
-export { expect } from '@playwright/test';
-
+export { expect } from "@playwright/test";

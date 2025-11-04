@@ -1,8 +1,8 @@
 // src/pages/api/study/review.ts
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { reviewFlashcard } from '../../../lib/services/study.service';
-import type { ReviewFlashcardResponseDto } from '../../../types';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { reviewFlashcard } from "../../../lib/services/study.service";
+import type { ReviewFlashcardResponseDto } from "../../../types";
 
 // Disable prerendering for API routes
 export const prerender = false;
@@ -12,15 +12,15 @@ export const prerender = false;
  */
 const reviewFlashcardSchema = z.object({
   flashcardId: z.number().int().positive(),
-  rating: z.enum(['again', 'hard', 'good', 'easy']),
+  rating: z.enum(["again", "hard", "good", "easy"]),
 });
 
 /**
  * POST /api/study/review
- * 
+ *
  * Submit a review for a flashcard and update SRS data
  * Requires authentication via session
- * 
+ *
  * @param flashcardId - ID of the flashcard being reviewed
  * @param rating - User rating: 'again', 'hard', 'good', 'easy'
  * @returns 200 OK with updated SRS data
@@ -33,10 +33,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
   try {
     // Check authentication
     if (!locals.user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized', message: 'Not authenticated' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized", message: "Not authenticated" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const userId = locals.user.id;
@@ -46,10 +46,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     try {
       requestBody = await request.json();
     } catch (error) {
-      return new Response(
-        JSON.stringify({ error: 'Bad Request', message: 'Invalid JSON in request body' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: "Bad Request", message: "Invalid JSON in request body" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Validate with Zod schema
@@ -58,14 +58,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'Validation failed',
+          error: "Bad Request",
+          message: "Validation failed",
           details: validationResult.error.errors.map((err) => ({
-            path: err.path.join('.'),
+            path: err.path.join("."),
             message: err.message,
           })),
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -73,12 +73,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Review flashcard
     try {
-      const result = await reviewFlashcard(
-        locals.supabase,
-        flashcardId,
-        rating,
-        userId
-      );
+      const result = await reviewFlashcard(locals.supabase, flashcardId, rating, userId);
 
       const response: ReviewFlashcardResponseDto = {
         easinessFactor: result.easinessFactor,
@@ -90,33 +85,32 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
       return new Response(JSON.stringify(response), {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       // Check if it's a "not found" error
-      if (errorMessage.includes('not found') || errorMessage.includes('does not belong')) {
+      if (errorMessage.includes("not found") || errorMessage.includes("does not belong")) {
         return new Response(
           JSON.stringify({
-            error: 'Not Found',
-            message: 'Flashcard not found or does not belong to user',
+            error: "Not Found",
+            message: "Flashcard not found or does not belong to user",
           }),
-          { status: 404, headers: { 'Content-Type': 'application/json' } }
+          { status: 404, headers: { "Content-Type": "application/json" } }
         );
       }
 
       throw error;
     }
   } catch (error) {
-    console.error('Error reviewing flashcard:', error);
+    console.error("Error reviewing flashcard:", error);
     return new Response(
       JSON.stringify({
-        error: 'Internal Server Error',
-        message: 'Failed to review flashcard',
+        error: "Internal Server Error",
+        message: "Failed to review flashcard",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
-

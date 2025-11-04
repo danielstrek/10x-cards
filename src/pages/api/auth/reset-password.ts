@@ -1,15 +1,15 @@
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { createSupabaseServerInstance } from '../../../db/supabase.client';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 
 // Validation schema for reset password
 const resetPasswordSchema = z.object({
   password: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
 });
 
 export const prerender = false;
@@ -22,11 +22,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       requestBody = await request.json();
     } catch {
       return new Response(
-        JSON.stringify({ 
-          error: 'Bad Request', 
-          message: 'Invalid JSON' 
+        JSON.stringify({
+          error: "Bad Request",
+          message: "Invalid JSON",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -35,14 +35,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'Validation failed',
+          error: "Bad Request",
+          message: "Validation failed",
           details: validationResult.error.errors.map((err) => ({
-            path: err.path.join('.'),
+            path: err.path.join("."),
             message: err.message,
           })),
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -56,15 +56,18 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     // 4. Get current user from session
     // The reset token should be in cookies (set by Supabase when user clicks email link)
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
     if (userError || !user) {
       return new Response(
-        JSON.stringify({ 
-          error: 'Unauthorized', 
-          message: 'Invalid or expired reset token' 
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "Invalid or expired reset token",
         }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
+        { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -74,13 +77,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
 
     if (updateError) {
-      console.error('Supabase password update error:', updateError);
+      console.error("Supabase password update error:", updateError);
       return new Response(
-        JSON.stringify({ 
-          error: 'Bad Request', 
-          message: 'Failed to reset password' 
+        JSON.stringify({
+          error: "Bad Request",
+          message: "Failed to reset password",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -88,20 +91,19 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // User is now logged in with new password
     return new Response(
       JSON.stringify({
-        message: 'Password has been reset successfully',
+        message: "Password has been reset successfully",
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
     // Catch-all for unexpected errors
-    console.error('Unexpected error in reset-password endpoint:', error);
+    console.error("Unexpected error in reset-password endpoint:", error);
     return new Response(
-      JSON.stringify({ 
-        error: 'Internal Server Error', 
-        message: 'An unexpected error occurred' 
+      JSON.stringify({
+        error: "Internal Server Error",
+        message: "An unexpected error occurred",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
-

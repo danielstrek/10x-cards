@@ -1,5 +1,5 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { Page, Locator } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 /**
  * Page Object Model for My Flashcards Page
@@ -23,29 +23,29 @@ export class FlashcardsPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators using test IDs
-    this.totalCount = page.getByTestId('flashcards-total-count');
-    this.addButton = page.getByTestId('flashcards-add-button');
-    this.errorNotification = page.getByTestId('flashcards-error-notification');
-    this.loadingIndicator = page.getByTestId('flashcards-loading-indicator');
-    this.emptyState = page.getByTestId('flashcards-empty-state');
-    this.emptyCreateButton = page.getByTestId('flashcards-empty-create-button');
-    this.flashcardsList = page.getByTestId('flashcards-list');
-    this.flashcardCards = page.getByTestId('flashcard-card');
-    this.addFlashcardDialog = page.getByTestId('add-flashcard-dialog');
-    this.addFlashcardFrontInput = page.getByTestId('add-flashcard-front-input');
-    this.addFlashcardBackInput = page.getByTestId('add-flashcard-back-input');
-    this.addFlashcardError = page.getByTestId('add-flashcard-error');
-    this.addFlashcardCancelButton = page.getByTestId('add-flashcard-cancel-button');
-    this.addFlashcardCreateButton = page.getByTestId('add-flashcard-create-button');
+    this.totalCount = page.getByTestId("flashcards-total-count");
+    this.addButton = page.getByTestId("flashcards-add-button");
+    this.errorNotification = page.getByTestId("flashcards-error-notification");
+    this.loadingIndicator = page.getByTestId("flashcards-loading-indicator");
+    this.emptyState = page.getByTestId("flashcards-empty-state");
+    this.emptyCreateButton = page.getByTestId("flashcards-empty-create-button");
+    this.flashcardsList = page.getByTestId("flashcards-list");
+    this.flashcardCards = page.getByTestId("flashcard-card");
+    this.addFlashcardDialog = page.getByTestId("add-flashcard-dialog");
+    this.addFlashcardFrontInput = page.getByTestId("add-flashcard-front-input");
+    this.addFlashcardBackInput = page.getByTestId("add-flashcard-back-input");
+    this.addFlashcardError = page.getByTestId("add-flashcard-error");
+    this.addFlashcardCancelButton = page.getByTestId("add-flashcard-cancel-button");
+    this.addFlashcardCreateButton = page.getByTestId("add-flashcard-create-button");
   }
 
   /**
    * Navigate to flashcards page
    */
   async navigate(): Promise<void> {
-    await this.goto('/flashcards');
+    await this.goto("/flashcards");
     await this.waitForPageLoad();
   }
 
@@ -53,7 +53,7 @@ export class FlashcardsPage extends BasePage {
    * Wait for flashcards to load
    */
   async waitForFlashcardsToLoad(timeout = 5000): Promise<void> {
-    await this.page.waitForLoadState('networkidle', { timeout }).catch(() => {});
+    await this.page.waitForLoadState("networkidle", { timeout }).catch(() => {});
   }
 
   /**
@@ -94,7 +94,7 @@ export class FlashcardsPage extends BasePage {
    * Wait for add dialog to open
    */
   async waitForAddDialog(timeout = 3000): Promise<void> {
-    await this.addFlashcardDialog.waitFor({ state: 'visible', timeout });
+    await this.addFlashcardDialog.waitFor({ state: "visible", timeout });
   }
 
   /**
@@ -127,9 +127,9 @@ export class FlashcardsPage extends BasePage {
     await this.waitForAddDialog();
     await this.fillAddFlashcardForm(front, back);
     await this.submitAddFlashcard();
-    
+
     // Wait for dialog to close
-    await this.addFlashcardDialog.waitFor({ state: 'hidden', timeout: 3000 }).catch(() => {});
+    await this.addFlashcardDialog.waitFor({ state: "hidden", timeout: 3000 }).catch(() => {});
   }
 
   /**
@@ -137,12 +137,12 @@ export class FlashcardsPage extends BasePage {
    */
   async editFlashcard(index: number, front: string, back: string): Promise<void> {
     const flashcard = this.flashcardCards.nth(index);
-    const editButton = flashcard.getByTestId('flashcard-card-edit-button');
+    const editButton = flashcard.getByTestId("flashcard-card-edit-button");
     await editButton.click();
 
-    const frontInput = flashcard.getByTestId('flashcard-card-edit-front-input');
-    const backInput = flashcard.getByTestId('flashcard-card-edit-back-input');
-    const saveButton = flashcard.getByTestId('flashcard-card-save-button');
+    const frontInput = flashcard.getByTestId("flashcard-card-edit-front-input");
+    const backInput = flashcard.getByTestId("flashcard-card-edit-back-input");
+    const saveButton = flashcard.getByTestId("flashcard-card-save-button");
 
     await frontInput.fill(front);
     await backInput.fill(back);
@@ -157,7 +157,7 @@ export class FlashcardsPage extends BasePage {
    */
   async deleteFlashcard(index: number): Promise<void> {
     const flashcard = this.flashcardCards.nth(index);
-    const deleteButton = flashcard.getByTestId('flashcard-card-delete-button');
+    const deleteButton = flashcard.getByTestId("flashcard-card-delete-button");
     await deleteButton.click();
 
     // Wait for deletion to complete
@@ -169,18 +169,18 @@ export class FlashcardsPage extends BasePage {
    */
   async getFlashcardContent(index: number): Promise<{ front: string; back: string } | null> {
     const flashcard = this.flashcardCards.nth(index);
-    
-    if (!await flashcard.isVisible()) {
+
+    if (!(await flashcard.isVisible())) {
       return null;
     }
 
     const content = await flashcard.textContent();
-    
+
     // Try to extract front and back from content
     // This is a simplified approach - adjust based on actual HTML structure
     return {
-      front: content?.split('\n')[0]?.trim() || '',
-      back: content?.split('\n')[1]?.trim() || '',
+      front: content?.split("\n")[0]?.trim() || "",
+      back: content?.split("\n")[1]?.trim() || "",
     };
   }
 
@@ -198,4 +198,3 @@ export class FlashcardsPage extends BasePage {
     return await this.addFlashcardError.isVisible({ timeout: 1000 }).catch(() => false);
   }
 }
-

@@ -1,15 +1,11 @@
-import { test, expect } from '../fixtures/auth.fixture';
-import { FlashcardsPage } from '../pages/FlashcardsPage';
-import { GeneratePage } from '../pages/GeneratePage';
-import { 
-  generateFlashcardData, 
-  generateSampleText,
-  generateInvalidFlashcard,
-} from '../helpers/test-data.helper';
+import { test, expect } from "../fixtures/auth.fixture";
+import { FlashcardsPage } from "../pages/FlashcardsPage";
+import { GeneratePage } from "../pages/GeneratePage";
+import { generateFlashcardData, generateSampleText, generateInvalidFlashcard } from "../helpers/test-data.helper";
 
 /**
  * E2E Tests for Scenario 3: Managing Flashcards
- * 
+ *
  * Test Cases:
  * - TC-FLASH-001: View empty flashcards list
  * - TC-FLASH-002: Create flashcard manually
@@ -21,8 +17,8 @@ import {
  * - TC-FLASH-008: Cancel flashcard creation
  */
 
-test.describe('Scenario 3: Managing Flashcards', () => {
-  test('TC-FLASH-001: Should show empty state when no flashcards exist', async ({ authenticatedPage }) => {
+test.describe("Scenario 3: Managing Flashcards", () => {
+  test("TC-FLASH-001: Should show empty state when no flashcards exist", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
 
     await flashcardsPage.navigate();
@@ -30,7 +26,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
 
     // Check if empty state is shown
     const isEmptyStateShown = await flashcardsPage.isEmptyStateShown();
-    
+
     // If no flashcards, should show empty state
     const count = await flashcardsPage.getFlashcardsCount();
     if (count === 0) {
@@ -38,7 +34,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     }
   });
 
-  test('TC-FLASH-002: Should create a flashcard manually', async ({ authenticatedPage }) => {
+  test("TC-FLASH-002: Should create a flashcard manually", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
     const flashcardData = generateFlashcardData();
 
@@ -62,7 +58,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     expect(isEmptyStateShown).toBe(false);
   });
 
-  test('TC-FLASH-003: Should display list of flashcards', async ({ authenticatedPage }) => {
+  test("TC-FLASH-003: Should display list of flashcards", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
     const generatePage = new GeneratePage(authenticatedPage);
 
@@ -70,7 +66,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     await generatePage.navigate();
     const sampleText = generateSampleText(3000);
     await generatePage.generateFlashcards(sampleText);
-    
+
     // Save all generated flashcards
     await generatePage.clickSaveAll();
     await generatePage.waitForSuccessDialog();
@@ -89,9 +85,9 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     expect(totalCount).toBeGreaterThan(0);
   });
 
-  test('TC-FLASH-004: Should edit an existing flashcard', async ({ authenticatedPage }) => {
+  test("TC-FLASH-004: Should edit an existing flashcard", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
-    
+
     // First, create a flashcard
     const originalData = generateFlashcardData();
     await flashcardsPage.navigate();
@@ -99,9 +95,9 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     // Now edit it
-    const newFront = 'Updated Question?';
-    const newBack = 'Updated Answer!';
-    
+    const newFront = "Updated Question?";
+    const newBack = "Updated Answer!";
+
     await flashcardsPage.editFlashcard(0, newFront, newBack);
 
     // Wait for save to complete
@@ -109,13 +105,13 @@ test.describe('Scenario 3: Managing Flashcards', () => {
 
     // Verify flashcard was updated
     const updatedContent = await flashcardsPage.getFlashcardContent(0);
-    expect(updatedContent?.front).toContain('Updated');
-    expect(updatedContent?.back).toContain('Updated');
+    expect(updatedContent?.front).toContain("Updated");
+    expect(updatedContent?.back).toContain("Updated");
   });
 
-  test('TC-FLASH-005: Should delete a flashcard', async ({ authenticatedPage }) => {
+  test("TC-FLASH-005: Should delete a flashcard", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
-    
+
     // First, create a flashcard
     const flashcardData = generateFlashcardData();
     await flashcardsPage.navigate();
@@ -136,7 +132,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     expect(newCount).toBe(initialCount - 1);
   });
 
-  test('TC-FLASH-006: Should validate flashcard field lengths', async ({ authenticatedPage }) => {
+  test("TC-FLASH-006: Should validate flashcard field lengths", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
     const invalidData = generateInvalidFlashcard();
 
@@ -161,7 +157,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     expect(hasError || isDialogOpen).toBe(true);
   });
 
-  test('TC-FLASH-007: Should create multiple flashcards in sequence', async ({ authenticatedPage }) => {
+  test("TC-FLASH-007: Should create multiple flashcards in sequence", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
 
     await flashcardsPage.navigate();
@@ -172,10 +168,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     // Create 3 flashcards
     for (let i = 0; i < 3; i++) {
       const flashcardData = generateFlashcardData();
-      await flashcardsPage.createFlashcard(
-        `${flashcardData.front} (${i + 1})`,
-        `${flashcardData.back} (${i + 1})`
-      );
+      await flashcardsPage.createFlashcard(`${flashcardData.front} (${i + 1})`, `${flashcardData.back} (${i + 1})`);
       await authenticatedPage.waitForTimeout(500);
     }
 
@@ -184,7 +177,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     expect(finalCount).toBe(initialCount + 3);
   });
 
-  test('TC-FLASH-008: Should cancel flashcard creation', async ({ authenticatedPage }) => {
+  test("TC-FLASH-008: Should cancel flashcard creation", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
     const flashcardData = generateFlashcardData();
 
@@ -215,7 +208,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     expect(finalCount).toBe(initialCount);
   });
 
-  test('TC-FLASH-009: Should show correct total count after operations', async ({ authenticatedPage }) => {
+  test("TC-FLASH-009: Should show correct total count after operations", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
 
     await flashcardsPage.navigate();
@@ -234,7 +227,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     expect(totalCount).toBeGreaterThanOrEqual(cardCount);
   });
 
-  test('TC-FLASH-010: Should handle empty fields validation', async ({ authenticatedPage }) => {
+  test("TC-FLASH-010: Should handle empty fields validation", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
 
     await flashcardsPage.navigate();
@@ -259,7 +252,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     expect(hasError || isButtonDisabled).toBe(true);
   });
 
-  test('TC-FLASH-011: Should persist flashcards after page reload', async ({ authenticatedPage }) => {
+  test("TC-FLASH-011: Should persist flashcards after page reload", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
     const flashcardData = generateFlashcardData();
 
@@ -281,7 +274,7 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     expect(countAfterReload).toBe(countBeforeReload);
   });
 
-  test('TC-FLASH-012: Should allow editing flashcard content multiple times', async ({ authenticatedPage }) => {
+  test("TC-FLASH-012: Should allow editing flashcard content multiple times", async ({ authenticatedPage }) => {
     const flashcardsPage = new FlashcardsPage(authenticatedPage);
     const originalData = generateFlashcardData();
 
@@ -292,17 +285,16 @@ test.describe('Scenario 3: Managing Flashcards', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     // First edit
-    await flashcardsPage.editFlashcard(0, 'Edit 1 Front', 'Edit 1 Back');
+    await flashcardsPage.editFlashcard(0, "Edit 1 Front", "Edit 1 Back");
     await authenticatedPage.waitForTimeout(500);
 
     // Second edit
-    await flashcardsPage.editFlashcard(0, 'Edit 2 Front', 'Edit 2 Back');
+    await flashcardsPage.editFlashcard(0, "Edit 2 Front", "Edit 2 Back");
     await authenticatedPage.waitForTimeout(500);
 
     // Verify latest edit is saved
     const finalContent = await flashcardsPage.getFlashcardContent(0);
-    expect(finalContent?.front).toContain('Edit 2');
-    expect(finalContent?.back).toContain('Edit 2');
+    expect(finalContent?.front).toContain("Edit 2");
+    expect(finalContent?.back).toContain("Edit 2");
   });
 });
-

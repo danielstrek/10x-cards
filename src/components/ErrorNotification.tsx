@@ -1,16 +1,13 @@
 // src/components/ErrorNotification.tsx
-import * as React from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import * as React from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface ErrorNotificationProps {
   message: string;
   title?: string;
 }
 
-export function ErrorNotification({
-  message,
-  title = 'Error',
-}: ErrorNotificationProps) {
+export function ErrorNotification({ message, title = "Error" }: ErrorNotificationProps) {
   if (!message) {
     return null;
   }
@@ -37,4 +34,3 @@ export function ErrorNotification({
     </Alert>
   );
 }
-

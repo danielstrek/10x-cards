@@ -1,12 +1,8 @@
 // src/lib/services/generations.service.ts
-import type { SupabaseClient } from '../../db/supabase.client';
-import type {
-  CreateGenerationDto,
-  CreateGenerationResponseDto,
-  ProposalDto,
-} from '../../types';
-import { OpenRouterService } from './openrouter.service';
-import type { OpenRouterResponseFormat } from './openrouter.types';
+import type { SupabaseClient } from "../../db/supabase.client";
+import type { CreateGenerationDto, CreateGenerationResponseDto, ProposalDto } from "../../types";
+import { OpenRouterService } from "./openrouter.service";
+import type { OpenRouterResponseFormat } from "./openrouter.types";
 
 /**
  * Service for managing flashcard generation operations
@@ -24,34 +20,34 @@ interface FlashcardProposal {
  * Schemat JSON dla odpowiedzi z fiszkami
  */
 const FLASHCARDS_RESPONSE_SCHEMA: OpenRouterResponseFormat = {
-  type: 'json_schema',
+  type: "json_schema",
   json_schema: {
-    name: 'flashcards_response',
+    name: "flashcards_response",
     strict: true,
     schema: {
-      type: 'object',
+      type: "object",
       properties: {
         flashcards: {
-          type: 'array',
+          type: "array",
           items: {
-            type: 'object',
+            type: "object",
             properties: {
               front: {
-                type: 'string',
-                description: 'Question on the front of the flashcard (max 200 chars)',
+                type: "string",
+                description: "Question on the front of the flashcard (max 200 chars)",
               },
               back: {
-                type: 'string',
-                description: 'Answer on the back of the flashcard (max 500 chars)',
+                type: "string",
+                description: "Answer on the back of the flashcard (max 500 chars)",
               },
             },
-            required: ['front', 'back'],
+            required: ["front", "back"],
             additionalProperties: false,
           },
-          description: 'Array of flashcards (5-20 items)',
+          description: "Array of flashcards (5-20 items)",
         },
       },
-      required: ['flashcards'],
+      required: ["flashcards"],
       additionalProperties: false,
     },
   },
@@ -81,9 +77,9 @@ Guidelines:
 async function generateTextHash(text: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   return hashHex;
 }
 
@@ -99,11 +95,11 @@ async function callLLM(
     model,
     messages: [
       {
-        role: 'system',
+        role: "system",
         content: SYSTEM_PROMPT,
       },
       {
-        role: 'user',
+        role: "user",
         content: `Generate flashcards from this text:\n\n${sourceText}`,
       },
     ],
@@ -122,24 +118,24 @@ async function callLLM(
     // Walidacja długości
     for (const card of flashcards) {
       if (card.front.length > 200) {
-        card.front = card.front.substring(0, 197) + '...';
+        card.front = card.front.substring(0, 197) + "...";
       }
       if (card.back.length > 500) {
-        card.back = card.back.substring(0, 497) + '...';
+        card.back = card.back.substring(0, 497) + "...";
       }
     }
 
     return flashcards;
   } catch (error) {
     throw new Error(
-      `Failed to parse flashcards from LLM response: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to parse flashcards from LLM response: ${error instanceof Error ? error.message : "Unknown error"}`
     );
   }
 }
 
 /**
  * Tworzy nową generację i zwraca propozycje fiszek
- * 
+ *
  * @param supabase - Supabase client instance
  * @param dto - Data transfer object containing sourceText and model
  * @param userId - The authenticated user's ID
@@ -164,7 +160,7 @@ export async function createGeneration(
   try {
     flashcardProposals = await callLLM(dto.sourceText, dto.model, openRouterService);
   } catch (error) {
-    llmError = error instanceof Error ? error : new Error('Unknown LLM error');
+    llmError = error instanceof Error ? error : new Error("Unknown LLM error");
     flashcardProposals = [];
   }
 
@@ -172,7 +168,7 @@ export async function createGeneration(
 
   // Krok 3: Utwórz rekord generacji w bazie danych
   const { data: generation, error: insertError } = await supabase
-    .from('generations')
+    .from("generations")
     .insert({
       user_id: userId,
       model: dto.model,
@@ -183,23 +179,21 @@ export async function createGeneration(
       accepted_edited_count: 0,
       generation_duration: generationDuration,
     })
-    .select('id, model, generated_count')
+    .select("id, model, generated_count")
     .single();
 
   if (insertError || !generation) {
-    throw new Error(
-      `Failed to create generation record: ${insertError?.message || 'Unknown error'}`
-    );
+    throw new Error(`Failed to create generation record: ${insertError?.message || "Unknown error"}`);
   }
 
   // Krok 4: Jeśli wystąpił błąd LLM, zaloguj go
   if (llmError) {
-    await supabase.from('generation_error_logs').insert({
+    await supabase.from("generation_error_logs").insert({
       user_id: userId,
       model: dto.model,
       source_text_hash: sourceTextHash,
       source_text_length: dto.sourceText.length,
-      error_code: 'LLM_GENERATION_ERROR',
+      error_code: "LLM_GENERATION_ERROR",
       error_message: llmError.message,
     });
 
@@ -221,4 +215,3 @@ export async function createGeneration(
     proposals,
   };
 }
-

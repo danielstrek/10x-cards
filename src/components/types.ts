@@ -12,7 +12,7 @@ export interface FlashcardProposalViewModel {
   /** Back side of the flashcard (answer) */
   back: string;
   /** Source type - dynamically set based on user actions */
-  source: 'ai-full' | 'ai-edited';
+  source: "ai-full" | "ai-edited";
   /** Whether the proposal has been accepted by the user */
   accepted: boolean;
   /** Whether the proposal has been edited by the user */
@@ -26,4 +26,3 @@ export interface GenerateFlashcardsCommand {
   sourceText: string;
   model: string;
 }
-

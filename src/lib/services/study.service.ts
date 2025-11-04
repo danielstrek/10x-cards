@@ -1,10 +1,10 @@
 // src/lib/services/study.service.ts
-import type { SupabaseClient } from '../../db/supabase.client';
+import type { SupabaseClient } from "../../db/supabase.client";
 
 /**
  * SM-2 Algorithm for Spaced Repetition
  * Based on SuperMemo 2 algorithm by Piotr Wozniak (1987)
- * 
+ *
  * Quality ratings:
  * - 0: Complete blackout
  * - 1: Incorrect response, but correct one remembered
@@ -29,7 +29,7 @@ export interface ReviewResult extends SRSData {
 
 /**
  * Calculate next review schedule using SM-2 algorithm
- * 
+ *
  * @param quality - Quality of the answer (0-5)
  * @param previousEF - Previous easiness factor
  * @param previousInterval - Previous interval in days
@@ -38,9 +38,9 @@ export interface ReviewResult extends SRSData {
  */
 export function calculateSM2(
   quality: ReviewQuality,
-  previousEF: number = 2.5,
-  previousInterval: number = 0,
-  previousRepetitions: number = 0
+  previousEF = 2.5,
+  previousInterval = 0,
+  previousRepetitions = 0
 ): SRSData {
   let easinessFactor = previousEF;
   let interval = previousInterval;
@@ -86,19 +86,19 @@ export function calculateSM2(
 
 /**
  * Convert quality rating from user-friendly format to SM-2 scale
- * 
+ *
  * @param rating - User-friendly rating: 'again', 'hard', 'good', 'easy'
  * @returns SM-2 quality (0-5)
  */
-export function ratingToQuality(rating: 'again' | 'hard' | 'good' | 'easy'): ReviewQuality {
+export function ratingToQuality(rating: "again" | "hard" | "good" | "easy"): ReviewQuality {
   switch (rating) {
-    case 'again':
+    case "again":
       return 0; // Complete failure
-    case 'hard':
+    case "hard":
       return 3; // Correct but difficult
-    case 'good':
+    case "good":
       return 4; // Correct with some hesitation
-    case 'easy':
+    case "easy":
       return 5; // Perfect response
     default:
       return 3; // Default to 'good'
@@ -107,25 +107,21 @@ export function ratingToQuality(rating: 'again' | 'hard' | 'good' | 'easy'): Rev
 
 /**
  * Get due flashcards for study session
- * 
+ *
  * @param supabase - Supabase client instance
  * @param userId - User ID
  * @param limit - Maximum number of cards to return
  * @returns Array of due flashcards
  */
-export async function getDueFlashcards(
-  supabase: SupabaseClient,
-  userId: string,
-  limit: number = 20
-) {
+export async function getDueFlashcards(supabase: SupabaseClient, userId: string, limit = 20) {
   const now = new Date().toISOString();
 
   const { data, error } = await supabase
-    .from('flashcards')
-    .select('id, front, back, easiness_factor, interval, repetitions, next_review_date')
-    .eq('user_id', userId)
-    .lte('next_review_date', now)
-    .order('next_review_date', { ascending: true })
+    .from("flashcards")
+    .select("id, front, back, easiness_factor, interval, repetitions, next_review_date")
+    .eq("user_id", userId)
+    .lte("next_review_date", now)
+    .order("next_review_date", { ascending: true })
     .limit(limit);
 
   if (error) {
@@ -137,22 +133,19 @@ export async function getDueFlashcards(
 
 /**
  * Get count of due flashcards
- * 
+ *
  * @param supabase - Supabase client instance
  * @param userId - User ID
  * @returns Count of due flashcards
  */
-export async function getDueFlashcardsCount(
-  supabase: SupabaseClient,
-  userId: string
-): Promise<number> {
+export async function getDueFlashcardsCount(supabase: SupabaseClient, userId: string): Promise<number> {
   const now = new Date().toISOString();
 
   const { count, error } = await supabase
-    .from('flashcards')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .lte('next_review_date', now);
+    .from("flashcards")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .lte("next_review_date", now);
 
   if (error) {
     throw new Error(`Failed to count due flashcards: ${error.message}`);
@@ -163,7 +156,7 @@ export async function getDueFlashcardsCount(
 
 /**
  * Review a flashcard and update SRS data
- * 
+ *
  * @param supabase - Supabase client instance
  * @param flashcardId - Flashcard ID
  * @param rating - User rating ('again', 'hard', 'good', 'easy')
@@ -173,35 +166,30 @@ export async function getDueFlashcardsCount(
 export async function reviewFlashcard(
   supabase: SupabaseClient,
   flashcardId: number,
-  rating: 'again' | 'hard' | 'good' | 'easy',
+  rating: "again" | "hard" | "good" | "easy",
   userId: string
 ): Promise<ReviewResult> {
   // First, get current SRS data
   const { data: flashcard, error: fetchError } = await supabase
-    .from('flashcards')
-    .select('easiness_factor, interval, repetitions, next_review_date')
-    .eq('id', flashcardId)
-    .eq('user_id', userId)
+    .from("flashcards")
+    .select("easiness_factor, interval, repetitions, next_review_date")
+    .eq("id", flashcardId)
+    .eq("user_id", userId)
     .single();
 
   if (fetchError || !flashcard) {
-    throw new Error('Flashcard not found or does not belong to user');
+    throw new Error("Flashcard not found or does not belong to user");
   }
 
   // Convert rating to quality
   const quality = ratingToQuality(rating);
 
   // Calculate new SRS data
-  const srsData = calculateSM2(
-    quality,
-    flashcard.easiness_factor,
-    flashcard.interval,
-    flashcard.repetitions
-  );
+  const srsData = calculateSM2(quality, flashcard.easiness_factor, flashcard.interval, flashcard.repetitions);
 
   // Update flashcard in database
   const { error: updateError } = await supabase
-    .from('flashcards')
+    .from("flashcards")
     .update({
       easiness_factor: srsData.easinessFactor,
       interval: srsData.interval,
@@ -209,8 +197,8 @@ export async function reviewFlashcard(
       next_review_date: srsData.nextReviewDate.toISOString(),
       last_reviewed_at: new Date().toISOString(),
     })
-    .eq('id', flashcardId)
-    .eq('user_id', userId);
+    .eq("id", flashcardId)
+    .eq("user_id", userId);
 
   if (updateError) {
     throw new Error(`Failed to update flashcard: ${updateError.message}`);
@@ -224,22 +212,19 @@ export async function reviewFlashcard(
 
 /**
  * Get study session statistics
- * 
+ *
  * @param supabase - Supabase client instance
  * @param userId - User ID
  * @returns Study statistics
  */
-export async function getStudyStatistics(
-  supabase: SupabaseClient,
-  userId: string
-) {
+export async function getStudyStatistics(supabase: SupabaseClient, userId: string) {
   const now = new Date().toISOString();
 
   // Get total flashcards count
   const { count: totalCount, error: totalError } = await supabase
-    .from('flashcards')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId);
+    .from("flashcards")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
 
   if (totalError) {
     throw new Error(`Failed to get total count: ${totalError.message}`);
@@ -247,10 +232,10 @@ export async function getStudyStatistics(
 
   // Get due flashcards count
   const { count: dueCount, error: dueError } = await supabase
-    .from('flashcards')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .lte('next_review_date', now);
+    .from("flashcards")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .lte("next_review_date", now);
 
   if (dueError) {
     throw new Error(`Failed to get due count: ${dueError.message}`);
@@ -261,10 +246,10 @@ export async function getStudyStatistics(
   todayStart.setHours(0, 0, 0, 0);
 
   const { count: reviewedTodayCount, error: reviewedError } = await supabase
-    .from('flashcards')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .gte('last_reviewed_at', todayStart.toISOString());
+    .from("flashcards")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("last_reviewed_at", todayStart.toISOString());
 
   if (reviewedError) {
     throw new Error(`Failed to get reviewed count: ${reviewedError.message}`);
@@ -276,4 +261,3 @@ export async function getStudyStatistics(
     reviewedToday: reviewedTodayCount || 0,
   };
 }
-

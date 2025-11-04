@@ -1,5 +1,5 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { Page, Locator } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 /**
  * Page Object Model for Home Page
@@ -12,18 +12,18 @@ export class HomePage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators
-    this.heading = page.locator('h1').first();
-    this.generateButton = page.getByRole('link', { name: /generate|create/i });
-    this.loginButton = page.getByRole('link', { name: /login|sign in/i });
+    this.heading = page.locator("h1").first();
+    this.generateButton = page.getByRole("link", { name: /generate|create/i });
+    this.loginButton = page.getByRole("link", { name: /login|sign in/i });
   }
 
   /**
    * Navigate to home page
    */
   async navigate(): Promise<void> {
-    await this.goto('/');
+    await this.goto("/");
     await this.waitForPageLoad();
   }
 
@@ -53,4 +53,3 @@ export class HomePage extends BasePage {
     }
   }
 }
-

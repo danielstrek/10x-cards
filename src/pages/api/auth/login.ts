@@ -1,11 +1,11 @@
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { createSupabaseServerInstance } from '../../../db/supabase.client';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 
 // Validation schema for login
 const loginSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export const prerender = false;
@@ -18,11 +18,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       requestBody = await request.json();
     } catch {
       return new Response(
-        JSON.stringify({ 
-          error: 'Bad Request', 
-          message: 'Invalid JSON' 
+        JSON.stringify({
+          error: "Bad Request",
+          message: "Invalid JSON",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -31,14 +31,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'Validation failed',
+          error: "Bad Request",
+          message: "Validation failed",
           details: validationResult.error.errors.map((err) => ({
-            path: err.path.join('.'),
+            path: err.path.join("."),
             message: err.message,
           })),
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -57,23 +57,23 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
 
     if (error) {
-      console.error('Supabase login error:', error);
+      console.error("Supabase login error:", error);
       return new Response(
-        JSON.stringify({ 
-          error: 'Unauthorized', 
-          message: 'Invalid email or password' 
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "Invalid email or password",
         }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
+        { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
     if (!data.session || !data.user) {
       return new Response(
-        JSON.stringify({ 
-          error: 'Unauthorized', 
-          message: 'Login failed' 
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "Login failed",
         }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
+        { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -89,18 +89,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           email: data.user.email!,
         },
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
     // Catch-all for unexpected errors
-    console.error('Unexpected error in login endpoint:', error);
+    console.error("Unexpected error in login endpoint:", error);
     return new Response(
-      JSON.stringify({ 
-        error: 'Internal Server Error', 
-        message: 'An unexpected error occurred' 
+      JSON.stringify({
+        error: "Internal Server Error",
+        message: "An unexpected error occurred",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
-
