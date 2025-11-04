@@ -17,8 +17,8 @@ if (isCloudflare) {
 }
 
 // Wybór adaptera w zależności od środowiska
-const adapter = isCloudflare
-  ? cloudflareAdapter({ mode: "directory" })
+const adapter = isCloudflare && cloudflareAdapter
+  ? cloudflareAdapter()
   : node({ mode: "standalone" });
 
 console.log(`🚀 Building with ${isCloudflare ? "Cloudflare" : "Node.js"} adapter`);

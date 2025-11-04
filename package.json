@@ -45,7 +45,7 @@
     "zod": "^3.25.76"
   },
   "optionalDependencies": {
-    "@astrojs/cloudflare": "^11.1.0"
+    "@astrojs/cloudflare": "^12.6.0"
   },
   "devDependencies": {
     "@eslint/compat": "1.2.7",
