@@ -1,10 +1,10 @@
 // src/components/FlashcardItem.tsx
-import * as React from 'react';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Textarea } from './ui/textarea';
-import { PencilIcon, TrashIcon, SaveIcon, XIcon } from 'lucide-react';
-import type { FlashcardListItemDto } from '../types';
+import * as React from "react";
+import { Card, CardContent } from "./ui/card";
+import { Button } from "./ui/button";
+import { Textarea } from "./ui/textarea";
+import { PencilIcon, TrashIcon, SaveIcon, XIcon } from "lucide-react";
+import type { FlashcardListItemDto } from "../types";
 
 interface FlashcardItemProps {
   flashcard: FlashcardListItemDto;
@@ -14,13 +14,7 @@ interface FlashcardItemProps {
   isDeleting: boolean;
 }
 
-export function FlashcardItem({ 
-  flashcard, 
-  onUpdate, 
-  onDelete, 
-  isUpdating, 
-  isDeleting 
-}: FlashcardItemProps) {
+export function FlashcardItem({ flashcard, onUpdate, onDelete, isUpdating, isDeleting }: FlashcardItemProps) {
   const [isEditing, setIsEditing] = React.useState(false);
   const [editedFront, setEditedFront] = React.useState(flashcard.front);
   const [editedBack, setEditedBack] = React.useState(flashcard.back);
@@ -47,17 +41,17 @@ export function FlashcardItem({
   const handleSave = async () => {
     // Validate
     if (!editedFront.trim() || !editedBack.trim()) {
-      setValidationError('Both front and back must not be empty');
+      setValidationError("Both front and back must not be empty");
       return;
     }
 
     if (editedFront.length > 200) {
-      setValidationError('Front must be at most 200 characters');
+      setValidationError("Front must be at most 200 characters");
       return;
     }
 
     if (editedBack.length > 500) {
-      setValidationError('Back must be at most 500 characters');
+      setValidationError("Back must be at most 500 characters");
       return;
     }
 
@@ -68,18 +62,18 @@ export function FlashcardItem({
   };
 
   const handleDelete = async () => {
-    if (confirm('Are you sure you want to delete this flashcard?')) {
+    if (confirm("Are you sure you want to delete this flashcard?")) {
       await onDelete(flashcard.id);
     }
   };
 
   const getSourceBadge = (source: string) => {
     switch (source) {
-      case 'ai-full':
+      case "ai-full":
         return <span className="text-xs px-2 py-1 rounded-md bg-blue-100 text-blue-700">AI Generated</span>;
-      case 'ai-edited':
+      case "ai-edited":
         return <span className="text-xs px-2 py-1 rounded-md bg-purple-100 text-purple-700">AI Edited</span>;
-      case 'manual':
+      case "manual":
         return <span className="text-xs px-2 py-1 rounded-md bg-green-100 text-green-700">Manual</span>;
       default:
         return null;
@@ -90,9 +84,7 @@ export function FlashcardItem({
     <Card className="relative" data-test-id="flashcard-card">
       <CardContent className="pt-6">
         {/* Source badge */}
-        <div className="absolute top-3 right-3">
-          {getSourceBadge(flashcard.source)}
-        </div>
+        <div className="absolute top-3 right-3">{getSourceBadge(flashcard.source)}</div>
 
         {/* Display mode */}
         {!isEditing ? (
@@ -135,7 +127,10 @@ export function FlashcardItem({
           /* Edit mode */
           <div className="space-y-4">
             <div>
-              <label htmlFor={`front-${flashcard.id}`} className="text-sm font-semibold text-muted-foreground mb-2 block">
+              <label
+                htmlFor={`front-${flashcard.id}`}
+                className="text-sm font-semibold text-muted-foreground mb-2 block"
+              >
                 Front ({editedFront.length}/200)
               </label>
               <Textarea
@@ -150,7 +145,10 @@ export function FlashcardItem({
               />
             </div>
             <div>
-              <label htmlFor={`back-${flashcard.id}`} className="text-sm font-semibold text-muted-foreground mb-2 block">
+              <label
+                htmlFor={`back-${flashcard.id}`}
+                className="text-sm font-semibold text-muted-foreground mb-2 block"
+              >
                 Back ({editedBack.length}/500)
               </label>
               <Textarea
@@ -174,14 +172,9 @@ export function FlashcardItem({
 
             {/* Action buttons */}
             <div className="flex gap-2 pt-2">
-              <Button
-                size="sm"
-                onClick={handleSave}
-                disabled={isUpdating}
-                data-test-id="flashcard-card-save-button"
-              >
+              <Button size="sm" onClick={handleSave} disabled={isUpdating} data-test-id="flashcard-card-save-button">
                 <SaveIcon className="mr-2 h-4 w-4" />
-                {isUpdating ? 'Saving...' : 'Save'}
+                {isUpdating ? "Saving..." : "Save"}
               </Button>
               <Button
                 variant="outline"
@@ -200,4 +193,3 @@ export function FlashcardItem({
     </Card>
   );
 }
-

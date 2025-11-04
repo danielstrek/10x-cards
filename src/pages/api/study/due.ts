@@ -1,17 +1,17 @@
 // src/pages/api/study/due.ts
-import type { APIRoute } from 'astro';
-import { getDueFlashcards, getStudyStatistics } from '../../../lib/services/study.service';
-import type { StudyFlashcardDto, StudyStatisticsDto } from '../../../types';
+import type { APIRoute } from "astro";
+import { getDueFlashcards, getStudyStatistics } from "../../../lib/services/study.service";
+import type { StudyFlashcardDto, StudyStatisticsDto } from "../../../types";
 
 // Disable prerendering for API routes
 export const prerender = false;
 
 /**
  * GET /api/study/due
- * 
+ *
  * Retrieves flashcards due for review
  * Requires authentication via session
- * 
+ *
  * @param limit - Optional query parameter for max cards (default: 20)
  * @returns 200 OK with array of due flashcards and statistics
  * @returns 401 Unauthorized if not authenticated
@@ -21,25 +21,25 @@ export const GET: APIRoute = async ({ locals, url }) => {
   try {
     // Check authentication
     if (!locals.user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized', message: 'Not authenticated' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized", message: "Not authenticated" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const userId = locals.user.id;
 
     // Parse query parameters
-    const limit = parseInt(url.searchParams.get('limit') || '20');
+    const limit = parseInt(url.searchParams.get("limit") || "20");
 
     // Validate limit
     if (limit < 1 || limit > 100) {
       return new Response(
-        JSON.stringify({ 
-          error: 'Bad Request', 
-          message: 'Limit must be between 1 and 100' 
+        JSON.stringify({
+          error: "Bad Request",
+          message: "Limit must be between 1 and 100",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -50,7 +50,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
     ]);
 
     // Map to DTOs
-    const flashcardsDto: StudyFlashcardDto[] = dueFlashcards.map(fc => ({
+    const flashcardsDto: StudyFlashcardDto[] = dueFlashcards.map((fc) => ({
       id: fc.id,
       front: fc.front,
       back: fc.back,
@@ -73,18 +73,17 @@ export const GET: APIRoute = async ({ locals, url }) => {
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   } catch (error) {
-    console.error('Error fetching due flashcards:', error);
+    console.error("Error fetching due flashcards:", error);
     return new Response(
       JSON.stringify({
-        error: 'Internal Server Error',
-        message: 'Failed to fetch due flashcards',
+        error: "Internal Server Error",
+        message: "Failed to fetch due flashcards",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
-

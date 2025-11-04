@@ -1,10 +1,10 @@
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { createSupabaseServerInstance } from '../../../db/supabase.client';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 
 // Validation schema for forgot password
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.string().email("Invalid email format"),
 });
 
 export const prerender = false;
@@ -17,11 +17,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       requestBody = await request.json();
     } catch {
       return new Response(
-        JSON.stringify({ 
-          error: 'Bad Request', 
-          message: 'Invalid JSON' 
+        JSON.stringify({
+          error: "Bad Request",
+          message: "Invalid JSON",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -30,14 +30,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'Validation failed',
+          error: "Bad Request",
+          message: "Validation failed",
           details: validationResult.error.errors.map((err) => ({
-            path: err.path.join('.'),
+            path: err.path.join("."),
             message: err.message,
           })),
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -53,11 +53,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // IMPORTANT: Always return success (security best practice)
     // Don't reveal whether the email exists in the system
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${import.meta.env.PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/reset-password`,
+      redirectTo: `${import.meta.env.PUBLIC_SITE_URL || "http://localhost:3000"}/auth/reset-password`,
     });
 
     if (error) {
-      console.error('Supabase password reset error:', error);
+      console.error("Supabase password reset error:", error);
       // Still return success to user (don't reveal error details)
     }
 
@@ -65,20 +65,19 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // This prevents email enumeration attacks
     return new Response(
       JSON.stringify({
-        message: 'If the email exists, a password reset link has been sent',
+        message: "If the email exists, a password reset link has been sent",
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
     // Catch-all for unexpected errors
-    console.error('Unexpected error in forgot-password endpoint:', error);
+    console.error("Unexpected error in forgot-password endpoint:", error);
     return new Response(
-      JSON.stringify({ 
-        error: 'Internal Server Error', 
-        message: 'An unexpected error occurred' 
+      JSON.stringify({
+        error: "Internal Server Error",
+        message: "An unexpected error occurred",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
-

@@ -1,16 +1,9 @@
 // src/components/AddFlashcardDialog.tsx
-import * as React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from './ui/dialog';
-import { Button } from './ui/button';
-import { Textarea } from './ui/textarea';
-import { PlusIcon } from 'lucide-react';
+import * as React from "react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Button } from "./ui/button";
+import { Textarea } from "./ui/textarea";
+import { PlusIcon } from "lucide-react";
 
 interface AddFlashcardDialogProps {
   open: boolean;
@@ -19,21 +12,16 @@ interface AddFlashcardDialogProps {
   isCreating: boolean;
 }
 
-export function AddFlashcardDialog({ 
-  open, 
-  onOpenChange, 
-  onCreate, 
-  isCreating 
-}: AddFlashcardDialogProps) {
-  const [front, setFront] = React.useState('');
-  const [back, setBack] = React.useState('');
+export function AddFlashcardDialog({ open, onOpenChange, onCreate, isCreating }: AddFlashcardDialogProps) {
+  const [front, setFront] = React.useState("");
+  const [back, setBack] = React.useState("");
   const [validationError, setValidationError] = React.useState<string | null>(null);
 
   // Reset form when dialog closes
   React.useEffect(() => {
     if (!open) {
-      setFront('');
-      setBack('');
+      setFront("");
+      setBack("");
       setValidationError(null);
     }
   }, [open]);
@@ -41,24 +29,24 @@ export function AddFlashcardDialog({
   const handleCreate = async () => {
     // Validate
     if (!front.trim() || !back.trim()) {
-      setValidationError('Both front and back must not be empty');
+      setValidationError("Both front and back must not be empty");
       return;
     }
 
     if (front.length > 200) {
-      setValidationError('Front must be at most 200 characters');
+      setValidationError("Front must be at most 200 characters");
       return;
     }
 
     if (back.length > 500) {
-      setValidationError('Back must be at most 500 characters');
+      setValidationError("Back must be at most 500 characters");
       return;
     }
 
     setValidationError(null);
 
     await onCreate(front, back);
-    
+
     // Close dialog on success
     onOpenChange(false);
   };
@@ -124,17 +112,12 @@ export function AddFlashcardDialog({
           >
             Cancel
           </Button>
-          <Button
-            onClick={handleCreate}
-            disabled={isCreating}
-            data-test-id="add-flashcard-create-button"
-          >
+          <Button onClick={handleCreate} disabled={isCreating} data-test-id="add-flashcard-create-button">
             <PlusIcon className="mr-2 h-4 w-4" />
-            {isCreating ? 'Creating...' : 'Create Flashcard'}
+            {isCreating ? "Creating..." : "Create Flashcard"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
-

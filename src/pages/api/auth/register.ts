@@ -1,16 +1,16 @@
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { createSupabaseServerInstance } from '../../../db/supabase.client';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 
 // Validation schema for registration
 const registerSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.string().email("Invalid email format"),
   password: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
 });
 
 export const prerender = false;
@@ -23,11 +23,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       requestBody = await request.json();
     } catch {
       return new Response(
-        JSON.stringify({ 
-          error: 'Bad Request', 
-          message: 'Invalid JSON' 
+        JSON.stringify({
+          error: "Bad Request",
+          message: "Invalid JSON",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -36,14 +36,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'Validation failed',
+          error: "Bad Request",
+          message: "Validation failed",
           details: validationResult.error.errors.map((err) => ({
-            path: err.path.join('.'),
+            path: err.path.join("."),
             message: err.message,
           })),
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -62,47 +62,47 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       options: {
         // Email confirmation can be configured in Supabase Dashboard
         // For MVP, we recommend disabling email confirmation
-        emailRedirectTo: `${import.meta.env.PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/verify-email`,
-      }
+        emailRedirectTo: `${import.meta.env.PUBLIC_SITE_URL || "http://localhost:3000"}/auth/verify-email`,
+      },
     });
 
     if (error) {
-      console.error('Supabase registration error:', error);
-      
+      console.error("Supabase registration error:", error);
+
       // Check for specific errors
-      if (error.message.includes('already registered') || error.message.includes('already exists')) {
+      if (error.message.includes("already registered") || error.message.includes("already exists")) {
         return new Response(
-          JSON.stringify({ 
-            error: 'Conflict', 
-            message: 'Email already registered' 
+          JSON.stringify({
+            error: "Conflict",
+            message: "Email already registered",
           }),
-          { status: 409, headers: { 'Content-Type': 'application/json' } }
+          { status: 409, headers: { "Content-Type": "application/json" } }
         );
       }
-      
+
       return new Response(
-        JSON.stringify({ 
-          error: 'Internal Server Error', 
-          message: 'Registration failed' 
+        JSON.stringify({
+          error: "Internal Server Error",
+          message: "Registration failed",
         }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
     if (!data.user) {
       return new Response(
-        JSON.stringify({ 
-          error: 'Internal Server Error', 
-          message: 'User creation failed' 
+        JSON.stringify({
+          error: "Internal Server Error",
+          message: "User creation failed",
         }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
     // 5. If email confirmation is disabled, user can login immediately
     // If enabled, they need to verify email first
     // Supabase SSR automatically sets cookies if session exists
-    
+
     return new Response(
       JSON.stringify({
         userId: data.user.id,
@@ -115,18 +115,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           expiresIn: data.session.expires_in,
         }),
       }),
-      { status: 201, headers: { 'Content-Type': 'application/json' } }
+      { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
     // Catch-all for unexpected errors
-    console.error('Unexpected error in register endpoint:', error);
+    console.error("Unexpected error in register endpoint:", error);
     return new Response(
-      JSON.stringify({ 
-        error: 'Internal Server Error', 
-        message: 'An unexpected error occurred' 
+      JSON.stringify({
+        error: "Internal Server Error",
+        message: "An unexpected error occurred",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
-

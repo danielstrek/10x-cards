@@ -1,12 +1,12 @@
 // src/lib/services/flashcards.service.ts
-import type { SupabaseClient } from '../../db/supabase.client';
+import type { SupabaseClient } from "../../db/supabase.client";
 import type {
   BulkCreateFlashcardsDto,
   FlashcardCreatedDto,
   FlashcardListResponseDto,
   FlashcardDetailDto,
   UpdateFlashcardDto,
-} from '../../types';
+} from "../../types";
 
 /**
  * Service for managing flashcards operations
@@ -14,7 +14,7 @@ import type {
 
 /**
  * Bulk creates flashcards for a given generation
- * 
+ *
  * @param supabase - Supabase client instance
  * @param dto - Data transfer object containing generationId and flashcards array
  * @param userId - The authenticated user's ID
@@ -29,14 +29,14 @@ export async function bulkCreateFlashcards(
 ): Promise<FlashcardCreatedDto[]> {
   // Step 1: Verify that the generation exists and belongs to the user
   const { data: generation, error: generationError } = await supabase
-    .from('generations')
-    .select('id, user_id, accepted_unedited_count, accepted_edited_count')
-    .eq('id', dto.generationId)
-    .eq('user_id', userId)
+    .from("generations")
+    .select("id, user_id, accepted_unedited_count, accepted_edited_count")
+    .eq("id", dto.generationId)
+    .eq("user_id", userId)
     .single();
 
   if (generationError || !generation) {
-    throw new Error('Generation not found or does not belong to user');
+    throw new Error("Generation not found or does not belong to user");
   }
 
   // Step 2: Map flashcards to insert structure
@@ -50,39 +50,35 @@ export async function bulkCreateFlashcards(
 
   // Step 3: Bulk insert flashcards
   const { data: insertedFlashcards, error: insertError } = await supabase
-    .from('flashcards')
+    .from("flashcards")
     .insert(flashcardsToInsert)
-    .select('id, front, back');
+    .select("id, front, back");
 
   if (insertError) {
     throw new Error(`Failed to insert flashcards: ${insertError.message}`);
   }
 
   if (!insertedFlashcards || insertedFlashcards.length === 0) {
-    throw new Error('No flashcards were created');
+    throw new Error("No flashcards were created");
   }
 
   // Step 4: Update generation counters
   // Count how many are ai-full (unedited) vs ai-edited
-  const uneditedCount = dto.flashcards.filter(
-    (f) => f.source === 'ai-full'
-  ).length;
-  const editedCount = dto.flashcards.filter(
-    (f) => f.source === 'ai-edited'
-  ).length;
+  const uneditedCount = dto.flashcards.filter((f) => f.source === "ai-full").length;
+  const editedCount = dto.flashcards.filter((f) => f.source === "ai-edited").length;
 
   // Update the generation record with accepted counts
   const { error: updateError } = await supabase
-    .from('generations')
+    .from("generations")
     .update({
       accepted_unedited_count: (generation.accepted_unedited_count || 0) + uneditedCount,
       accepted_edited_count: (generation.accepted_edited_count || 0) + editedCount,
     })
-    .eq('id', dto.generationId);
+    .eq("id", dto.generationId);
 
   if (updateError) {
     // Log the error but don't fail the operation since flashcards were created
-    console.error('Failed to update generation counters:', updateError);
+    console.error("Failed to update generation counters:", updateError);
   }
 
   return insertedFlashcards;
@@ -90,7 +86,7 @@ export async function bulkCreateFlashcards(
 
 /**
  * Retrieves all flashcards for a user with pagination
- * 
+ *
  * @param supabase - Supabase client instance
  * @param userId - The authenticated user's ID
  * @param page - Page number (1-indexed)
@@ -100,17 +96,17 @@ export async function bulkCreateFlashcards(
 export async function getUserFlashcards(
   supabase: SupabaseClient,
   userId: string,
-  page: number = 1,
-  limit: number = 50
+  page = 1,
+  limit = 50
 ): Promise<FlashcardListResponseDto> {
   // Calculate offset
   const offset = (page - 1) * limit;
 
   // Get total count
   const { count, error: countError } = await supabase
-    .from('flashcards')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId);
+    .from("flashcards")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
 
   if (countError) {
     throw new Error(`Failed to count flashcards: ${countError.message}`);
@@ -118,10 +114,10 @@ export async function getUserFlashcards(
 
   // Get paginated data
   const { data, error } = await supabase
-    .from('flashcards')
-    .select('id, front, back, source, created_at')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
+    .from("flashcards")
+    .select("id, front, back, source, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) {
@@ -129,7 +125,7 @@ export async function getUserFlashcards(
   }
 
   return {
-    data: (data || []).map(fc => ({
+    data: (data || []).map((fc) => ({
       id: fc.id,
       front: fc.front,
       back: fc.back,
@@ -144,7 +140,7 @@ export async function getUserFlashcards(
 
 /**
  * Retrieves a single flashcard by ID
- * 
+ *
  * @param supabase - Supabase client instance
  * @param flashcardId - The flashcard ID
  * @param userId - The authenticated user's ID
@@ -156,10 +152,10 @@ export async function getFlashcardById(
   userId: string
 ): Promise<FlashcardDetailDto | null> {
   const { data, error } = await supabase
-    .from('flashcards')
-    .select('id, front, back, source, created_at, updated_at, generation_id')
-    .eq('id', flashcardId)
-    .eq('user_id', userId)
+    .from("flashcards")
+    .select("id, front, back, source, created_at, updated_at, generation_id")
+    .eq("id", flashcardId)
+    .eq("user_id", userId)
     .single();
 
   if (error || !data) {
@@ -179,7 +175,7 @@ export async function getFlashcardById(
 
 /**
  * Updates a flashcard
- * 
+ *
  * @param supabase - Supabase client instance
  * @param flashcardId - The flashcard ID
  * @param dto - Data to update
@@ -194,22 +190,22 @@ export async function updateFlashcard(
 ): Promise<FlashcardDetailDto | null> {
   // First verify the flashcard belongs to the user
   const existing = await getFlashcardById(supabase, flashcardId, userId);
-  
+
   if (!existing) {
     return null;
   }
 
   // Update the flashcard
   const { data, error } = await supabase
-    .from('flashcards')
+    .from("flashcards")
     .update({
       front: dto.front,
       back: dto.back,
       updated_at: new Date().toISOString(),
     })
-    .eq('id', flashcardId)
-    .eq('user_id', userId)
-    .select('id, front, back, source, created_at, updated_at, generation_id')
+    .eq("id", flashcardId)
+    .eq("user_id", userId)
+    .select("id, front, back, source, created_at, updated_at, generation_id")
     .single();
 
   if (error || !data) {
@@ -229,30 +225,22 @@ export async function updateFlashcard(
 
 /**
  * Deletes a flashcard
- * 
+ *
  * @param supabase - Supabase client instance
  * @param flashcardId - The flashcard ID
  * @param userId - The authenticated user's ID
  * @returns true if deleted, false if not found
  */
-export async function deleteFlashcard(
-  supabase: SupabaseClient,
-  flashcardId: number,
-  userId: string
-): Promise<boolean> {
+export async function deleteFlashcard(supabase: SupabaseClient, flashcardId: number, userId: string): Promise<boolean> {
   // First verify the flashcard belongs to the user
   const existing = await getFlashcardById(supabase, flashcardId, userId);
-  
+
   if (!existing) {
     return false;
   }
 
   // Delete the flashcard
-  const { error } = await supabase
-    .from('flashcards')
-    .delete()
-    .eq('id', flashcardId)
-    .eq('user_id', userId);
+  const { error } = await supabase.from("flashcards").delete().eq("id", flashcardId).eq("user_id", userId);
 
   if (error) {
     throw new Error(`Failed to delete flashcard: ${error.message}`);
@@ -263,7 +251,7 @@ export async function deleteFlashcard(
 
 /**
  * Creates a single flashcard manually (without generation)
- * 
+ *
  * @param supabase - Supabase client instance
  * @param front - Front text
  * @param back - Back text
@@ -277,15 +265,15 @@ export async function createManualFlashcard(
   userId: string
 ): Promise<FlashcardCreatedDto> {
   const { data, error } = await supabase
-    .from('flashcards')
+    .from("flashcards")
     .insert({
       user_id: userId,
       front,
       back,
-      source: 'manual',
+      source: "manual",
       generation_id: null,
     })
-    .select('id, front, back')
+    .select("id, front, back")
     .single();
 
   if (error || !data) {

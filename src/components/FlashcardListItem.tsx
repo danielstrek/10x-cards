@@ -1,11 +1,11 @@
 // src/components/FlashcardListItem.tsx
-import * as React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
-import type { FlashcardProposalViewModel } from './types';
+import * as React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import type { FlashcardProposalViewModel } from "./types";
 
 interface FlashcardListItemProps {
   flashcard: FlashcardProposalViewModel;
@@ -17,12 +17,7 @@ interface FlashcardListItemProps {
 const MAX_FRONT_LENGTH = 200;
 const MAX_BACK_LENGTH = 500;
 
-export function FlashcardListItem({
-  flashcard,
-  onAccept,
-  onEdit,
-  onReject,
-}: FlashcardListItemProps) {
+export function FlashcardListItem({ flashcard, onAccept, onEdit, onReject }: FlashcardListItemProps) {
   const [isEditing, setIsEditing] = React.useState(false);
   const [editedFront, setEditedFront] = React.useState(flashcard.front);
   const [editedBack, setEditedBack] = React.useState(flashcard.back);
@@ -67,12 +62,12 @@ export function FlashcardListItem({
   return (
     <Card
       className={cn(
-        'transition-all',
-        flashcard.accepted && 'border-green-600 bg-green-50 dark:bg-green-950/20',
-        flashcard.edited && 'border-blue-600'
+        "transition-all",
+        flashcard.accepted && "border-green-600 bg-green-50 dark:bg-green-950/20",
+        flashcard.edited && "border-blue-600"
       )}
       role="article"
-      aria-label={`Flashcard: ${flashcard.front.substring(0, 50)}${flashcard.front.length > 50 ? '...' : ''}`}
+      aria-label={`Flashcard: ${flashcard.front.substring(0, 50)}${flashcard.front.length > 50 ? "..." : ""}`}
       data-test-id="flashcard-item"
     >
       <CardHeader>
@@ -118,7 +113,7 @@ export function FlashcardListItem({
           </CardTitle>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Front side */}
         <div className="space-y-2">
@@ -133,7 +128,8 @@ export function FlashcardListItem({
                 onChange={(e) => setEditedFront(e.target.value)}
                 maxLength={MAX_FRONT_LENGTH}
                 className={cn(
-                  !isFrontValid && 'border-destructive focus-visible:border-destructive focus-visible:ring-destructive/50'
+                  !isFrontValid &&
+                    "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/50"
                 )}
                 aria-invalid={!isFrontValid}
                 aria-describedby={`front-char-count-${flashcard.proposalId}`}
@@ -141,10 +137,7 @@ export function FlashcardListItem({
               />
               <p
                 id={`front-char-count-${flashcard.proposalId}`}
-                className={cn(
-                  'text-xs',
-                  !isFrontValid ? 'text-destructive' : 'text-muted-foreground'
-                )}
+                className={cn("text-xs", !isFrontValid ? "text-destructive" : "text-muted-foreground")}
                 aria-live="polite"
               >
                 {editedFront.length} / {MAX_FRONT_LENGTH}
@@ -168,8 +161,9 @@ export function FlashcardListItem({
                 onChange={(e) => setEditedBack(e.target.value)}
                 maxLength={MAX_BACK_LENGTH}
                 className={cn(
-                  'min-h-[100px]',
-                  !isBackValid && 'border-destructive focus-visible:border-destructive focus-visible:ring-destructive/50'
+                  "min-h-[100px]",
+                  !isBackValid &&
+                    "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/50"
                 )}
                 aria-invalid={!isBackValid}
                 aria-describedby={`back-char-count-${flashcard.proposalId}`}
@@ -177,10 +171,7 @@ export function FlashcardListItem({
               />
               <p
                 id={`back-char-count-${flashcard.proposalId}`}
-                className={cn(
-                  'text-xs',
-                  !isBackValid ? 'text-destructive' : 'text-muted-foreground'
-                )}
+                className={cn("text-xs", !isBackValid ? "text-destructive" : "text-muted-foreground")}
                 aria-live="polite"
               >
                 {editedBack.length} / {MAX_BACK_LENGTH}
@@ -220,13 +211,13 @@ export function FlashcardListItem({
               <Button
                 onClick={handleAccept}
                 size="sm"
-                variant={flashcard.accepted ? 'secondary' : 'default'}
+                variant={flashcard.accepted ? "secondary" : "default"}
                 disabled={flashcard.accepted}
-                aria-label={flashcard.accepted ? 'Flashcard already accepted' : 'Accept this flashcard'}
+                aria-label={flashcard.accepted ? "Flashcard already accepted" : "Accept this flashcard"}
                 aria-pressed={flashcard.accepted}
                 data-test-id="flashcard-accept-button"
               >
-                {flashcard.accepted ? 'Accepted' : 'Accept'}
+                {flashcard.accepted ? "Accepted" : "Accept"}
               </Button>
               <Button
                 onClick={handleEditClick}
@@ -253,4 +244,3 @@ export function FlashcardListItem({
     </Card>
   );
 }
-

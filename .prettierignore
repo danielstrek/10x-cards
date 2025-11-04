@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.astro/
+
+# Test outputs
+playwright-report/
+test-results/
+coverage/
+
+# Specific files
+src/db/database.types.ts
+src/pages/auth/verify-email.astro
+

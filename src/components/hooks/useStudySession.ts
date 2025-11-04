@@ -1,6 +1,6 @@
 // src/components/hooks/useStudySession.ts
-import * as React from 'react';
-import type { StudyFlashcardDto, StudyStatisticsDto } from '../../types';
+import * as React from "react";
+import type { StudyFlashcardDto, StudyStatisticsDto } from "../../types";
 
 interface DueFlashcardsResponse {
   flashcards: StudyFlashcardDto[];
@@ -18,7 +18,7 @@ interface UseStudySessionResult {
 /**
  * Hook to fetch due flashcards for study session
  */
-export function useStudySession(limit: number = 20): UseStudySessionResult {
+export function useStudySession(limit = 20): UseStudySessionResult {
   const [flashcards, setFlashcards] = React.useState<StudyFlashcardDto[]>([]);
   const [statistics, setStatistics] = React.useState<StudyStatisticsDto | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -30,23 +30,23 @@ export function useStudySession(limit: number = 20): UseStudySessionResult {
 
     try {
       const response = await fetch(`/api/study/due?limit=${limit}`, {
-        credentials: 'include',
+        credentials: "include",
       });
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error('Not authenticated');
+          throw new Error("Not authenticated");
         }
-        throw new Error('Failed to fetch due flashcards');
+        throw new Error("Failed to fetch due flashcards");
       }
 
       const data: DueFlashcardsResponse = await response.json();
       setFlashcards(data.flashcards);
       setStatistics(data.statistics);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError(errorMessage);
-      console.error('Error fetching due flashcards:', err);
+      console.error("Error fetching due flashcards:", err);
     } finally {
       setIsLoading(false);
     }
@@ -64,4 +64,3 @@ export function useStudySession(limit: number = 20): UseStudySessionResult {
     refetch: fetchDueFlashcards,
   };
 }
-

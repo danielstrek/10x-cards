@@ -1,41 +1,29 @@
 // src/components/FlashcardGenerationView.tsx
-import * as React from 'react';
-import { TextInputArea } from './TextInputArea';
-import { GenerateButton } from './GenerateButton';
-import { ErrorNotification } from './ErrorNotification';
-import { SkeletonLoader } from './SkeletonLoader';
-import { FlashcardList } from './FlashcardList';
-import { BulkSaveButton } from './BulkSaveButton';
-import { SuccessDialog } from './SuccessDialog';
-import { useGenerateFlashcards } from './hooks/useGenerateFlashcards';
-import { useSaveFlashcards } from './hooks/useSaveFlashcards';
-import type { FlashcardProposalViewModel } from './types';
+import * as React from "react";
+import { TextInputArea } from "./TextInputArea";
+import { GenerateButton } from "./GenerateButton";
+import { ErrorNotification } from "./ErrorNotification";
+import { SkeletonLoader } from "./SkeletonLoader";
+import { FlashcardList } from "./FlashcardList";
+import { BulkSaveButton } from "./BulkSaveButton";
+import { SuccessDialog } from "./SuccessDialog";
+import { useGenerateFlashcards } from "./hooks/useGenerateFlashcards";
+import { useSaveFlashcards } from "./hooks/useSaveFlashcards";
+import type { FlashcardProposalViewModel } from "./types";
 
 const MIN_TEXT_LENGTH = 1000;
 const MAX_TEXT_LENGTH = 10000;
-const DEFAULT_MODEL = 'openai/gpt-4o-mini';
+const DEFAULT_MODEL = "openai/gpt-4o-mini";
 
 export default function FlashcardGenerationView() {
   // State management
-  const [sourceText, setSourceText] = React.useState('');
+  const [sourceText, setSourceText] = React.useState("");
   const [localFlashcards, setLocalFlashcards] = React.useState<FlashcardProposalViewModel[]>([]);
-  
-  // Use custom hooks for API operations
-  const {
-    isLoading,
-    error: errorMessage,
-    generationId,
-    flashcards,
-    generateFlashcards,
-  } = useGenerateFlashcards();
 
-  const {
-    isSaving,
-    saveError,
-    savedCount,
-    saveFlashcards,
-    clearSaveError,
-  } = useSaveFlashcards();
+  // Use custom hooks for API operations
+  const { isLoading, error: errorMessage, generationId, flashcards, generateFlashcards } = useGenerateFlashcards();
+
+  const { isSaving, saveError, savedCount, saveFlashcards, clearSaveError } = useSaveFlashcards();
 
   // State for success dialog
   const [showSuccessDialog, setShowSuccessDialog] = React.useState(false);
@@ -64,11 +52,7 @@ export default function FlashcardGenerationView() {
   // Handler for accepting a flashcard
   const handleAccept = (proposalId: string) => {
     setLocalFlashcards((prev) =>
-      prev.map((card) =>
-        card.proposalId === proposalId
-          ? { ...card, accepted: true }
-          : card
-      )
+      prev.map((card) => (card.proposalId === proposalId ? { ...card, accepted: true } : card))
     );
   };
 
@@ -76,29 +60,25 @@ export default function FlashcardGenerationView() {
   const handleEdit = (proposalId: string, front: string, back: string) => {
     setLocalFlashcards((prev) =>
       prev.map((card) =>
-        card.proposalId === proposalId
-          ? { ...card, front, back, edited: true, source: 'ai-edited' }
-          : card
+        card.proposalId === proposalId ? { ...card, front, back, edited: true, source: "ai-edited" } : card
       )
     );
   };
 
   // Handler for rejecting a flashcard
   const handleReject = (proposalId: string) => {
-    setLocalFlashcards((prev) =>
-      prev.filter((card) => card.proposalId !== proposalId)
-    );
+    setLocalFlashcards((prev) => prev.filter((card) => card.proposalId !== proposalId));
   };
 
   // Handler for saving all flashcards
   const handleSaveAll = async () => {
     if (!generationId) {
-      console.error('No generation ID available');
+      console.error("No generation ID available");
       return;
     }
 
     const success = await saveFlashcards(localFlashcards, generationId);
-    
+
     if (success) {
       setShowSuccessDialog(true);
     }
@@ -107,18 +87,18 @@ export default function FlashcardGenerationView() {
   // Handler for saving only accepted flashcards
   const handleSaveAccepted = async () => {
     if (!generationId) {
-      console.error('No generation ID available');
+      console.error("No generation ID available");
       return;
     }
 
-    const acceptedFlashcards = localFlashcards.filter(card => card.accepted);
-    
+    const acceptedFlashcards = localFlashcards.filter((card) => card.accepted);
+
     if (acceptedFlashcards.length === 0) {
       return;
     }
 
     const success = await saveFlashcards(acceptedFlashcards, generationId);
-    
+
     if (success) {
       setShowSuccessDialog(true);
     }
@@ -128,7 +108,7 @@ export default function FlashcardGenerationView() {
   const handleCloseSuccessDialog = () => {
     setShowSuccessDialog(false);
     // Optionally reset the form
-    setSourceText('');
+    setSourceText("");
     setLocalFlashcards([]);
   };
 
@@ -138,9 +118,7 @@ export default function FlashcardGenerationView() {
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Generate Flashcards</h1>
-          <p className="text-muted-foreground">
-            Paste your study material and let AI generate flashcards for you.
-          </p>
+          <p className="text-muted-foreground">Paste your study material and let AI generate flashcards for you.</p>
         </div>
 
         {/* Error notifications */}
@@ -149,7 +127,7 @@ export default function FlashcardGenerationView() {
             <ErrorNotification message={errorMessage} title="Generation Error" />
           </div>
         )}
-        
+
         {saveError && (
           <div data-test-id="generate-save-error-notification">
             <ErrorNotification message={saveError} title="Save Error" />
@@ -165,12 +143,8 @@ export default function FlashcardGenerationView() {
             minLength={MIN_TEXT_LENGTH}
             maxLength={MAX_TEXT_LENGTH}
           />
-          
-          <GenerateButton
-            onClick={handleGenerate}
-            disabled={!canGenerate}
-            isLoading={isLoading}
-          />
+
+          <GenerateButton onClick={handleGenerate} disabled={!canGenerate} isLoading={isLoading} />
         </div>
 
         {/* Loading state */}
@@ -189,10 +163,10 @@ export default function FlashcardGenerationView() {
                 Generated Flashcards ({localFlashcards.length})
               </h2>
               <div className="text-sm text-muted-foreground" data-test-id="generate-accepted-count">
-                Accepted: {localFlashcards.filter(f => f.accepted).length}
+                Accepted: {localFlashcards.filter((f) => f.accepted).length}
               </div>
             </div>
-            
+
             {/* Bulk save buttons */}
             <BulkSaveButton
               flashcards={localFlashcards}
@@ -201,7 +175,7 @@ export default function FlashcardGenerationView() {
               isSaving={isSaving}
               disabled={isSaving}
             />
-            
+
             <FlashcardList
               flashcards={localFlashcards}
               onAccept={handleAccept}
@@ -212,13 +186,8 @@ export default function FlashcardGenerationView() {
         )}
 
         {/* Success dialog */}
-        <SuccessDialog
-          open={showSuccessDialog}
-          onClose={handleCloseSuccessDialog}
-          savedCount={savedCount || 0}
-        />
+        <SuccessDialog open={showSuccessDialog} onClose={handleCloseSuccessDialog} savedCount={savedCount || 0} />
       </div>
     </div>
   );
 }
-

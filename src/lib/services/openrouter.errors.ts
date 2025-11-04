@@ -11,8 +11,8 @@ export class OpenRouterError extends Error {
     public readonly details?: unknown
   ) {
     super(message);
-    this.name = 'OpenRouterError';
-    
+    this.name = "OpenRouterError";
+
     // Zachowaj stack trace
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
@@ -25,8 +25,8 @@ export class OpenRouterError extends Error {
  */
 export class OpenRouterValidationError extends OpenRouterError {
   constructor(message: string, details?: unknown) {
-    super(message, 'VALIDATION_ERROR', 400, details);
-    this.name = 'OpenRouterValidationError';
+    super(message, "VALIDATION_ERROR", 400, details);
+    this.name = "OpenRouterValidationError";
   }
 }
 
@@ -34,9 +34,9 @@ export class OpenRouterValidationError extends OpenRouterError {
  * Błąd autoryzacji (invalid API key)
  */
 export class OpenRouterAuthError extends OpenRouterError {
-  constructor(message: string = 'Invalid API key') {
-    super(message, 'AUTH_ERROR', 401);
-    this.name = 'OpenRouterAuthError';
+  constructor(message = "Invalid API key") {
+    super(message, "AUTH_ERROR", 401);
+    this.name = "OpenRouterAuthError";
   }
 }
 
@@ -45,11 +45,11 @@ export class OpenRouterAuthError extends OpenRouterError {
  */
 export class OpenRouterRateLimitError extends OpenRouterError {
   constructor(
-    message: string = 'Rate limit exceeded',
+    message = "Rate limit exceeded",
     public readonly retryAfter?: number
   ) {
-    super(message, 'RATE_LIMIT_ERROR', 429);
-    this.name = 'OpenRouterRateLimitError';
+    super(message, "RATE_LIMIT_ERROR", 429);
+    this.name = "OpenRouterRateLimitError";
   }
 }
 
@@ -57,9 +57,12 @@ export class OpenRouterRateLimitError extends OpenRouterError {
  * Błąd modelu (nieprawidłowa nazwa lub model niedostępny)
  */
 export class OpenRouterModelError extends OpenRouterError {
-  constructor(message: string, public readonly modelId?: string) {
-    super(message, 'MODEL_ERROR', 400);
-    this.name = 'OpenRouterModelError';
+  constructor(
+    message: string,
+    public readonly modelId?: string
+  ) {
+    super(message, "MODEL_ERROR", 400);
+    this.name = "OpenRouterModelError";
   }
 }
 
@@ -68,8 +71,8 @@ export class OpenRouterModelError extends OpenRouterError {
  */
 export class OpenRouterAPIError extends OpenRouterError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, 'API_ERROR', statusCode, details);
-    this.name = 'OpenRouterAPIError';
+    super(message, "API_ERROR", statusCode, details);
+    this.name = "OpenRouterAPIError";
   }
 }
 
@@ -77,9 +80,9 @@ export class OpenRouterAPIError extends OpenRouterError {
  * Błąd sieci lub timeout
  */
 export class OpenRouterNetworkError extends OpenRouterError {
-  constructor(message: string = 'Network error or timeout') {
-    super(message, 'NETWORK_ERROR', 0);
-    this.name = 'OpenRouterNetworkError';
+  constructor(message = "Network error or timeout") {
+    super(message, "NETWORK_ERROR", 0);
+    this.name = "OpenRouterNetworkError";
   }
 }
 
@@ -87,9 +90,11 @@ export class OpenRouterNetworkError extends OpenRouterError {
  * Błąd parsowania odpowiedzi
  */
 export class OpenRouterParseError extends OpenRouterError {
-  constructor(message: string, public readonly rawResponse?: string) {
-    super(message, 'PARSE_ERROR', 0);
-    this.name = 'OpenRouterParseError';
+  constructor(
+    message: string,
+    public readonly rawResponse?: string
+  ) {
+    super(message, "PARSE_ERROR", 0);
+    this.name = "OpenRouterParseError";
   }
 }
-

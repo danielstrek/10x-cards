@@ -24,7 +24,7 @@ export interface OpenRouterServiceConfig {
  * Wiadomość w konwersacji
  */
 export interface OpenRouterMessage {
-  role: 'system' | 'user' | 'assistant';
+  role: "system" | "user" | "assistant";
   content: string;
 }
 
@@ -46,12 +46,12 @@ export interface OpenRouterRequestParams {
  * Format odpowiedzi (structured outputs)
  */
 export interface OpenRouterResponseFormat {
-  type: 'json_schema';
+  type: "json_schema";
   json_schema: {
     name: string;
     strict: boolean;
     schema: {
-      type: 'object';
+      type: "object";
       properties: Record<string, any>;
       required?: string[];
       additionalProperties?: boolean;
@@ -116,13 +116,13 @@ export interface OpenRouterModel {
 export interface OpenRouterAPIResponse {
   id: string;
   model: string;
-  choices: Array<{
+  choices: {
     message: {
       role: string;
       content: string;
     };
     finish_reason: string;
-  }>;
+  }[];
   usage?: {
     prompt_tokens: number;
     completion_tokens: number;
@@ -146,7 +146,7 @@ export interface OpenRouterAPIRequestBody {
   top_k?: number;
   repetition_penalty?: number;
   response_format?: {
-    type: 'json_schema';
+    type: "json_schema";
     json_schema: {
       name: string;
       strict: boolean;
@@ -155,4 +155,3 @@ export interface OpenRouterAPIRequestBody {
     };
   };
 }
-

@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page } from "@playwright/test";
 
 /**
  * Base Page Object Model class
@@ -10,7 +10,7 @@ export class BasePage {
   /**
    * Navigate to a specific URL
    */
-  async goto(path: string = '/'): Promise<void> {
+  async goto(path = "/"): Promise<void> {
     await this.page.goto(path);
   }
 
@@ -18,7 +18,7 @@ export class BasePage {
    * Wait for page to be loaded
    */
   async waitForPageLoad(): Promise<void> {
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState("domcontentloaded");
   }
 
   /**
@@ -35,4 +35,3 @@ export class BasePage {
     await this.page.screenshot({ path: `screenshots/${name}.png`, fullPage: true });
   }
 }
-

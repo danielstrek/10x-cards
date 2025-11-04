@@ -1,82 +1,66 @@
 // src/components/FlashcardsView.tsx
-import * as React from 'react';
-import { Button } from './ui/button';
-import { FlashcardItem } from './FlashcardItem';
-import { AddFlashcardDialog } from './AddFlashcardDialog';
-import { ErrorNotification } from './ErrorNotification';
-import { SkeletonLoader } from './SkeletonLoader';
-import { useFlashcards } from './hooks/useFlashcards';
-import { useUpdateFlashcard } from './hooks/useUpdateFlashcard';
-import { useDeleteFlashcard } from './hooks/useDeleteFlashcard';
-import { useCreateFlashcard } from './hooks/useCreateFlashcard';
-import { PlusIcon } from 'lucide-react';
+import * as React from "react";
+import { Button } from "./ui/button";
+import { FlashcardItem } from "./FlashcardItem";
+import { AddFlashcardDialog } from "./AddFlashcardDialog";
+import { ErrorNotification } from "./ErrorNotification";
+import { SkeletonLoader } from "./SkeletonLoader";
+import { useFlashcards } from "./hooks/useFlashcards";
+import { useUpdateFlashcard } from "./hooks/useUpdateFlashcard";
+import { useDeleteFlashcard } from "./hooks/useDeleteFlashcard";
+import { useCreateFlashcard } from "./hooks/useCreateFlashcard";
+import { PlusIcon } from "lucide-react";
 
 export default function FlashcardsView() {
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
 
   // Fetch flashcards
-  const { 
-    flashcards, 
-    isLoading, 
-    error: fetchError, 
-    total,
-    refetch 
-  } = useFlashcards();
+  const { flashcards, isLoading, error: fetchError, total, refetch } = useFlashcards();
 
   // Update flashcard hook
-  const { 
-    updateFlashcard, 
-    isUpdating, 
-    error: updateError,
-    clearError: clearUpdateError 
-  } = useUpdateFlashcard();
+  const { updateFlashcard, isUpdating, error: updateError, clearError: clearUpdateError } = useUpdateFlashcard();
 
   // Delete flashcard hook
-  const { 
-    deleteFlashcard, 
-    isDeleting, 
-    error: deleteError,
-    clearError: clearDeleteError 
-  } = useDeleteFlashcard();
+  const { deleteFlashcard, isDeleting, error: deleteError, clearError: clearDeleteError } = useDeleteFlashcard();
 
   // Create flashcard hook
-  const { 
-    createFlashcard, 
-    isCreating, 
-    error: createError,
-    clearError: clearCreateError 
-  } = useCreateFlashcard();
+  const { createFlashcard, isCreating, error: createError, clearError: clearCreateError } = useCreateFlashcard();
 
   // Handle update
-  const handleUpdate = React.useCallback(async (
-    flashcardId: number, 
-    front: string, 
-    back: string
-  ) => {
-    const result = await updateFlashcard(flashcardId, { front, back });
-    if (result) {
-      // Refetch to get updated data
-      await refetch();
-    }
-  }, [updateFlashcard, refetch]);
+  const handleUpdate = React.useCallback(
+    async (flashcardId: number, front: string, back: string) => {
+      const result = await updateFlashcard(flashcardId, { front, back });
+      if (result) {
+        // Refetch to get updated data
+        await refetch();
+      }
+    },
+    [updateFlashcard, refetch]
+  );
 
   // Handle delete
-  const handleDelete = React.useCallback(async (flashcardId: number) => {
-    const result = await deleteFlashcard(flashcardId);
-    if (result) {
-      // Refetch to remove deleted item
-      await refetch();
-    }
-  }, [deleteFlashcard, refetch]);
+  const handleDelete = React.useCallback(
+    async (flashcardId: number) => {
+      const result = await deleteFlashcard(flashcardId);
+      if (result) {
+        // Refetch to remove deleted item
+        await refetch();
+      }
+    },
+    [deleteFlashcard, refetch]
+  );
 
   // Handle create
-  const handleCreate = React.useCallback(async (front: string, back: string) => {
-    const result = await createFlashcard(front, back);
-    if (result) {
-      // Refetch to show new flashcard
-      await refetch();
-    }
-  }, [createFlashcard, refetch]);
+  const handleCreate = React.useCallback(
+    async (front: string, back: string) => {
+      const result = await createFlashcard(front, back);
+      if (result) {
+        // Refetch to show new flashcard
+        await refetch();
+      }
+    },
+    [createFlashcard, refetch]
+  );
 
   // Combined error
   const error = fetchError || updateError || deleteError || createError;
@@ -96,7 +80,7 @@ export default function FlashcardsView() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">My Flashcards</h1>
             <p className="text-muted-foreground mt-1" data-test-id="flashcards-total-count">
-              {total > 0 ? `${total} flashcard${total !== 1 ? 's' : ''} total` : 'No flashcards yet'}
+              {total > 0 ? `${total} flashcard${total !== 1 ? "s" : ""} total` : "No flashcards yet"}
             </p>
           </div>
           <Button onClick={() => setIsAddDialogOpen(true)} data-test-id="flashcards-add-button">
@@ -108,9 +92,7 @@ export default function FlashcardsView() {
         {/* Error notification */}
         {error && (
           <div data-test-id="flashcards-error-notification">
-            <ErrorNotification 
-              message={error}
-            />
+            <ErrorNotification message={error} />
           </div>
         )}
 
@@ -129,7 +111,7 @@ export default function FlashcardsView() {
             </div>
             <h2 className="text-xl font-semibold mb-2">No flashcards yet</h2>
             <p className="text-muted-foreground mb-6">
-              Create your first flashcard or generate some using AI on the{' '}
+              Create your first flashcard or generate some using AI on the{" "}
               <a href="/generate" className="text-primary hover:underline">
                 generate page
               </a>
@@ -170,4 +152,3 @@ export default function FlashcardsView() {
     </div>
   );
 }
-

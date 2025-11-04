@@ -1,10 +1,10 @@
 // src/components/auth/RegisterForm.tsx
-import * as React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ErrorNotification } from '@/components/ErrorNotification';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ErrorNotification } from "@/components/ErrorNotification";
+import { cn } from "@/lib/utils";
 
 interface RegisterFormState {
   email: string;
@@ -17,9 +17,9 @@ interface RegisterFormState {
 
 export default function RegisterForm() {
   const [state, setState] = React.useState<RegisterFormState>({
-    email: '',
-    password: '',
-    confirmPassword: '',
+    email: "",
+    password: "",
+    confirmPassword: "",
     isLoading: false,
     error: null,
     success: false,
@@ -34,23 +34,25 @@ export default function RegisterForm() {
     return emailRegex.test(email);
   };
 
-  const validatePassword = (password: string): {
+  const validatePassword = (
+    password: string
+  ): {
     valid: boolean;
     errors: string[];
   } => {
     const errors: string[] = [];
-    
+
     if (password.length < 8) {
-      errors.push('Hasło musi mieć co najmniej 8 znaków');
+      errors.push("Hasło musi mieć co najmniej 8 znaków");
     }
     if (!/[A-Z]/.test(password)) {
-      errors.push('Hasło musi zawierać wielką literę');
+      errors.push("Hasło musi zawierać wielką literę");
     }
     if (!/[0-9]/.test(password)) {
-      errors.push('Hasło musi zawierać cyfrę');
+      errors.push("Hasło musi zawierać cyfrę");
     }
     if (!/[^A-Za-z0-9]/.test(password)) {
-      errors.push('Hasło musi zawierać znak specjalny');
+      errors.push("Hasło musi zawierać znak specjalny");
     }
 
     return {
@@ -61,27 +63,24 @@ export default function RegisterForm() {
 
   const passwordValidation = validatePassword(state.password);
   const passwordsMatch = state.password === state.confirmPassword && state.confirmPassword.length > 0;
-  const isFormValid = 
-    validateEmail(state.email) && 
-    passwordValidation.valid && 
-    passwordsMatch;
+  const isFormValid = validateEmail(state.email) && passwordValidation.valid && passwordsMatch;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isFormValid) {
-      setState(prev => ({ ...prev, error: 'Popraw błędy formularza' }));
+      setState((prev) => ({ ...prev, error: "Popraw błędy formularza" }));
       return;
     }
 
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       // Call register API endpoint
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: state.email,
@@ -93,10 +92,10 @@ export default function RegisterForm() {
 
       if (!response.ok) {
         // Handle error response
-        setState(prev => ({ 
-          ...prev, 
-          isLoading: false, 
-          error: data.message || 'Wystąpił błąd podczas rejestracji' 
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: data.message || "Wystąpił błąd podczas rejestracji",
         }));
         return;
       }
@@ -104,24 +103,24 @@ export default function RegisterForm() {
       // Success: check if we got tokens (auto-confirm enabled)
       if (data.accessToken) {
         // Auto-login: store tokens and redirect
-        localStorage.setItem('sb-access-token', data.accessToken);
-        localStorage.setItem('sb-refresh-token', data.refreshToken);
-        
-        window.location.href = '/generate';
+        localStorage.setItem("sb-access-token", data.accessToken);
+        localStorage.setItem("sb-refresh-token", data.refreshToken);
+
+        window.location.href = "/generate";
       } else {
         // Email verification required
-        setState(prev => ({ 
-          ...prev, 
-          isLoading: false, 
-          success: true 
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          success: true,
         }));
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      setState(prev => ({ 
-        ...prev, 
-        isLoading: false, 
-        error: 'Nie udało się połączyć z serwerem. Spróbuj ponownie.' 
+      console.error("Registration error:", error);
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: "Nie udało się połączyć z serwerem. Spróbuj ponownie.",
       }));
     }
   };
@@ -133,21 +132,16 @@ export default function RegisterForm() {
         <Card className="w-full max-w-md shadow-2xl">
           <CardHeader>
             <CardTitle className="text-2xl text-center">✅ Rejestracja zakończona!</CardTitle>
-            <CardDescription className="text-center">
-              Sprawdź swoją skrzynkę email
-            </CardDescription>
+            <CardDescription className="text-center">Sprawdź swoją skrzynkę email</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground text-center">
-              Wysłaliśmy link weryfikacyjny na adres <strong>{state.email}</strong>.
-              Kliknij link w wiadomości, aby aktywować swoje konto.
+              Wysłaliśmy link weryfikacyjny na adres <strong>{state.email}</strong>. Kliknij link w wiadomości, aby
+              aktywować swoje konto.
             </p>
           </CardContent>
           <CardFooter>
-            <Button
-              className="w-full"
-              onClick={() => window.location.href = '/auth/login'}
-            >
+            <Button className="w-full" onClick={() => (window.location.href = "/auth/login")}>
               Przejdź do logowania
             </Button>
           </CardFooter>
@@ -162,9 +156,7 @@ export default function RegisterForm() {
         <form onSubmit={handleSubmit}>
           <CardHeader>
             <CardTitle className="text-2xl">Zarejestruj się</CardTitle>
-            <CardDescription>
-              Utwórz konto, aby korzystać z 10x Cards
-            </CardDescription>
+            <CardDescription>Utwórz konto, aby korzystać z 10x Cards</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -187,9 +179,9 @@ export default function RegisterForm() {
                 type="email"
                 placeholder="twoj@email.com"
                 value={state.email}
-                onChange={(e) => setState(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e) => setState((prev) => ({ ...prev, email: e.target.value }))}
                 disabled={state.isLoading}
-                aria-invalid={state.error ? 'true' : 'false'}
+                aria-invalid={state.error ? "true" : "false"}
                 required
                 data-test-id="register-email-input"
               />
@@ -206,12 +198,12 @@ export default function RegisterForm() {
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={state.password}
-                  onChange={(e) => setState(prev => ({ ...prev, password: e.target.value }))}
+                  onChange={(e) => setState((prev) => ({ ...prev, password: e.target.value }))}
                   disabled={state.isLoading}
-                  aria-invalid={state.password.length > 0 && !passwordValidation.valid ? 'true' : 'false'}
+                  aria-invalid={state.password.length > 0 && !passwordValidation.valid ? "true" : "false"}
                   required
                   data-test-id="register-password-input"
                 />
@@ -219,7 +211,7 @@ export default function RegisterForm() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                  aria-label={showPassword ? "Ukryj hasło" : "Pokaż hasło"}
                   disabled={state.isLoading}
                   data-test-id="register-password-toggle"
                 >
@@ -256,7 +248,7 @@ export default function RegisterForm() {
                   )}
                 </button>
               </div>
-              
+
               {/* Password strength indicator */}
               {state.password.length > 0 && (
                 <div className="space-y-1">
@@ -265,11 +257,7 @@ export default function RegisterForm() {
                       • {error}
                     </p>
                   ))}
-                  {passwordValidation.valid && (
-                    <p className="text-xs text-green-600">
-                      ✓ Hasło spełnia wymagania
-                    </p>
-                  )}
+                  {passwordValidation.valid && <p className="text-xs text-green-600">✓ Hasło spełnia wymagania</p>}
                 </div>
               )}
             </div>
@@ -285,12 +273,12 @@ export default function RegisterForm() {
               <div className="relative">
                 <Input
                   id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={state.confirmPassword}
-                  onChange={(e) => setState(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  onChange={(e) => setState((prev) => ({ ...prev, confirmPassword: e.target.value }))}
                   disabled={state.isLoading}
-                  aria-invalid={state.confirmPassword.length > 0 && !passwordsMatch ? 'true' : 'false'}
+                  aria-invalid={state.confirmPassword.length > 0 && !passwordsMatch ? "true" : "false"}
                   required
                   data-test-id="register-confirm-password-input"
                 />
@@ -298,7 +286,7 @@ export default function RegisterForm() {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showConfirmPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                  aria-label={showConfirmPassword ? "Ukryj hasło" : "Pokaż hasło"}
                   disabled={state.isLoading}
                   data-test-id="register-confirm-password-toggle"
                 >
@@ -335,13 +323,10 @@ export default function RegisterForm() {
                   )}
                 </button>
               </div>
-              
+
               {state.confirmPassword.length > 0 && (
-                <p className={cn(
-                  "text-xs",
-                  passwordsMatch ? "text-green-600" : "text-destructive"
-                )}>
-                  {passwordsMatch ? '✓ Hasła są identyczne' : '✗ Hasła nie są identyczne'}
+                <p className={cn("text-xs", passwordsMatch ? "text-green-600" : "text-destructive")}>
+                  {passwordsMatch ? "✓ Hasła są identyczne" : "✗ Hasła nie są identyczne"}
                 </p>
               )}
             </div>
@@ -363,14 +348,7 @@ export default function RegisterForm() {
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path
                       className="opacity-75"
                       fill="currentColor"
@@ -380,12 +358,12 @@ export default function RegisterForm() {
                   Rejestracja...
                 </>
               ) : (
-                'Zarejestruj się'
+                "Zarejestruj się"
               )}
             </Button>
 
             <div className="text-sm text-center text-muted-foreground">
-              Masz już konto?{' '}
+              Masz już konto?{" "}
               <a
                 href="/auth/login"
                 className="text-primary font-medium hover:underline underline-offset-4"

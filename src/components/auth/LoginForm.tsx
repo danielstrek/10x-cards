@@ -1,10 +1,10 @@
 // src/components/auth/LoginForm.tsx
-import * as React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ErrorNotification } from '@/components/ErrorNotification';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ErrorNotification } from "@/components/ErrorNotification";
+import { cn } from "@/lib/utils";
 
 interface LoginFormState {
   email: string;
@@ -16,8 +16,8 @@ interface LoginFormState {
 
 export default function LoginForm() {
   const [state, setState] = React.useState<LoginFormState>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     isLoading: false,
     error: null,
     rememberMe: false,
@@ -37,18 +37,18 @@ export default function LoginForm() {
     e.preventDefault();
 
     if (!isFormValid) {
-      setState(prev => ({ ...prev, error: 'Podaj prawidłowy adres email i hasło' }));
+      setState((prev) => ({ ...prev, error: "Podaj prawidłowy adres email i hasło" }));
       return;
     }
 
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       // Call login API endpoint
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: state.email,
@@ -60,31 +60,31 @@ export default function LoginForm() {
 
       if (!response.ok) {
         // Handle error response
-        setState(prev => ({ 
-          ...prev, 
-          isLoading: false, 
-          error: data.message || 'Wystąpił błąd podczas logowania' 
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: data.message || "Wystąpił błąd podczas logowania",
         }));
         return;
       }
 
       // Success: store tokens in localStorage
       if (state.rememberMe) {
-        localStorage.setItem('sb-access-token', data.accessToken);
-        localStorage.setItem('sb-refresh-token', data.refreshToken);
+        localStorage.setItem("sb-access-token", data.accessToken);
+        localStorage.setItem("sb-refresh-token", data.refreshToken);
       } else {
-        sessionStorage.setItem('sb-access-token', data.accessToken);
-        sessionStorage.setItem('sb-refresh-token', data.refreshToken);
+        sessionStorage.setItem("sb-access-token", data.accessToken);
+        sessionStorage.setItem("sb-refresh-token", data.refreshToken);
       }
 
       // Redirect to generate page
-      window.location.href = '/generate';
+      window.location.href = "/generate";
     } catch (error) {
-      console.error('Login error:', error);
-      setState(prev => ({ 
-        ...prev, 
-        isLoading: false, 
-        error: 'Nie udało się połączyć z serwerem. Spróbuj ponownie.' 
+      console.error("Login error:", error);
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: "Nie udało się połączyć z serwerem. Spróbuj ponownie.",
       }));
     }
   };
@@ -95,9 +95,7 @@ export default function LoginForm() {
         <form onSubmit={handleSubmit}>
           <CardHeader>
             <CardTitle className="text-2xl">Zaloguj się</CardTitle>
-            <CardDescription>
-              Wprowadź swoje dane, aby uzyskać dostęp do 10x Cards
-            </CardDescription>
+            <CardDescription>Wprowadź swoje dane, aby uzyskać dostęp do 10x Cards</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -120,10 +118,10 @@ export default function LoginForm() {
                 type="email"
                 placeholder="twoj@email.com"
                 value={state.email}
-                onChange={(e) => setState(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e) => setState((prev) => ({ ...prev, email: e.target.value }))}
                 disabled={state.isLoading}
-                aria-invalid={state.error ? 'true' : 'false'}
-                aria-describedby={state.error ? 'email-error' : undefined}
+                aria-invalid={state.error ? "true" : "false"}
+                aria-describedby={state.error ? "email-error" : undefined}
                 required
                 data-test-id="login-email-input"
               />
@@ -140,12 +138,12 @@ export default function LoginForm() {
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={state.password}
-                  onChange={(e) => setState(prev => ({ ...prev, password: e.target.value }))}
+                  onChange={(e) => setState((prev) => ({ ...prev, password: e.target.value }))}
                   disabled={state.isLoading}
-                  aria-invalid={state.error ? 'true' : 'false'}
+                  aria-invalid={state.error ? "true" : "false"}
                   required
                   data-test-id="login-password-input"
                 />
@@ -153,7 +151,7 @@ export default function LoginForm() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                  aria-label={showPassword ? "Ukryj hasło" : "Pokaż hasło"}
                   disabled={state.isLoading}
                   data-test-id="login-password-toggle"
                 >
@@ -198,7 +196,7 @@ export default function LoginForm() {
                 type="checkbox"
                 id="remember"
                 checked={state.rememberMe}
-                onChange={(e) => setState(prev => ({ ...prev, rememberMe: e.target.checked }))}
+                onChange={(e) => setState((prev) => ({ ...prev, rememberMe: e.target.checked }))}
                 disabled={state.isLoading}
                 className="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 data-test-id="login-remember-me-checkbox"
@@ -239,14 +237,7 @@ export default function LoginForm() {
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path
                       className="opacity-75"
                       fill="currentColor"
@@ -256,12 +247,12 @@ export default function LoginForm() {
                   Logowanie...
                 </>
               ) : (
-                'Zaloguj się'
+                "Zaloguj się"
               )}
             </Button>
 
             <div className="text-sm text-center text-muted-foreground">
-              Nie masz konta?{' '}
+              Nie masz konta?{" "}
               <a
                 href="/auth/register"
                 className="text-primary font-medium hover:underline underline-offset-4"
@@ -276,4 +267,3 @@ export default function LoginForm() {
     </div>
   );
 }
-

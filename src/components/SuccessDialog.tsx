@@ -1,5 +1,5 @@
 // src/components/SuccessDialog.tsx
-import * as React from 'react';
+import * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,8 +7,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface SuccessDialogProps {
   open: boolean;
@@ -38,8 +38,8 @@ export function SuccessDialog({ open, onClose, savedCount }: SuccessDialogProps)
           </div>
           <DialogTitle className="text-center">Flashcards Saved Successfully!</DialogTitle>
           <DialogDescription className="text-center">
-            {savedCount} flashcard{savedCount !== 1 ? 's have' : ' has'} been saved to your collection.
-            You can now study them in your flashcard deck.
+            {savedCount} flashcard{savedCount !== 1 ? "s have" : " has"} been saved to your collection. You can now
+            study them in your flashcard deck.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-center">
@@ -51,4 +51,3 @@ export function SuccessDialog({ open, onClose, savedCount }: SuccessDialogProps)
     </Dialog>
   );
 }
-
