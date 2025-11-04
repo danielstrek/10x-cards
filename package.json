@@ -42,9 +42,7 @@
     "react-dom": "^19.1.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
-    "zod": "^3.25.76"
-  },
-  "optionalDependencies": {
+    "zod": "^3.25.76",
     "@astrojs/cloudflare": "^12.6.10"
   },
   "devDependencies": {
