@@ -7,15 +7,18 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 ### Pokrycie User Stories z PRD
 
 **W pełni pokryte przez tę specyfikację:**
+
 - ✅ **US-001**: Rejestracja konta
 - ✅ **US-002**: Logowanie do aplikacji
 - ✅ **US-009**: Bezpieczny dostęp i autoryzacja
 
 **Częściowo pokryte:**
+
 - 🟡 **US-003**: Generowanie fiszek przy użyciu AI (dodanie tokenu autoryzacji do istniejących API)
 - 🟡 **PRD punkt 3, 7**: Usuwanie konta (endpoint DELETE /api/auth/account - wymagane przez RODO)
 
 **Poza zakresem tej specyfikacji** (wymagają osobnych specyfikacji):
+
 - ⏳ **US-004**: Przegląd i zatwierdzanie propozycji fiszek (już zaimplementowane, wymaga tylko integracji z auth)
 - ⏳ **US-005**: Edycja fiszek - wymaga widoku "Moje fiszki"
 - ⏳ **US-006**: Usuwanie fiszek - wymaga widoku "Moje fiszki"
@@ -26,6 +29,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 ### Wymagania RODO
 
 **WAŻNE**: Zgodnie z PRD (punkt 3, 7) i wymaganiami RODO, system MUSI umożliwiać:
+
 1. ✅ Rejestrację i przechowywanie danych w bezpieczny sposób (pokryte)
 2. ✅ Dostęp do własnych danych (pokryte przez API endpoints)
 3. ✅ **Usunięcie konta i wszystkich powiązanych danych** (endpoint DELETE /api/auth/account)
@@ -39,6 +43,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 #### 1.1.1 Nowe Strony Astro (SSR)
 
 **`src/pages/auth/login.astro`**
+
 - **Opis**: Strona logowania użytkownika
 - **Tryb renderowania**: Server-side (output: "server" w astro.config.mjs)
 - **Odpowiedzialność**:
@@ -50,6 +55,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 - **Zawartość**: Komponent React `<LoginForm client:load />`
 
 **`src/pages/auth/register.astro`**
+
 - **Opis**: Strona rejestracji nowego użytkownika
 - **Tryb renderowania**: Server-side (output: "server")
 - **Odpowiedzialność**:
@@ -61,6 +67,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 - **Zawartość**: Komponent React `<RegisterForm client:load />`
 
 **`src/pages/auth/forgot-password.astro`**
+
 - **Opis**: Strona resetowania hasła
 - **Tryb renderowania**: Server-side (output: "server")
 - **Odpowiedzialność**:
@@ -70,6 +77,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 - **Zawartość**: Komponent React `<ForgotPasswordForm client:load />`
 
 **`src/pages/auth/reset-password.astro`**
+
 - **Opis**: Strona ustawiania nowego hasła
 - **Tryb renderowania**: Server-side (output: "server")
 - **Odpowiedzialność**:
@@ -80,6 +88,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 - **Zawartość**: Komponent React `<ResetPasswordForm client:load />`
 
 **`src/pages/auth/verify-email.astro`**
+
 - **Opis**: Strona potwierdzenia emaila (opcjonalne w MVP)
 - **Tryb renderowania**: Server-side (output: "server")
 - **Odpowiedzialność**:
@@ -91,6 +100,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 #### 1.1.2 Zmodyfikowane Strony Astro
 
 **`src/pages/index.astro`** (strona powitalna)
+
 - **Obecny stan**: Wyświetla komponent Welcome bez autentykacji
 - **Wymagane zmiany**:
   - Sprawdzenie sesji użytkownika w kodzie server-side
@@ -101,6 +111,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
   - Przycisk "Zarejestruj się" → link do `/auth/register`
 
 **`src/pages/generate.astro`** (główna funkcjonalność generowania fiszek)
+
 - **Obecny stan**: Dostępna bez autentykacji
 - **Wymagane zmiany**:
   - **Middleware Protection**: Sprawdzenie sesji przed renderowaniem
@@ -112,6 +123,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 #### 1.1.3 Nowe Komponenty React (Client-side)
 
 **`src/components/auth/LoginForm.tsx`**
+
 - **Typ**: Interaktywny komponent React
 - **Odpowiedzialność**:
   - Zarządzanie stanem formularza (email, password)
@@ -141,6 +153,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
   - Komponent `<ErrorNotification />` do wyświetlania błędów
 
 **`src/components/auth/RegisterForm.tsx`**
+
 - **Typ**: Interaktywny komponent React
 - **Odpowiedzialność**:
   - Zarządzanie stanem formularza (email, password, confirmPassword)
@@ -172,6 +185,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
   - Komponent sukcesu z instrukcją sprawdzenia emaila (jeśli wymagana weryfikacja)
 
 **`src/components/auth/ForgotPasswordForm.tsx`**
+
 - **Typ**: Interaktywny komponent React
 - **Odpowiedzialność**:
   - Zarządzanie stanem formularza (email)
@@ -194,6 +208,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
   - Link powrotny do logowania
 
 **`src/components/auth/ResetPasswordForm.tsx`**
+
 - **Typ**: Interaktywny komponent React
 - **Props**: `token: string` (z query params)
 - **Odpowiedzialność**:
@@ -213,6 +228,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
   ```
 
 **`src/components/auth/UserNav.tsx`**
+
 - **Typ**: Interaktywny komponent React
 - **Odpowiedzialność**:
   - Wyświetlanie informacji o zalogowanym użytkowniku (email, avatar)
@@ -237,6 +253,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 #### 1.1.4 Rozszerzenie Istniejących Komponentów
 
 **`src/components/FlashcardGenerationView.tsx`**
+
 - **Obecny stan**: Wysyła żądania do API bez tokenu
 - **Wymagane zmiany**:
   - Pobranie tokenu z localStorage/sessionStorage
@@ -245,6 +262,7 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
   - Wyświetlanie komunikatu o konieczności ponownego zalogowania
 
 **`src/layouts/Layout.astro`**
+
 - **Obecny stan**: Podstawowy layout HTML
 - **Wymagane zmiany**:
   - Opcjonalne: Dodanie warunkowego renderowania nawigacji w zależności od stanu autentykacji
@@ -255,10 +273,12 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 #### 1.2.1 Walidacja Client-side (React)
 
 **Email**:
+
 - Format: regex `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`
 - Komunikat błędu: "Podaj prawidłowy adres email"
 
 **Hasło (rejestracja i reset)**:
+
 - Minimalna długość: 8 znaków
 - Wymogi: co najmniej 1 wielka litera, 1 cyfra, 1 znak specjalny
 - Komunikaty:
@@ -266,28 +286,34 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
   - "Hasło musi zawierać wielką literę, cyfrę i znak specjalny"
 
 **Potwierdzenie hasła**:
+
 - Warunek: musi być identyczne z hasłem
 - Komunikat: "Hasła nie są identyczne"
 
 #### 1.2.2 Komunikaty Błędów z API
 
 **401 Unauthorized**:
+
 - UI: "Nieprawidłowy email lub hasło"
 - Akcja: Wyświetlenie błędu w formularzu
 
 **409 Conflict** (email już istnieje):
+
 - UI: "Konto z tym adresem email już istnieje"
 - Akcja: Podświetlenie pola email, link do strony logowania
 
 **400 Bad Request** (walidacja):
+
 - UI: Wyświetlenie szczegółowych błędów walidacji przy odpowiednich polach
 - Format: `{ field: 'email', message: 'Invalid email format' }`
 
 **429 Too Many Requests**:
+
 - UI: "Zbyt wiele prób. Spróbuj ponownie za chwilę"
 - Akcja: Wyłączenie przycisku submit na 60 sekund
 
 **500 Internal Server Error**:
+
 - UI: "Wystąpił błąd serwera. Spróbuj ponownie później"
 - Akcja: Wyświetlenie generycznego komunikatu, logowanie po stronie klienta
 
@@ -370,11 +396,13 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 **Lokalizacja**: `src/pages/api/auth/register.ts`
 
 **Odpowiedzialność**:
+
 - Walidacja danych wejściowych (email, password)
 - Rejestracja użytkownika w Supabase Auth
 - Zwrócenie informacji o utworzonym koncie
 
 **Request Body**:
+
 ```typescript
 {
   email: string;
@@ -383,19 +411,21 @@ Ta specyfikacja opisuje **System Autentykacji** dla aplikacji 10x-cards. Jest to
 ```
 
 **Walidacja (Zod schema)**:
+
 ```typescript
 const registerSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.string().email("Invalid email format"),
   password: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
 });
 ```
 
 **Logika endpointu**:
+
 1. Parsowanie i walidacja request body
 2. Wywołanie `supabaseClient.auth.signUp({ email, password })`
 3. Obsługa różnych przypadków:
@@ -405,6 +435,7 @@ const registerSchema = z.object({
 4. **Opcjonalnie**: Wysłanie emaila weryfikacyjnego (jeśli włączone w Supabase)
 
 **Response (201 Created)**:
+
 ```typescript
 {
   userId: string;
@@ -414,18 +445,20 @@ const registerSchema = z.object({
 ```
 
 **Response (409 Conflict)**:
+
 ```typescript
 {
-  error: 'Conflict';
-  message: 'Email already registered';
+  error: "Conflict";
+  message: "Email already registered";
 }
 ```
 
 **Response (400 Bad Request)**:
+
 ```typescript
 {
-  error: 'Bad Request';
-  message: 'Validation failed';
+  error: "Bad Request";
+  message: "Validation failed";
   details: Array<{ path: string; message: string }>;
 }
 ```
@@ -435,11 +468,13 @@ const registerSchema = z.object({
 **Lokalizacja**: `src/pages/api/auth/login.ts`
 
 **Odpowiedzialność**:
+
 - Walidacja danych wejściowych
 - Autentykacja użytkownika
 - Zwrócenie tokenu JWT
 
 **Request Body**:
+
 ```typescript
 {
   email: string;
@@ -448,14 +483,16 @@ const registerSchema = z.object({
 ```
 
 **Walidacja (Zod schema)**:
+
 ```typescript
 const loginSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(1, "Password is required"),
 });
 ```
 
 **Logika endpointu**:
+
 1. Parsowanie i walidacja request body
 2. Wywołanie `supabaseClient.auth.signInWithPassword({ email, password })`
 3. Obsługa przypadków:
@@ -465,6 +502,7 @@ const loginSchema = z.object({
    - Błąd serwera → 500 Internal Server Error
 
 **Response (200 OK)**:
+
 ```typescript
 {
   accessToken: string;
@@ -478,10 +516,11 @@ const loginSchema = z.object({
 ```
 
 **Response (401 Unauthorized)**:
+
 ```typescript
 {
-  error: 'Unauthorized';
-  message: 'Invalid email or password';
+  error: "Unauthorized";
+  message: "Invalid email or password";
 }
 ```
 
@@ -490,12 +529,14 @@ const loginSchema = z.object({
 **Lokalizacja**: `src/pages/api/auth/logout.ts`
 
 **Odpowiedzialność**:
+
 - Invalidacja tokenu użytkownika
 - Wylogowanie z Supabase Auth
 
 **Authorization**: Bearer token (wymagany)
 
 **Logika endpointu**:
+
 1. Sprawdzenie nagłówka Authorization
 2. Wywołanie `supabaseClient.auth.signOut()`
 3. Zwrócenie 204 No Content
@@ -503,10 +544,11 @@ const loginSchema = z.object({
 **Response (204 No Content)**: brak body
 
 **Response (401 Unauthorized)**:
+
 ```typescript
 {
-  error: 'Unauthorized';
-  message: 'Missing or invalid authorization token';
+  error: "Unauthorized";
+  message: "Missing or invalid authorization token";
 }
 ```
 
@@ -515,10 +557,12 @@ const loginSchema = z.object({
 **Lokalizacja**: `src/pages/api/auth/forgot-password.ts`
 
 **Odpowiedzialność**:
+
 - Wysłanie emaila z linkiem resetującym hasło
 - Wykorzystanie Supabase Auth do generowania tokenu
 
 **Request Body**:
+
 ```typescript
 {
   email: string;
@@ -526,21 +570,24 @@ const loginSchema = z.object({
 ```
 
 **Walidacja (Zod schema)**:
+
 ```typescript
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.string().email("Invalid email format"),
 });
 ```
 
 **Logika endpointu**:
+
 1. Walidacja email
 2. Wywołanie `supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: '...' })`
 3. Zawsze zwrócenie sukcesu (security best practice - nie ujawniamy czy email istnieje)
 
 **Response (200 OK)**:
+
 ```typescript
 {
-  message: 'If the email exists, a password reset link has been sent';
+  message: "If the email exists, a password reset link has been sent";
 }
 ```
 
@@ -549,10 +596,12 @@ const forgotPasswordSchema = z.object({
 **Lokalizacja**: `src/pages/api/auth/reset-password.ts`
 
 **Odpowiedzialność**:
+
 - Ustawienie nowego hasła
 - Walidacja tokenu resetowania
 
 **Request Body**:
+
 ```typescript
 {
   token: string;
@@ -561,19 +610,21 @@ const forgotPasswordSchema = z.object({
 ```
 
 **Walidacja**:
+
 ```typescript
 const resetPasswordSchema = z.object({
-  token: z.string().min(1, 'Token is required'),
+  token: z.string().min(1, "Token is required"),
   newPassword: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
 });
 ```
 
 **Logika endpointu**:
+
 1. Walidacja danych wejściowych
 2. Wywołanie `supabaseClient.auth.updateUser({ password: newPassword })`
 3. Obsługa przypadków:
@@ -582,17 +633,19 @@ const resetPasswordSchema = z.object({
    - Błąd serwera → 500 Internal Server Error
 
 **Response (200 OK)**:
+
 ```typescript
 {
-  message: 'Password has been reset successfully';
+  message: "Password has been reset successfully";
 }
 ```
 
 **Response (400 Bad Request)**:
+
 ```typescript
 {
-  error: 'Bad Request';
-  message: 'Invalid or expired reset token';
+  error: "Bad Request";
+  message: "Invalid or expired reset token";
 }
 ```
 
@@ -601,17 +654,20 @@ const resetPasswordSchema = z.object({
 **Lokalizacja**: `src/pages/api/auth/me.ts`
 
 **Odpowiedzialność**:
+
 - Zwrócenie informacji o aktualnie zalogowanym użytkowniku
 - Weryfikacja tokenu
 
 **Authorization**: Bearer token (wymagany)
 
 **Logika endpointu**:
+
 1. Sprawdzenie nagłówka Authorization
 2. Wywołanie `supabaseClient.auth.getUser(token)`
 3. Zwrócenie danych użytkownika lub błędu
 
 **Response (200 OK)**:
+
 ```typescript
 {
   id: string;
@@ -621,10 +677,11 @@ const resetPasswordSchema = z.object({
 ```
 
 **Response (401 Unauthorized)**:
+
 ```typescript
 {
-  error: 'Unauthorized';
-  message: 'Invalid or expired token';
+  error: "Unauthorized";
+  message: "Invalid or expired token";
 }
 ```
 
@@ -633,12 +690,14 @@ const resetPasswordSchema = z.object({
 **Lokalizacja**: `src/pages/api/auth/account.ts`
 
 **Odpowiedzialność**:
+
 - Usunięcie konta użytkownika i wszystkich powiązanych danych
 - Wymagane przez RODO (PRD punkt 3, 7)
 
 **Authorization**: Bearer token (wymagany)
 
 **Logika endpointu**:
+
 1. Sprawdzenie nagłówka Authorization i weryfikacja użytkownika
 2. Usunięcie wszystkich fiszek użytkownika (CASCADE z user_id)
 3. Usunięcie historii generowania (generations, generation_error_logs)
@@ -648,18 +707,20 @@ const resetPasswordSchema = z.object({
 **Response (204 No Content)**: brak body
 
 **Response (401 Unauthorized)**:
+
 ```typescript
 {
-  error: 'Unauthorized';
-  message: 'Invalid or expired token';
+  error: "Unauthorized";
+  message: "Invalid or expired token";
 }
 ```
 
 **Response (500 Internal Server Error)**:
+
 ```typescript
 {
-  error: 'Internal Server Error';
-  message: 'Failed to delete account';
+  error: "Internal Server Error";
+  message: "Failed to delete account";
 }
 ```
 
@@ -672,25 +733,27 @@ const resetPasswordSchema = z.object({
 **Lokalizacja schematów**: W każdym pliku endpointu (kolokacja z logiką)
 
 **Wspólne reguły walidacji**:
+
 - Email: format zgodny z RFC 5322
 - Hasło: min. 8 znaków, 1 wielka litera, 1 cyfra, 1 znak specjalny
 - Token: string niepusty
 
 **Przykład użycia w endpoincie**:
+
 ```typescript
 const validationResult = registerSchema.safeParse(requestBody);
 
 if (!validationResult.success) {
   return new Response(
     JSON.stringify({
-      error: 'Bad Request',
-      message: 'Validation failed',
+      error: "Bad Request",
+      message: "Validation failed",
       details: validationResult.error.errors.map((err) => ({
-        path: err.path.join('.'),
+        path: err.path.join("."),
         message: err.message,
       })),
     }),
-    { status: 400, headers: { 'Content-Type': 'application/json' } }
+    { status: 400, headers: { "Content-Type": "application/json" } }
   );
 }
 ```
@@ -732,6 +795,7 @@ if (!validationResult.success) {
    - Logowanie na konsolę serwera
 
 **Przykład struktury obsługi błędów**:
+
 ```typescript
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
@@ -757,7 +821,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // 3. Logika biznesowa
     const { data, error } = await supabaseClient.auth.signUp(...);
-    
+
     if (error) {
       // Obsługa specyficznych błędów Supabase
       if (error.message.includes('already registered')) {
@@ -766,7 +830,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           { status: 409, headers: { 'Content-Type': 'application/json' } }
         );
       }
-      
+
       // Generyczne błędy
       console.error('Supabase auth error:', error);
       return new Response(
@@ -780,7 +844,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       JSON.stringify({ userId: data.user.id, ... }),
       { status: 201, headers: { 'Content-Type': 'application/json' } }
     );
-    
+
   } catch (error) {
     // Catch-all dla nieoczekiwanych błędów
     console.error('Unexpected error in auth endpoint:', error);
@@ -799,6 +863,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 **Zmiany w `src/middleware/index.ts`**:
 
 **Obecny stan**:
+
 ```typescript
 export const onRequest = defineMiddleware((context, next) => {
   context.locals.supabase = supabaseServiceClient;
@@ -807,18 +872,22 @@ export const onRequest = defineMiddleware((context, next) => {
 ```
 
 **Nowy stan** (rozszerzony):
+
 ```typescript
 export const onRequest = defineMiddleware(async (context, next) => {
   // Dodaj Supabase client do locals (bez zmian)
   context.locals.supabase = supabaseServiceClient;
-  
+
   // Sprawdź sesję użytkownika z cookies
-  const accessToken = context.cookies.get('sb-access-token')?.value;
-  
+  const accessToken = context.cookies.get("sb-access-token")?.value;
+
   if (accessToken) {
     // Zweryfikuj token
-    const { data: { user }, error } = await supabaseClient.auth.getUser(accessToken);
-    
+    const {
+      data: { user },
+      error,
+    } = await supabaseClient.auth.getUser(accessToken);
+
     if (!error && user) {
       // Dodaj użytkownika do context.locals
       context.locals.user = {
@@ -827,12 +896,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
       };
     }
   }
-  
+
   return next();
 });
 ```
 
 **Definicja typów w `src/env.d.ts`** (aktualizacja):
+
 ```typescript
 declare global {
   namespace App {
@@ -899,6 +969,7 @@ if (Astro.locals.user) {
 ### 3.1 Wykorzystanie Supabase Auth
 
 **Konfiguracja Supabase Auth**:
+
 - Lokalizacja ustawień: Supabase Dashboard → Authentication → Settings
 - Wymagane konfiguracje:
   - **Site URL**: URL aplikacji produkcyjnej (np. `https://10x-cards.com`)
@@ -916,11 +987,13 @@ W przeciwieństwie do operacji na danych (gdzie używamy `supabaseServiceClient`
 **Lokalizacja**: `src/db/supabase.client.ts` (już istnieje)
 
 **Uzasadnienie**:
+
 - Supabase Auth wymaga użycia anon key (nie service role key)
 - Service role key bypasses'uje wszystkie zabezpieczenia RLS, co nie jest potrzebne dla auth
 - Anon key pozwala na bezpieczne operacje auth po stronie klienta i serwera
 
 **Eksport dla auth**:
+
 ```typescript
 // W src/db/supabase.client.ts
 export { supabaseClient as supabaseAuthClient };
@@ -931,13 +1004,13 @@ export { supabaseClient as supabaseAuthClient };
 **Implementacja w `src/pages/api/auth/register.ts`**:
 
 ```typescript
-import { supabaseClient } from '../../../db/supabase.client';
+import { supabaseClient } from "../../../db/supabase.client";
 
 export const POST: APIRoute = async ({ request }) => {
   // ... walidacja ...
-  
+
   const { email, password } = validationResult.data;
-  
+
   // Rejestracja w Supabase Auth
   const { data, error } = await supabaseClient.auth.signUp({
     email,
@@ -946,30 +1019,31 @@ export const POST: APIRoute = async ({ request }) => {
       // Opcjonalnie: dodatkowe metadane użytkownika
       data: {
         // np. displayName, jeśli będzie wymagane
-      }
-    }
+      },
+    },
   });
-  
+
   if (error) {
     // Obsługa błędów (email już istnieje, itp.)
     // ...
   }
-  
+
   // Supabase automatycznie tworzy rekord w tabeli auth.users
   // User ID: data.user.id
-  
+
   return new Response(
     JSON.stringify({
       userId: data.user!.id,
       email: data.user!.email!,
       createdAt: data.user!.created_at,
     }),
-    { status: 201, headers: { 'Content-Type': 'application/json' } }
+    { status: 201, headers: { "Content-Type": "application/json" } }
   );
 };
 ```
 
 **Ważne uwagi**:
+
 - Supabase automatycznie hashuje hasła (bcrypt)
 - User ID jest UUID v4 generowane przez Supabase
 - Po rejestracji użytkownik może od razu się zalogować (jeśli email verification wyłączona)
@@ -979,43 +1053,43 @@ export const POST: APIRoute = async ({ request }) => {
 **Implementacja w `src/pages/api/auth/login.ts`**:
 
 ```typescript
-import { supabaseClient } from '../../../db/supabase.client';
+import { supabaseClient } from "../../../db/supabase.client";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   // ... walidacja ...
-  
+
   const { email, password } = validationResult.data;
-  
+
   // Logowanie w Supabase Auth
   const { data, error } = await supabaseClient.auth.signInWithPassword({
     email,
     password,
   });
-  
+
   if (error) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized', message: 'Invalid email or password' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: "Unauthorized", message: "Invalid email or password" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  
+
   // Opcjonalnie: Zapisz token w cookie (dla SSR)
-  cookies.set('sb-access-token', data.session!.access_token, {
-    path: '/',
+  cookies.set("sb-access-token", data.session!.access_token, {
+    path: "/",
     httpOnly: true,
     secure: import.meta.env.PROD, // tylko HTTPS w produkcji
-    sameSite: 'lax',
+    sameSite: "lax",
     maxAge: data.session!.expires_in,
   });
-  
-  cookies.set('sb-refresh-token', data.session!.refresh_token, {
-    path: '/',
+
+  cookies.set("sb-refresh-token", data.session!.refresh_token, {
+    path: "/",
     httpOnly: true,
     secure: import.meta.env.PROD,
-    sameSite: 'lax',
+    sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7, // 7 dni
   });
-  
+
   // Zwróć token również w response body (dla localStorage)
   return new Response(
     JSON.stringify({
@@ -1025,14 +1099,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       user: {
         id: data.user!.id,
         email: data.user!.email!,
-      }
+      },
     }),
-    { status: 200, headers: { 'Content-Type': 'application/json' } }
+    { status: 200, headers: { "Content-Type": "application/json" } }
   );
 };
 ```
 
 **Strategia przechowywania tokenów**:
+
 - **Cookies (httpOnly)**: Główna metoda dla zabezpieczenia przed XSS, używana przez SSR
 - **localStorage**: Backup dla client-side requests (React components)
 
@@ -1041,32 +1116,32 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 **Implementacja w `src/pages/api/auth/logout.ts`**:
 
 ```typescript
-import { supabaseClient } from '../../../db/supabase.client';
+import { supabaseClient } from "../../../db/supabase.client";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   // Pobierz token z nagłówka lub cookie
-  const authHeader = request.headers.get('Authorization');
-  const token = authHeader?.substring(7) || cookies.get('sb-access-token')?.value;
-  
+  const authHeader = request.headers.get("Authorization");
+  const token = authHeader?.substring(7) || cookies.get("sb-access-token")?.value;
+
   if (!token) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized', message: 'No token provided' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: "Unauthorized", message: "No token provided" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  
+
   // Wylogowanie w Supabase (invalidacja tokenu)
   const { error } = await supabaseClient.auth.signOut();
-  
+
   // Usuń cookies (nawet jeśli signOut zwrócił błąd)
-  cookies.delete('sb-access-token', { path: '/' });
-  cookies.delete('sb-refresh-token', { path: '/' });
-  
+  cookies.delete("sb-access-token", { path: "/" });
+  cookies.delete("sb-refresh-token", { path: "/" });
+
   if (error) {
-    console.error('Supabase signOut error:', error);
+    console.error("Supabase signOut error:", error);
     // Mimo błędu, zwróć sukces (cookies są już usunięte)
   }
-  
+
   return new Response(null, { status: 204 });
 };
 ```
@@ -1084,23 +1159,23 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 **Implementacja forgot-password**:
 
 ```typescript
-import { supabaseClient } from '../../../db/supabase.client';
+import { supabaseClient } from "../../../db/supabase.client";
 
 export const POST: APIRoute = async ({ request }) => {
   // ... walidacja ...
-  
+
   const { email } = validationResult.data;
-  
+
   const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
     redirectTo: `${import.meta.env.PUBLIC_SITE_URL}/auth/reset-password`,
   });
-  
+
   // Zawsze zwracaj sukces (security best practice)
   return new Response(
-    JSON.stringify({ 
-      message: 'If the email exists, a password reset link has been sent' 
+    JSON.stringify({
+      message: "If the email exists, a password reset link has been sent",
     }),
-    { status: 200, headers: { 'Content-Type': 'application/json' } }
+    { status: 200, headers: { "Content-Type": "application/json" } }
   );
 };
 ```
@@ -1110,38 +1185,38 @@ export const POST: APIRoute = async ({ request }) => {
 ```typescript
 export const POST: APIRoute = async ({ request }) => {
   // ... walidacja ...
-  
+
   const { token, newPassword } = validationResult.data;
-  
+
   // Ustawienie sesji z tokenem resetowania
   const { error: sessionError } = await supabaseClient.auth.setSession({
     access_token: token,
     refresh_token: token,
   });
-  
+
   if (sessionError) {
-    return new Response(
-      JSON.stringify({ error: 'Bad Request', message: 'Invalid or expired token' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: "Bad Request", message: "Invalid or expired token" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  
+
   // Aktualizacja hasła
   const { error: updateError } = await supabaseClient.auth.updateUser({
     password: newPassword,
   });
-  
+
   if (updateError) {
-    return new Response(
-      JSON.stringify({ error: 'Bad Request', message: 'Failed to reset password' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: "Bad Request", message: "Failed to reset password" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  
-  return new Response(
-    JSON.stringify({ message: 'Password has been reset successfully' }),
-    { status: 200, headers: { 'Content-Type': 'application/json' } }
-  );
+
+  return new Response(JSON.stringify({ message: "Password has been reset successfully" }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 };
 ```
 
@@ -1155,29 +1230,32 @@ Wzorzec już używany w `/api/generations` i `/api/flashcards`:
 // Przykład z src/pages/api/generations.ts
 export const POST: APIRoute = async ({ request, locals }) => {
   // 1. Pobierz token z nagłówka
-  const authHeader = request.headers.get('Authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized', message: 'Missing authorization header' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
+  const authHeader = request.headers.get("Authorization");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Unauthorized", message: "Missing authorization header" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  
+
   const token = authHeader.substring(7);
-  
+
   // 2. Zweryfikuj token
-  const { data: { user }, error: authError } = await locals.supabase.auth.getUser(token);
-  
+  const {
+    data: { user },
+    error: authError,
+  } = await locals.supabase.auth.getUser(token);
+
   if (authError || !user) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized', message: 'Invalid or expired token' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: "Unauthorized", message: "Invalid or expired token" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  
+
   const userId = user.id;
-  
+
   // 3. Kontynuuj logikę endpointu z userId
   // ...
 };
@@ -1190,6 +1268,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 **Strategia odświeżania tokenów**:
 
 **Client-side (React)**:
+
 - Implementacja custom hook `useAuth` do zarządzania sesją
 - Automatyczne odświeżanie tokenu przed wygaśnięciem
 - Przechowywanie refresh token w localStorage
@@ -1197,67 +1276,72 @@ export const POST: APIRoute = async ({ request, locals }) => {
 **Lokalizacja**: `src/components/hooks/useAuth.ts` (nowy hook)
 
 **Podstawowa struktura**:
+
 ```typescript
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Funkcja odświeżania tokenu
   const refreshAccessToken = async () => {
-    const refreshToken = localStorage.getItem('sb-refresh-token');
+    const refreshToken = localStorage.getItem("sb-refresh-token");
     if (!refreshToken) return null;
-    
+
     // Wywołanie Supabase do odświeżenia tokenu
     // (można to zrobić przez endpoint lub bezpośrednio z klienta)
-    const response = await fetch('/api/auth/refresh', {
-      method: 'POST',
+    const response = await fetch("/api/auth/refresh", {
+      method: "POST",
       body: JSON.stringify({ refreshToken }),
     });
-    
+
     if (response.ok) {
       const data = await response.json();
-      localStorage.setItem('sb-access-token', data.accessToken);
+      localStorage.setItem("sb-access-token", data.accessToken);
       return data.accessToken;
     }
-    
+
     return null;
   };
-  
+
   // Automatyczne odświeżanie co 50 minut (przed wygaśnięciem 1h tokenu)
   useEffect(() => {
-    const interval = setInterval(() => {
-      refreshAccessToken();
-    }, 50 * 60 * 1000);
-    
+    const interval = setInterval(
+      () => {
+        refreshAccessToken();
+      },
+      50 * 60 * 1000
+    );
+
     return () => clearInterval(interval);
   }, []);
-  
+
   return { user, isLoading, refreshAccessToken };
 }
 ```
 
 **Endpoint `/api/auth/refresh`** (opcjonalny):
+
 ```typescript
 export const POST: APIRoute = async ({ request }) => {
   const { refreshToken } = await request.json();
-  
+
   const { data, error } = await supabaseClient.auth.refreshSession({
     refresh_token: refreshToken,
   });
-  
+
   if (error || !data.session) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized', message: 'Invalid refresh token' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: "Unauthorized", message: "Invalid refresh token" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  
+
   return new Response(
     JSON.stringify({
       accessToken: data.session.access_token,
       expiresIn: data.session.expires_in,
     }),
-    { status: 200, headers: { 'Content-Type': 'application/json' } }
+    { status: 200, headers: { "Content-Type": "application/json" } }
   );
 };
 ```
@@ -1267,11 +1351,13 @@ export const POST: APIRoute = async ({ request }) => {
 **Powiązanie user_id**:
 
 Istniejące tabele już zawierają kolumnę `user_id`:
+
 - `flashcards.user_id` → UUID
 - `generations.user_id` → UUID
 - `generation_error_logs.user_id` → UUID
 
 **User ID pochodzi z Supabase Auth**:
+
 - Po rejestracji użytkownika, Supabase tworzy rekord w `auth.users`
 - Ten sam UUID jest używany w kolumnach `user_id` w tabelach aplikacji
 - Nie ma potrzeby tworzenia dodatkowej tabeli `users` w schemacie `public`
@@ -1279,6 +1365,7 @@ Istniejące tabele już zawierają kolumnę `user_id`:
 **Integracja w serwisach**:
 
 Istniejące serwisy już poprawnie używają `userId`:
+
 ```typescript
 // src/lib/services/flashcards.service.ts
 export async function bulkCreateFlashcards(
@@ -1304,12 +1391,14 @@ export async function bulkCreateFlashcards(
 ### 4.1 Kluczowe Komponenty
 
 **Frontend (Astro + React)**:
+
 - 4 nowe strony Astro: login, register, forgot-password, reset-password
 - 5 nowych komponentów React: LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, UserNav
 - Rozszerzenie istniejących: FlashcardGenerationView (dodanie Authorization header)
 - Middleware SSR dla ochrony stron
 
 **Backend (Astro API Routes)**:
+
 - 7 nowych endpointów w tej specyfikacji: register, login, logout, forgot-password, reset-password, me, account (DELETE)
 - Endpoint account DELETE jest **WYMAGANY przez RODO** (PRD punkt 3, 7)
 - Wszystkie z walidacją Zod
@@ -1317,6 +1406,7 @@ export async function bulkCreateFlashcards(
 - Integracja z Supabase Auth
 
 **Autentykacja**:
+
 - Supabase Auth jako główny system
 - JWT tokeny z 1h czasem życia
 - Refresh tokens dla długotrwałych sesji
@@ -1325,17 +1415,20 @@ export async function bulkCreateFlashcards(
 ### 4.2 Bezpieczeństwo
 
 **Ochrona przed atakami**:
+
 - XSS: HttpOnly cookies, sanityzacja inputów
 - CSRF: SameSite cookies
 - Brute force: Rate limiting (do implementacji)
 - SQL Injection: N/A (Supabase ORM)
 
 **Polityka haseł**:
+
 - Min. 8 znaków
 - Wymóg wielkich liter, cyfr, znaków specjalnych
 - Hashing przez Supabase (bcrypt)
 
 **Zarządzanie tokenami**:
+
 - Krótki czas życia access token (1h)
 - Długotrwałe refresh tokens (7 dni)
 - Invalidacja przy wylogowaniu
@@ -1345,6 +1438,7 @@ export async function bulkCreateFlashcards(
 #### Mapowanie User Stories na Implementację
 
 **US-001: Rejestracja konta** ✅ W PEŁNI ZAIMPLEMENTOWANE
+
 - ✅ Formularz rejestracyjny (email + hasło) → `RegisterForm.tsx`
 - ✅ Walidacja danych → Client-side (React) + Server-side (Zod)
 - ✅ Potwierdzenie rejestracji → Success state w komponencie
@@ -1352,6 +1446,7 @@ export async function bulkCreateFlashcards(
 - **Implementacja**: `/auth/register` + `/api/auth/register`
 
 **US-002: Logowanie do aplikacji** ✅ W PEŁNI ZAIMPLEMENTOWANE
+
 - ✅ Formularz logowania → `LoginForm.tsx`
 - ✅ Przekierowanie na `/generate` po zalogowaniu → `?redirect=` parameter
 - ✅ Komunikaty błędów dla nieprawidłowych danych → Error states
@@ -1359,42 +1454,49 @@ export async function bulkCreateFlashcards(
 - **Implementacja**: `/auth/login` + `/api/auth/login`
 
 **US-003: Generowanie fiszek przy użyciu AI** 🟡 CZĘŚCIOWO
+
 - ✅ Endpoint już istnieje i ma autoryzację → `/api/generations`
 - ✅ Pole tekstowe 1000-10000 znaków → `FlashcardGenerationView.tsx`
 - 🟡 **DO ZROBIENIA**: Dodanie tokenu do nagłówka Authorization w requestach
 - 🟡 **DO ZROBIENIA**: Obsługa 401 (wygasła sesja) → przekierowanie na login
 
 **US-004: Przegląd i zatwierdzanie propozycji fiszek** ⏳ JUŻ ZAIMPLEMENTOWANE
+
 - ✅ Lista wygenerowanych fiszek → `FlashcardList.tsx`
 - ✅ Przyciski zatwierdzenia/edycji/odrzucenia → `FlashcardListItem.tsx`
 - ✅ Zapis do bazy → `/api/flashcards` + `BulkSaveButton.tsx`
 - **Uwaga**: Wymaga tylko dodania tokenu do requestów (jak US-003)
 
 **US-005: Edycja fiszek** ⏳ WYMAGA NOWEGO WIDOKU
+
 - ❌ Brak widoku "Moje fiszki"
 - ❌ Brak UI do edycji zapisanych fiszek
 - ✅ Backend endpoint już istnieje → `/api/flashcards` (PUT)
 - **Wymagane**: Nowa strona `/flashcards` lub `/my-flashcards` (Faza 9)
 
 **US-006: Usuwanie fiszek** ⏳ WYMAGA NOWEGO WIDOKU
+
 - ❌ Brak widoku "Moje fiszki"
 - ❌ Brak UI do usuwania fiszek z listy
 - ✅ Backend endpoint już istnieje → `/api/flashcards` (DELETE)
 - **Wymagane**: Nowa strona `/flashcards` lub `/my-flashcards` (Faza 9)
 
 **US-007: Ręczne tworzenie fiszek** ⏳ WYMAGA NOWEGO WIDOKU
+
 - ❌ Brak widoku "Moje fiszki"
 - ❌ Brak formularza do ręcznego tworzenia
 - ✅ Backend endpoint już istnieje → `/api/flashcards` (POST)
 - **Wymagane**: Nowa strona `/flashcards` z formularzem (Faza 9)
 
 **US-008: Sesja nauki z algorytmem powtórek** ⏳ WYMAGA OSOBNEJ SPECYFIKACJI
+
 - ❌ Brak widoku "Sesja nauki"
 - ❌ Brak integracji z algorytmem spaced repetition
 - ❌ Brak UI do oceny fiszek
 - **Wymagane**: Nowa specyfikacja + implementacja (Faza 10)
 
 **US-009: Bezpieczny dostęp i autoryzacja** ✅ W PEŁNI ZAIMPLEMENTOWANE
+
 - ✅ Middleware weryfikuje sesję przed dostępem do `/generate`
 - ✅ API endpoints weryfikują Bearer token
 - ✅ Filtrowanie danych po `user_id` w serwisach
@@ -1402,12 +1504,14 @@ export async function bulkCreateFlashcards(
 - **Implementacja**: Middleware + Token verification we wszystkich endpointach
 
 **PRD punkt 3, 7: Usuwanie konta (RODO)** ✅ ZAIMPLEMENTOWANE
+
 - ✅ Endpoint DELETE /api/auth/account
 - 🟡 **DO ZROBIENIA**: UI do usunięcia konta (w UserNav lub Settings)
 - 🟡 **DO ZROBIENIA**: Potwierdzenie z hasłem przed usunięciem
 - **Implementacja**: `/api/auth/account` (Faza 8)
 
 **PRD punkt 6: Statystyki generowania** ⏳ WYMAGA IMPLEMENTACJI
+
 - ❌ Brak endpointu do statystyk
 - ❌ Brak widoku Dashboard
 - ✅ Tabele w bazie są gotowe (generations, generation_error_logs)
@@ -1416,32 +1520,38 @@ export async function bulkCreateFlashcards(
 ### 4.4 Nie Naruszone Istniejące Funkcjonalności
 
 **Generowanie fiszek (US-003)**:
+
 - ✅ Endpoint `/api/generations` pozostaje bez zmian (już ma auth)
 - ✅ FlashcardGenerationView wymaga tylko dodania tokenu do requestów
 
 **Zarządzanie fiszkami (US-004, US-005, US-006)**:
+
 - ✅ Endpoint `/api/flashcards` pozostaje bez zmian (już ma auth)
 - ✅ Walidacja `user_id` już istnieje w serwisach
 
 **Baza danych**:
+
 - ✅ Żadne zmiany w schemacie nie są wymagane
 - ✅ Kolumny `user_id` już istnieją i są gotowe do użycia
 
 ### 4.5 Przepływ Danych
 
 **Rejestracja**:
+
 ```
 User → RegisterForm → POST /api/auth/register → Supabase Auth → DB (auth.users)
 → Response (userId) → Auto-login → localStorage (token) → Redirect /generate
 ```
 
 **Logowanie**:
+
 ```
 User → LoginForm → POST /api/auth/login → Supabase Auth → JWT Token
 → localStorage + Cookies → Redirect /generate
 ```
 
 **Chroniony Request**:
+
 ```
 FlashcardGenerationView → GET /api/generations
   Headers: { Authorization: `Bearer ${token}` }
@@ -1450,6 +1560,7 @@ FlashcardGenerationView → GET /api/generations
 ```
 
 **Wylogowanie**:
+
 ```
 UserNav → POST /api/auth/logout → Supabase signOut
 → Clear cookies → Clear localStorage → Redirect /auth/login
@@ -1458,12 +1569,14 @@ UserNav → POST /api/auth/logout → Supabase signOut
 ### 4.6 Konfiguracja Środowiskowa
 
 **Wymagane zmienne środowiskowe** (w `.env`):
+
 - `SUPABASE_URL` - URL instancji Supabase (już istnieje)
 - `SUPABASE_KEY` - Anon/Public key (już istnieje)
 - `SUPABASE_SERVICE_ROLE_KEY` - Service role key (już istnieje)
 - `PUBLIC_SITE_URL` - URL aplikacji dla redirects (nowa)
 
 **Aktualizacja `src/env.d.ts`**:
+
 ```typescript
 interface ImportMetaEnv {
   readonly SUPABASE_URL: string;
@@ -1543,6 +1656,7 @@ interface ImportMetaEnv {
 ### 4.8 Testowanie
 
 **Scenariusze testowe**:
+
 1. Rejestracja nowego użytkownika → sukces
 2. Rejestracja z istniejącym emailem → błąd 409
 3. Logowanie z poprawnymi danymi → sukces
@@ -1562,6 +1676,7 @@ interface ImportMetaEnv {
 12. Wygaśnięcie sesji podczas pracy → auto-logout i przekierowanie
 
 **Narzędzia**:
+
 - Postman/Insomnia dla testowania API
 - Przeglądarka dev tools dla flow frontend
 - Supabase Dashboard do weryfikacji users w `auth.users`
@@ -1575,6 +1690,7 @@ interface ImportMetaEnv {
 **Wszystkie endpointy zwracają JSON z nagłówkiem `Content-Type: application/json`**
 
 **Format błędów**:
+
 ```typescript
 {
   error: string; // Typ błędu (np. "Bad Request", "Unauthorized")
@@ -1590,6 +1706,7 @@ interface ImportMetaEnv {
 **Lokalizacja**: `src/types.ts` (aktualizacja istniejącego pliku)
 
 **Nowe typy do dodania**:
+
 ```typescript
 // --- AUTH DTOs (dodaj na początku pliku) ---
 
@@ -1702,6 +1819,7 @@ src/
 ### 6.2 Ograniczenia MVP
 
 **Nie zawarte w tej specyfikacji** (zgodnie z PRD):
+
 - Weryfikacja email (opcjonalna, można włączyć w Supabase)
 - Social login (Google, GitHub, etc.)
 - Two-factor authentication
@@ -1709,6 +1827,7 @@ src/
 - Email customization (używamy domyślnych templates Supabase)
 
 **Będą dodane w dalszych fazach implementacji** (wymagane przez PRD):
+
 - Account deletion endpoint (**WYMAGANE przez RODO i PRD punkt 3, 7**)
 - Widok "Moje fiszki" do zarządzania zapisanymi fiszkami (**US-005, US-006, US-007**)
 - Widok "Sesja nauki" z algorytmem spaced repetition (**US-008**)
@@ -1717,6 +1836,7 @@ src/
 ### 6.3 Możliwości Rozbudowy
 
 **Przyszłe funkcjonalności**:
+
 - Profilowe strony użytkownika
 - Zmiana hasła (bez resetu)
 - Zmiana emaila
@@ -1728,17 +1848,20 @@ src/
 ### 6.4 Dependency na Supabase
 
 **Zalety**:
+
 - Gotowy system auth out-of-the-box
 - Zarządzanie sesjami i tokenami
 - Email service wbudowany
 - Skalowalność i bezpieczeństwo
 
 **Wady**:
+
 - Vendor lock-in (ale Supabase jest open-source)
 - Zależność od zewnętrznej usługi
 - Konieczność konfiguracji dashboard
 
 **Mitigacja**:
+
 - Abstrakcja logiki auth w serwisach
 - Możliwość przejścia na self-hosted Supabase
 - Dokumentacja procesu migracji (w razie potrzeby)
@@ -1748,6 +1871,7 @@ src/
 ## CHANGELOG
 
 ### Wersja 1.1 - 2025-10-27
+
 **Autor**: AI Assistant (Claude Sonnet 4.5)
 
 **Zmiany po weryfikacji zgodności z PRD:**
@@ -1788,6 +1912,7 @@ src/
    - Oznaczono jako wymagany przez RODO
 
 **Podsumowanie weryfikacji:**
+
 - ✅ Wszystkie wymagania US-001, US-002, US-009 są pokryte
 - ✅ Wymagania RODO (usuwanie konta) są uwzględnione
 - ⚠️ Zidentyfikowano brakujące widoki (Moje fiszki, Sesja nauki, Statystyki)
@@ -1796,9 +1921,11 @@ src/
 ---
 
 ### Wersja 1.0 - 2025-10-27
+
 **Autor**: AI Assistant (Claude Sonnet 4.5)
 
 **Pierwotna specyfikacja techniczna:**
+
 - System autentykacji (rejestracja, logowanie, reset hasła)
 - 6 endpointów API
 - 5 komponentów React
@@ -1814,4 +1941,3 @@ src/
 Wersja: 1.1
 Data ostatniej aktualizacji: 2025-10-27
 Autorzy: AI Assistant (Claude Sonnet 4.5)
-

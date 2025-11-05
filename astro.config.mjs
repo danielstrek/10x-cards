@@ -16,7 +16,9 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   // Use Cloudflare adapter for production, Node.js for local development
-  adapter: process.env.CF_PAGES ? cloudflare() : node({
-    mode: "standalone",
-  }),
+  adapter: process.env.CF_PAGES
+    ? cloudflare()
+    : node({
+        mode: "standalone",
+      }),
 });

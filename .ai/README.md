@@ -5,6 +5,7 @@ Katalog `.ai` zawiera całą dokumentację projektową, plany implementacji oraz
 ## 🚀 Quick Start - Test Flashcards Endpoint
 
 ### Windows (PowerShell)
+
 ```powershell
 # Uruchom serwer dev
 npm run dev
@@ -14,6 +15,7 @@ npm run dev
 ```
 
 ### Linux/macOS (Bash)
+
 ```bash
 # Uruchom serwer dev
 npm run dev
@@ -24,6 +26,7 @@ chmod +x .ai/test-flashcards-endpoint.sh
 ```
 
 ### Manual Testing (cURL)
+
 ```bash
 curl -X POST http://localhost:4321/api/flashcards \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -36,6 +39,7 @@ curl -X POST http://localhost:4321/api/flashcards \
 ## 📋 Dokumenty projektowe
 
 ### Planowanie i architektura
+
 - **[prd.md](prd.md)** - Product Requirements Document
 - **[tech-stach.md](tech-stach.md)** - Stack technologiczny projektu
 - **[db-plan.md](db-plan.md)** - Schemat bazy danych i migracje
@@ -48,6 +52,7 @@ curl -X POST http://localhost:4321/api/flashcards \
 Endpoint do masowego tworzenia flashcards z propozycji AI.
 
 #### Dokumentacja
+
 1. **[flashcards-implementation-summary.md](flashcards-implementation-summary.md)** - START HERE!
    - Podsumowanie całej implementacji
    - Status wszystkich kroków
@@ -83,10 +88,12 @@ Endpoint do masowego tworzenia flashcards z propozycji AI.
    - Testują wszystkie główne scenariusze (success, validation, auth, not found)
 
 #### Plany implementacji
+
 - **[generations-endpoint-implementation-plan.md](generations-endpoint-implementation-plan.md)** - Plan wdrożenia
   > ⚠️ **Uwaga**: Nazwa pliku jest myląca (legacy naming). Plik zawiera plan dla endpointa `/api/flashcards`, NIE `/api/generations`.
 
 #### Zaimplementowane pliki kodu
+
 ```
 src/
 ├── lib/
@@ -103,37 +110,40 @@ src/
 ## 📖 Jak czytać dokumentację
 
 ### Dla developerów implementujących nowe endpointy
+
 1. Przeczytaj `api-plan.md` - znajdź swój endpoint
 2. Stwórz plan implementacji (wzoruj się na `generations-endpoint-implementation-plan.md`)
 3. Implementuj endpoint (użyj `flashcards.service.ts` i `flashcards.ts` jako referencji)
 4. Dokumentuj (wzoruj się na dokumentacji flashcards)
 
 ### Dla developerów używających API
+
 1. Zacznij od `flashcards-implementation-summary.md`
 2. Zobacz `flashcards-endpoint-examples.md` dla przykładów kodu
 3. Sprawdź `flashcards-endpoint-documentation.md` dla szczegółów
 
 ### Dla QA/Testerów
+
 1. `flashcards-endpoint-documentation.md` - zrozum endpoint
 2. `flashcards-endpoint-tests.md` - scenariusze testowe
 3. `flashcards-endpoint-examples.md` - przykłady do manual testingu
 
 ## 🎯 Status implementacji endpointów
 
-| Endpoint | Metoda | Status | Dokumentacja |
-|----------|--------|--------|--------------|
-| `/api/auth/register` | POST | ⏳ Pending | [api-plan.md](api-plan.md#21-authentication) |
-| `/api/auth/login` | POST | ⏳ Pending | [api-plan.md](api-plan.md#21-authentication) |
-| `/api/auth` | DELETE | ⏳ Pending | [api-plan.md](api-plan.md#21-authentication) |
-| `/api/generations` | POST | ⏳ Pending | [api-plan.md](api-plan.md#22-generations) |
-| `/api/generations` | GET | ⏳ Pending | [api-plan.md](api-plan.md#22-generations) |
-| **`/api/flashcards`** | **POST** | **✅ Done** | [📁 Docs](flashcards-implementation-summary.md) |
-| `/api/flashcards` | GET | ⏳ Pending | [api-plan.md](api-plan.md#23-flashcards) |
-| `/api/flashcards/:id` | GET | ⏳ Pending | [api-plan.md](api-plan.md#23-flashcards) |
-| `/api/flashcards/:id` | PUT | ⏳ Pending | [api-plan.md](api-plan.md#23-flashcards) |
-| `/api/flashcards/:id` | DELETE | ⏳ Pending | [api-plan.md](api-plan.md#23-flashcards) |
-| `/api/sessions/due` | GET | ⏳ Pending | [api-plan.md](api-plan.md#24-study-sessions) |
-| `/api/sessions/review` | POST | ⏳ Pending | [api-plan.md](api-plan.md#24-study-sessions) |
+| Endpoint               | Metoda   | Status      | Dokumentacja                                    |
+| ---------------------- | -------- | ----------- | ----------------------------------------------- |
+| `/api/auth/register`   | POST     | ⏳ Pending  | [api-plan.md](api-plan.md#21-authentication)    |
+| `/api/auth/login`      | POST     | ⏳ Pending  | [api-plan.md](api-plan.md#21-authentication)    |
+| `/api/auth`            | DELETE   | ⏳ Pending  | [api-plan.md](api-plan.md#21-authentication)    |
+| `/api/generations`     | POST     | ⏳ Pending  | [api-plan.md](api-plan.md#22-generations)       |
+| `/api/generations`     | GET      | ⏳ Pending  | [api-plan.md](api-plan.md#22-generations)       |
+| **`/api/flashcards`**  | **POST** | **✅ Done** | [📁 Docs](flashcards-implementation-summary.md) |
+| `/api/flashcards`      | GET      | ⏳ Pending  | [api-plan.md](api-plan.md#23-flashcards)        |
+| `/api/flashcards/:id`  | GET      | ⏳ Pending  | [api-plan.md](api-plan.md#23-flashcards)        |
+| `/api/flashcards/:id`  | PUT      | ⏳ Pending  | [api-plan.md](api-plan.md#23-flashcards)        |
+| `/api/flashcards/:id`  | DELETE   | ⏳ Pending  | [api-plan.md](api-plan.md#23-flashcards)        |
+| `/api/sessions/due`    | GET      | ⏳ Pending  | [api-plan.md](api-plan.md#24-study-sessions)    |
+| `/api/sessions/review` | POST     | ⏳ Pending  | [api-plan.md](api-plan.md#24-study-sessions)    |
 
 ## 📂 Struktura katalogów projektu
 
@@ -166,6 +176,7 @@ src/
 ## 💡 Wskazówki
 
 ### Konwencje nazewnicze
+
 - Plany implementacji: `{resource}-endpoint-implementation-plan.md`
 - Dokumentacja: `{resource}-endpoint-documentation.md`
 - Przykłady: `{resource}-endpoint-examples.md`
@@ -173,6 +184,7 @@ src/
 - Podsumowanie: `{resource}-implementation-summary.md`
 
 ### Best Practices
+
 1. Zawsze zacznij od planu implementacji
 2. Dokumentuj podczas implementacji, nie po
 3. Dodaj przykłady użycia dla developerów
@@ -183,4 +195,3 @@ src/
 
 **Last Updated**: 2025-10-16  
 **Maintained by**: Development Team
-

@@ -84,6 +84,7 @@ export default tseslint.config(
       "**/*.ttf",
       "**/*.eot",
       "**/database.types.ts",
+      "astro.config.mjs",
     ],
   },
   baseConfig,

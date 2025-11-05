@@ -14,8 +14,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -34,8 +34,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -67,8 +67,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -135,7 +135,7 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             // Get job statuses
             const jobs = {
               lint: '${{ needs.lint.result }}',
@@ -143,7 +143,7 @@ jobs:
               build: '${{ needs.build.result }}',
               deploy: '${{ needs.deploy.result }}',
             };
-            
+
             // Helper to create status emoji
             const getStatusEmoji = (status) => {
               switch(status) {
@@ -154,7 +154,7 @@ jobs:
                 default: return '❓';
               }
             };
-            
+
             // Build summary body
             let summaryBody = '## 🚀 Deployment to Cloudflare Pages\n\n';
             summaryBody += '### Job Status\n\n';
@@ -165,7 +165,7 @@ jobs:
             summaryBody += `| Build | ${getStatusEmoji(jobs.build)} ${jobs.build} |\n`;
             summaryBody += `| Deploy | ${getStatusEmoji(jobs.deploy)} ${jobs.deploy} |\n`;
             summaryBody += '\n';
-            
+
             // Overall status
             const allSuccess = Object.values(jobs).every(status => status === 'success');
             if (allSuccess) {
@@ -175,7 +175,7 @@ jobs:
               summaryBody += '### ⚠️ Deployment failed\n\n';
               summaryBody += 'Please review the failed jobs and fix any issues.\n';
             }
-            
+
             // Try to read coverage summary
             try {
               const coveragePath = path.join('coverage', 'coverage-summary.json');
@@ -194,12 +194,11 @@ jobs:
             } catch (error) {
               console.log('Coverage summary not available');
             }
-            
+
             summaryBody += '\n---\n';
             summaryBody += `*Workflow run: [#${context.runNumber}](${context.payload.repository.html_url}/actions/runs/${context.runId})*\n`;
-            
+
             // Write to job summary
             await core.summary
               .addRaw(summaryBody)
               .write();
-

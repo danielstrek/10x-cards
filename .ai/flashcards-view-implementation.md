@@ -1,37 +1,44 @@
 # Flashcards View Implementation
 
 ## Overview
+
 Successfully implemented a complete flashcards management page (`/flashcards`) for the 10x-cards application. Users can now view, edit, delete, and manually create flashcards.
 
 ## Implementation Date
+
 November 3, 2025
 
 ## Features Implemented
 
 ### 1. View All Flashcards
+
 - Paginated list of all user's flashcards
 - Displays front, back, and source (AI-generated, AI-edited, or manual)
 - Shows total count
 - Empty state with helpful message
 
 ### 2. Edit Flashcards
+
 - In-place editing with validation
 - Character count indicators (200 for front, 500 for back)
 - Save/Cancel actions
 - Optimistic UI updates
 
 ### 3. Delete Flashcards
+
 - Confirmation dialog before deletion
 - Removes flashcard from database
 - Refreshes list after deletion
 
 ### 4. Create Manual Flashcards
+
 - Dialog-based creation form
 - Validation for required fields and max lengths
 - Source automatically set to 'manual'
 - No generation_id required
 
 ### 5. Navigation
+
 - Added navigation menu to UserNav component
 - Links to "Generuj" (/generate) and "Moje Fiszki" (/flashcards)
 - Responsive design (hidden on mobile)
@@ -121,6 +128,7 @@ November 3, 2025
     - Responsive design (hidden on mobile <md)
 
 ## Tech Stack Used
+
 - **Frontend Framework**: Astro 5 with React 19
 - **Styling**: Tailwind CSS 4
 - **UI Components**: Shadcn/ui (Card, Dialog, Button, Textarea)
@@ -131,43 +139,49 @@ November 3, 2025
 ## User Stories Completed
 
 ### US-005: Edit Flashcards
+
 ✅ Users can edit both AI-generated and manually created flashcards
 ✅ Changes are validated and saved to database
 ✅ Edit mode with inline form
 
 ### US-006: Delete Flashcards
+
 ✅ Users can delete flashcards with confirmation
 ✅ Flashcards are permanently removed from database
 
 ### US-007: Manual Flashcard Creation
+
 ✅ Users can manually create flashcards via dialog
 ✅ Form validates front and back text
 ✅ New flashcards appear in the list immediately
 
 ### US-009: Security
+
 ✅ All endpoints verify user authentication
 ✅ Users can only access their own flashcards
 ✅ Ownership verification on update/delete operations
 
 ## API Endpoints Summary
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/api/flashcards` | List user's flashcards | Session |
-| GET | `/api/flashcards/:id` | Get single flashcard | Session |
-| PUT | `/api/flashcards/:id` | Update flashcard | Session |
-| DELETE | `/api/flashcards/:id` | Delete flashcard | Session |
-| POST | `/api/flashcards/manual` | Create manual flashcard | Session |
-| POST | `/api/flashcards` | Bulk create from generation | Bearer token |
+| Method | Endpoint                 | Description                 | Auth         |
+| ------ | ------------------------ | --------------------------- | ------------ |
+| GET    | `/api/flashcards`        | List user's flashcards      | Session      |
+| GET    | `/api/flashcards/:id`    | Get single flashcard        | Session      |
+| PUT    | `/api/flashcards/:id`    | Update flashcard            | Session      |
+| DELETE | `/api/flashcards/:id`    | Delete flashcard            | Session      |
+| POST   | `/api/flashcards/manual` | Create manual flashcard     | Session      |
+| POST   | `/api/flashcards`        | Bulk create from generation | Bearer token |
 
 ## Key Features
 
 ### Security
+
 - All endpoints verify authentication
 - Ownership verification on single flashcard operations
 - Server-side validation with Zod schemas
 
 ### UX Improvements
+
 - In-place editing (no separate page)
 - Confirmation before deletion
 - Character count indicators
@@ -177,11 +191,13 @@ November 3, 2025
 - Loading states for all operations
 
 ### Performance
+
 - Optimistic UI updates
 - Pagination support for large flashcard lists
 - Refetch only when needed
 
 ### Accessibility
+
 - ARIA labels on form inputs
 - Role attributes on lists
 - Semantic HTML structure
@@ -190,6 +206,7 @@ November 3, 2025
 ## Testing Notes
 
 The implementation includes:
+
 1. ✅ Protected route (redirects to login if not authenticated)
 2. ✅ API endpoints with proper error handling
 3. ✅ Client-side validation
@@ -200,6 +217,7 @@ The implementation includes:
 ## Next Steps
 
 Future enhancements could include:
+
 1. Search/filter functionality
 2. Bulk operations (delete multiple, export)
 3. Tags/categories for organization
@@ -212,11 +230,12 @@ Future enhancements could include:
 ## Related PRD Requirements
 
 This implementation addresses:
+
 - **US-005**: Edit flashcards ✅
 - **US-006**: Delete flashcards ✅
 - **US-007**: Manual flashcard creation ✅
 - **US-009**: Secure access and authorization ✅
 
 Remaining PRD features:
-- **US-008**: Study sessions with spaced repetition algorithm (not yet implemented)
 
+- **US-008**: Study sessions with spaced repetition algorithm (not yet implemented)
