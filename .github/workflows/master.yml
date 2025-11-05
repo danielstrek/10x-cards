@@ -61,7 +61,6 @@ jobs:
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      PUBLIC_SITE_URL: ${{ secrets.PUBLIC_SITE_URL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -97,7 +96,6 @@ jobs:
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      PUBLIC_SITE_URL: ${{ secrets.PUBLIC_SITE_URL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
