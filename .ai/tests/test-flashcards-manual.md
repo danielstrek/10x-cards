@@ -3,22 +3,26 @@
 ## Przygotowanie
 
 ### 1. Sprawdź czy serwer działa
+
 Serwer powinien być uruchomiony na: `http://localhost:4321`
 
 ### 2. Uzyskaj token autoryzacji
 
 **Opcja A: Jeśli masz już użytkownika w Supabase**
+
 ```bash
 # Zaloguj się przez Supabase Auth i uzyskaj access token
 # (możesz to zrobić przez frontend lub bezpośrednio przez Supabase API)
 ```
 
 **Opcja B: Utwórz nowego użytkownika (gdy będzie endpoint /api/auth/register)**
+
 ```bash
 # Najpierw potrzebny będzie endpoint rejestracji
 ```
 
 **Tymczasowe rozwiązanie - przez Supabase Dashboard:**
+
 1. Otwórz Supabase Dashboard
 2. Przejdź do Authentication > Users
 3. Utwórz użytkownika lub skopiuj istniejący `user_id`
@@ -91,6 +95,7 @@ Invoke-WebRequest -Uri "http://localhost:4321/api/flashcards" `
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `201`
 - Response zawiera `created` array z 3 flashcards
 - Każdy flashcard ma `id`, `front`, `back`
@@ -127,6 +132,7 @@ try {
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `400`
 - Error message o walidacji
 
@@ -164,6 +170,7 @@ try {
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `400`
 - Details zawierają informację o "200 characters"
 
@@ -193,6 +200,7 @@ try {
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `400`
 - Message o wymaganym minimum 1 flashcard
 
@@ -227,6 +235,7 @@ try {
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `401`
 - Error: "Unauthorized"
 
@@ -262,6 +271,7 @@ try {
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `401`
 - Message o nieprawidłowym tokenie
 
@@ -297,6 +307,7 @@ try {
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `404`
 - Message o nieznalezionej generacji
 
@@ -329,6 +340,7 @@ Invoke-WebRequest -Uri "http://localhost:4321/api/flashcards" `
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `201`
 - Flashcards utworzone pomyślnie
 
@@ -364,6 +376,7 @@ $response.StatusCode
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `201`
 - created.Count: `100`
 
@@ -402,6 +415,7 @@ try {
 ```
 
 **Oczekiwany wynik:**
+
 - Status Code: `400`
 - Message o maksymalnym limicie 100
 
@@ -413,21 +427,22 @@ Po udanych testach, możesz zweryfikować dane w Supabase:
 
 ```sql
 -- Sprawdź utworzone flashcards
-SELECT * FROM flashcards 
-WHERE generation_id = TWOJ_GENERATION_ID 
+SELECT * FROM flashcards
+WHERE generation_id = TWOJ_GENERATION_ID
 ORDER BY created_at DESC;
 
 -- Sprawdź zaktualizowane liczniki w generacji
-SELECT 
+SELECT
   id,
   generated_count,
   accepted_unedited_count,
   accepted_edited_count
-FROM generations 
+FROM generations
 WHERE id = TWOJ_GENERATION_ID;
 ```
 
 **Oczekiwane:**
+
 - `accepted_unedited_count` - liczba flashcards ze source='ai-full'
 - `accepted_edited_count` - liczba flashcards ze source='ai-edited'
 
@@ -439,7 +454,7 @@ WHERE id = TWOJ_GENERATION_ID;
 
 ```powershell
 # ZAMIEŃ te wartości na prawdziwe!
-$token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  
+$token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 $generationId = 1
 $apiUrl = "http://localhost:4321/api/flashcards"
 ```
@@ -454,4 +469,3 @@ Invoke-WebRequest -Uri $apiUrl -Method POST -Headers @{"Authorization"="Bearer $
 ---
 
 **Powodzenia w testowaniu! 🚀**
-

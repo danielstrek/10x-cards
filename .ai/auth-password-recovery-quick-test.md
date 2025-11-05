@@ -10,11 +10,13 @@
    - (Opcjonalnie) Dostosuj do języka polskiego
 
 2. **Zmienne środowiskowe** w `.env`:
+
 ```env
 PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 3. **Uruchom dev server**:
+
 ```bash
 npm run dev
 ```
@@ -31,6 +33,7 @@ npm run dev
 4. Kliknij **"Wyślij link resetujący"**
 
 **Oczekiwany rezultat**:
+
 - ✅ Button: "Wysyłanie..." ze spinnerem
 - ✅ Success screen: "📧 Email wysłany!"
 - ✅ Zielone pole z komunikatem
@@ -44,11 +47,13 @@ npm run dev
 2. Poczekaj ~30 sekund
 
 **Oczekiwany rezultat**:
+
 - ✅ Email od Supabase: "Reset Your Password"
 - ✅ Link w emailu z tokenem
 - ✅ Sprawdź folder spam jeśli nie ma
 
 **Debug**:
+
 - Supabase Dashboard → Logs → Email logs (jeśli email nie przyszedł)
 
 ---
@@ -64,6 +69,7 @@ npm run dev
 5. Kliknij **"Ustaw nowe hasło"**
 
 **Oczekiwany rezultat**:
+
 - ✅ Button: "Resetowanie..."
 - ✅ Success screen: "✅ Hasło zmienione!"
 - ✅ "Przekierowanie za 3 sekundy..."
@@ -79,6 +85,7 @@ npm run dev
 2. Kliknij **"Zaloguj się"**
 
 **Oczekiwany rezultat**:
+
 - ✅ Sukces! Redirect na `/generate`
 - ✅ UserNav wyświetlony
 - ✅ Nowe hasło działa! 🎉
@@ -109,6 +116,7 @@ npm run dev
 3. Submit
 
 **Oczekiwany rezultat**:
+
 - ✅ Success screen (nie ujawnia że email nie istnieje!)
 - ✅ Network: 200 OK (security best practice)
 
@@ -121,6 +129,7 @@ npm run dev
 3. Submit
 
 **Oczekiwany rezultat**:
+
 - ✅ Error: "Link resetujący wygasł lub jest nieprawidłowy"
 - ✅ HTTP 401 Unauthorized
 
@@ -132,6 +141,7 @@ npm run dev
 2. Obserwuj błędy real-time
 
 **Oczekiwany rezultat**:
+
 - ✅ 4 komunikaty błędów:
   - "• Hasło musi mieć co najmniej 8 znaków"
   - "• Hasło musi zawierać wielką literę"
@@ -142,6 +152,7 @@ npm run dev
 3. Popraw: `NewPass123!`
 
 **Oczekiwany rezultat**:
+
 - ✅ "✓ Hasło spełnia wymagania" (zielony)
 - ✅ Przycisk enabled
 
@@ -161,16 +172,19 @@ npm run dev
 ## 🐛 Common Issues
 
 ### Email nie przychodzi?
+
 1. Sprawdź folder spam
 2. Supabase Dashboard → Logs → Email logs
 3. Sprawdź czy user istnieje w Auth → Users
 
 ### Token invalid/expired?
+
 1. Link można użyć tylko raz
 2. Token ważny 60 minut
 3. Wyślij nowy link z forgot-password
 
 ### Password validation errors?
+
 - Sprawdź wszystkie 4 wymagania
 - Password i Confirm muszą być identyczne
 - Min. 8 znaków, 1 wielka, 1 cyfra, 1 specjalny
@@ -185,4 +199,3 @@ Szczegółowa dokumentacja z 10 testami:
 ---
 
 **Status**: ✅ Password Recovery System - GOTOWE!
-

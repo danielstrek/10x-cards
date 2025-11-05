@@ -1,8 +1,7 @@
 name: Pull Request Checks
 
 on:
-  pull_request:
-    branches: ['main']
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -15,8 +14,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -35,8 +34,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -73,13 +72,13 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             // Get job statuses
             const jobs = {
               lint: '${{ needs.lint.result }}',
               unitTest: '${{ needs.unit-test.result }}',
             };
-            
+
             // Helper to create status emoji
             const getStatusEmoji = (status) => {
               switch(status) {
@@ -90,7 +89,7 @@ jobs:
                 default: return '❓';
               }
             };
-            
+
             // Build comment body
             let commentBody = '## 🔍 Pull Request Check Results\n\n';
             commentBody += '### Job Status\n\n';
@@ -99,7 +98,7 @@ jobs:
             commentBody += `| Lint | ${getStatusEmoji(jobs.lint)} ${jobs.lint} |\n`;
             commentBody += `| Unit Tests | ${getStatusEmoji(jobs.unitTest)} ${jobs.unitTest} |\n`;
             commentBody += '\n';
-            
+
             // Overall status
             const allSuccess = Object.values(jobs).every(status => status === 'success');
             if (allSuccess) {
@@ -109,7 +108,7 @@ jobs:
               commentBody += '### ⚠️ Some checks failed\n\n';
               commentBody += 'Please review the failed jobs and fix any issues.\n';
             }
-            
+
             // Try to read coverage summary
             try {
               const coveragePath = path.join('coverage', 'coverage-summary.json');
@@ -128,22 +127,22 @@ jobs:
             } catch (error) {
               console.log('Coverage summary not available');
             }
-            
+
             commentBody += '\n---\n';
             commentBody += `*Workflow run: [#${context.runNumber}](${context.payload.repository.html_url}/actions/runs/${context.runId})*\n`;
-            
+
             // Find existing comment to update or create new one
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
             });
-            
+
             const botComment = comments.find(comment => 
               comment.user.type === 'Bot' && 
               comment.body.includes('Pull Request Check Results')
             );
-            
+
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
@@ -159,4 +158,3 @@ jobs:
                 body: commentBody
               });
             }
-

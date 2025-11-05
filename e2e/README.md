@@ -32,9 +32,11 @@ e2e/
 ## Test Scenarios
 
 ### Scenario 1: Registration and First Login
+
 **File:** `auth/01-registration-and-login.spec.ts`
 
 Tests cover:
+
 - TC-AUTH-001: Successful user registration
 - TC-AUTH-002: Weak password validation
 - TC-AUTH-003: Password mismatch validation
@@ -47,9 +49,11 @@ Tests cover:
 - TC-AUTH-010: Password visibility toggle
 
 ### Scenario 2: Generating Flashcards with AI
+
 **File:** `generation/02-generate-flashcards.spec.ts`
 
 Tests cover:
+
 - TC-GEN-001: Successful flashcard generation (5-20 cards)
 - TC-GEN-002: Text too short validation (< 1000 chars)
 - TC-GEN-003: Text too long validation (> 10000 chars)
@@ -64,9 +68,11 @@ Tests cover:
 - TC-GEN-012: Disable button during generation
 
 ### Scenario 3: Managing Flashcards
+
 **File:** `flashcards/03-manage-flashcards.spec.ts`
 
 Tests cover:
+
 - TC-FLASH-001: Empty state display
 - TC-FLASH-002: Create flashcard manually
 - TC-FLASH-003: Display flashcards list
@@ -81,9 +87,11 @@ Tests cover:
 - TC-FLASH-012: Multiple edits
 
 ### Scenario 4: Logout and Re-login
+
 **File:** `auth/04-logout-and-relogin.spec.ts`
 
 Tests cover:
+
 - TC-LOGOUT-001: Successful logout
 - TC-LOGOUT-002: Clear authentication data
 - TC-LOGOUT-003: Redirect after logout
@@ -100,17 +108,20 @@ Tests cover:
 ### Prerequisites
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Install Playwright browsers:
+
 ```bash
 npx playwright install
 ```
 
 3. Set up environment variables:
-Create a `.env.test` file with:
+   Create a `.env.test` file with:
+
 ```
 BASE_URL=http://localhost:3000
 SUPABASE_URL=your_supabase_url
@@ -119,6 +130,7 @@ OPENROUTER_API_KEY=your_openrouter_key
 ```
 
 4. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -203,14 +215,18 @@ Reports are generated in `playwright-report/` directory.
 The tests use the Page Object Model pattern for better maintainability:
 
 ### BasePage
+
 Base class for all page objects with common functionality:
+
 - Navigation
 - Page load waiting
 - Screenshot capture
 - Title retrieval
 
 ### RegisterPage
+
 Methods for registration page:
+
 - `navigate()` - Navigate to register page
 - `fillForm(email, password, confirmPassword)` - Fill registration form
 - `register(email, password)` - Complete registration
@@ -218,7 +234,9 @@ Methods for registration page:
 - `getPasswordValidationErrors()` - Get validation errors
 
 ### LoginPage
+
 Methods for login page:
+
 - `navigate()` - Navigate to login page
 - `login(email, password, rememberMe)` - Complete login
 - `hasError()` - Check for errors
@@ -226,7 +244,9 @@ Methods for login page:
 - `waitForSuccessfulLogin()` - Wait for redirect
 
 ### GeneratePage
+
 Methods for flashcard generation:
+
 - `navigate()` - Navigate to generate page
 - `generateFlashcards(text)` - Generate flashcards from text
 - `acceptFlashcard(index)` - Accept a flashcard
@@ -236,7 +256,9 @@ Methods for flashcard generation:
 - `clickSaveAccepted()` - Save only accepted
 
 ### FlashcardsPage
+
 Methods for flashcard management:
+
 - `navigate()` - Navigate to flashcards page
 - `createFlashcard(front, back)` - Create new flashcard
 - `editFlashcard(index, front, back)` - Edit flashcard
@@ -246,7 +268,9 @@ Methods for flashcard management:
 ## Test Helpers
 
 ### auth.helper.ts
+
 Authentication utilities:
+
 - `generateUniqueEmail()` - Generate test email
 - `generateStrongPassword()` - Generate valid password
 - `registerNewUser(page)` - Register and return credentials
@@ -256,7 +280,9 @@ Authentication utilities:
 - `isAuthenticated(page)` - Check auth status
 
 ### test-data.helper.ts
+
 Test data generation:
+
 - `generateSampleText(length)` - Generate text (1000-10000 chars)
 - `generateShortText()` - Text below minimum
 - `generateLongText()` - Text above maximum
@@ -267,17 +293,20 @@ Test data generation:
 ## Test Fixtures
 
 ### auth.fixture.ts
+
 Provides:
+
 - `authenticatedPage` - Pre-authenticated browser page
 - `userCredentials` - User credentials for testing
 
 Usage:
-```typescript
-import { test, expect } from '../fixtures/auth.fixture';
 
-test('My test', async ({ authenticatedPage }) => {
+```typescript
+import { test, expect } from "../fixtures/auth.fixture";
+
+test("My test", async ({ authenticatedPage }) => {
   // Page is already authenticated
-  await authenticatedPage.goto('/generate');
+  await authenticatedPage.goto("/generate");
   // ... test code
 });
 ```
@@ -288,6 +317,7 @@ All interactive elements have `data-test-id` attributes for reliable test select
 See [test-ids.md](./test-ids.md) for complete reference.
 
 Examples:
+
 - `login-email-input` - Email field on login page
 - `generate-flashcards-button` - Generate button
 - `flashcard-card-edit-button` - Edit button on flashcard
@@ -318,21 +348,25 @@ Tests can be run in CI/CD pipelines:
 ## Troubleshooting
 
 ### Tests are flaky
+
 - Increase timeouts in `playwright.config.ts`
 - Add more specific waits in tests
 - Check for race conditions
 
 ### Authentication issues
+
 - Verify Supabase credentials in `.env.test`
 - Check if email confirmation is disabled in Supabase
 - Verify RLS policies are disabled for testing
 
 ### Generation tests fail
+
 - Check OpenRouter API key is valid
 - Verify API has sufficient credits
 - Check rate limiting settings
 
 ### Flashcards not persisting
+
 - Verify database connection
 - Check RLS policies
 - Verify user_id is correctly set
@@ -340,6 +374,7 @@ Tests can be run in CI/CD pipelines:
 ## Coverage Goals
 
 Based on test plan:
+
 - ✅ E2E tests: Minimum 15 scenarios (achieved: 40+ test cases)
 - ✅ Critical user stories: US-001 to US-004 covered
 - ✅ Authentication flow: Complete coverage

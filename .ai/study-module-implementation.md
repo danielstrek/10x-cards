@@ -1,14 +1,17 @@
 # Study Module Implementation - Spaced Repetition System
 
 ## Overview
+
 Successfully implemented a complete study session module (`/study`) with SM-2 spaced repetition algorithm for the 10x-cards application. Users can now efficiently learn their flashcards using a scientifically proven method.
 
 ## Implementation Date
+
 November 3, 2025
 
 ## Features Implemented
 
 ### 1. SM-2 Spaced Repetition Algorithm
+
 - **Algorithm**: SuperMemo 2 by Piotr Wozniak (1987)
 - **Quality Ratings**: 4 user-friendly options mapped to SM-2 scale (0-5)
   - "Wcale" (Again) → Quality 0
@@ -22,6 +25,7 @@ November 3, 2025
   - Next Review Date: Calculated based on interval
 
 ### 2. Study Session Features
+
 - ✅ Fetch due flashcards (cards ready for review)
 - ✅ Card flip interaction (show question → show answer)
 - ✅ 4-button rating system with visual feedback
@@ -32,12 +36,14 @@ November 3, 2025
 - ✅ Refresh functionality for new sessions
 
 ### 3. Statistics Dashboard
+
 - **Total Cards**: Total number of user's flashcards
 - **Due Cards**: Cards ready for review right now
 - **Reviewed Today**: Cards studied in current session
 - **Real-time Updates**: Statistics update after each review
 
 ### 4. User Experience
+
 - 🎯 Clean, focused study interface
 - 🔄 Smooth card flip animation
 - 📊 Visual progress bar
@@ -139,6 +145,7 @@ November 3, 2025
     - Links: Generuj → Moje Fiszki → Nauka
 
 ## Tech Stack Used
+
 - **Frontend Framework**: Astro 5 with React 19
 - **Styling**: Tailwind CSS 4
 - **UI Components**: Shadcn/ui (Card, Button)
@@ -184,6 +191,7 @@ EF' = EF + (0.1 - (5 - quality) × (0.08 + (5 - quality) × 0.02))
 ```
 
 Where:
+
 - `EF'` = New easiness factor
 - `EF` = Previous easiness factor
 - `quality` = Answer quality (0-5)
@@ -207,6 +215,7 @@ Else:
 ## User Stories Completed
 
 ### US-008: Study Sessions with Spaced Repetition
+
 ✅ Study view prepares session based on due cards
 ✅ Front of card displayed initially
 ✅ User can reveal back via interaction
@@ -216,10 +225,10 @@ Else:
 
 ## API Endpoints Summary
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/api/study/due` | Get due flashcards + statistics | Session |
-| POST | `/api/study/review` | Submit review and update SRS data | Session |
+| Method | Endpoint            | Description                       | Auth    |
+| ------ | ------------------- | --------------------------------- | ------- |
+| GET    | `/api/study/due`    | Get due flashcards + statistics   | Session |
+| POST   | `/api/study/review` | Submit review and update SRS data | Session |
 
 ## Database Schema Changes
 
@@ -236,20 +245,22 @@ last_reviewed_at TIMESTAMPTZ
 ### New Index:
 
 ```sql
-CREATE INDEX idx_flashcards_next_review_date 
-ON flashcards(user_id, next_review_date) 
+CREATE INDEX idx_flashcards_next_review_date
+ON flashcards(user_id, next_review_date)
 WHERE next_review_date <= NOW();
 ```
 
 ## Key Features
 
 ### Security
+
 - All endpoints verify session authentication
 - User can only access their own flashcards
 - Server-side SRS calculations (no client manipulation)
 - Validation with Zod schemas
 
 ### UX Improvements
+
 - Card flip interaction (front → back)
 - Color-coded rating buttons:
   - Red: "Wcale" (Again)
@@ -263,12 +274,14 @@ WHERE next_review_date <= NOW();
 - SRS metadata display (for learning transparency)
 
 ### Performance
+
 - Efficient database queries with indexes
 - Pagination support (configurable limit)
 - Minimal data transfer
 - Client-side session state management
 
 ### Accessibility
+
 - Semantic HTML structure
 - ARIA labels where needed
 - Keyboard navigation support
@@ -295,18 +308,22 @@ To test the study module:
 Test cases for SM-2 implementation:
 
 ### Test 1: First Review (Easy)
+
 - **Input**: Quality = 5, EF = 2.5, Interval = 0, Reps = 0
 - **Expected**: EF = 2.6, Interval = 1, Reps = 1
 
 ### Test 2: Second Review (Good)
+
 - **Input**: Quality = 4, EF = 2.6, Interval = 1, Reps = 1
 - **Expected**: EF = 2.5, Interval = 6, Reps = 2
 
 ### Test 3: Third Review (Easy)
+
 - **Input**: Quality = 5, EF = 2.5, Interval = 6, Reps = 2
 - **Expected**: EF = 2.6, Interval = 16, Reps = 3
 
 ### Test 4: Failed Review (Again)
+
 - **Input**: Quality = 0, EF = 2.6, Interval = 16, Reps = 3
 - **Expected**: EF ≈ 1.7, Interval = 1, Reps = 0
 
@@ -344,12 +361,14 @@ Future enhancements could include:
 ## Related PRD Requirements
 
 This implementation addresses:
+
 - **US-008**: Study sessions with spaced repetition algorithm ✅
 - **PRD 4**: Integration with spaced repetition algorithm ✅
 
 ## Performance Metrics
 
 Expected performance:
+
 - Due cards query: < 50ms (with index)
 - Review update: < 100ms
 - Session load: < 200ms
@@ -357,9 +376,8 @@ Expected performance:
 
 ## References
 
-1. **SM-2 Algorithm**: 
+1. **SM-2 Algorithm**:
    - [SuperMemo: Application of a computer to improve memory](https://www.supermemo.com/en/blog/application-of-a-computer-to-improve-the-results-obtained-in-working-with-the-supermemo-method)
-   
 2. **Spaced Repetition Research**:
    - Wozniak, P. (1987). SuperMemo 2 Algorithm
    - Ebbinghaus Forgetting Curve
@@ -379,4 +397,3 @@ Expected performance:
 ✅ **Documentation**: Comprehensive inline comments and docs
 
 The study module is now fully functional and ready for use! 🎉
-

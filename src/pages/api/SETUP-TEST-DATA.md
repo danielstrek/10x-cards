@@ -131,7 +131,7 @@ INSERT INTO generations (
 ```sql
 -- Utwórz 3 testowe generacje
 INSERT INTO generations (user_id, model, source_text_hash, source_text_length, generated_count, generation_duration)
-VALUES 
+VALUES
   ('YOUR_USER_ID', 'gpt-4', 'hash-1', 1000, 5, 1000),
   ('YOUR_USER_ID', 'gpt-3.5-turbo', 'hash-2', 2000, 8, 1500),
   ('YOUR_USER_ID', 'claude-3', 'hash-3', 1500, 6, 1200)
@@ -178,8 +178,8 @@ Użyj w testach:
 
 ```sql
 -- Sprawdź użytkownika
-SELECT id, email, created_at 
-FROM auth.users 
+SELECT id, email, created_at
+FROM auth.users
 WHERE email = 'test@example.com';
 
 -- Sprawdź generacje
@@ -222,7 +222,7 @@ try {
         -Method POST `
         -Headers @{ "apikey" = $anonKey; "Content-Type" = "application/json" } `
         -Body $loginBody
-    
+
     Write-Host "✓ Zalogowano pomyślnie!" -ForegroundColor Green
     $token = $authResponse.access_token
     $userId = $authResponse.user.id
@@ -270,7 +270,7 @@ DELETE FROM flashcards WHERE user_id = 'YOUR_USER_ID';
 DELETE FROM generations WHERE user_id = 'YOUR_USER_ID';
 
 -- Resetuj liczniki w istniejącej generacji
-UPDATE generations 
+UPDATE generations
 SET accepted_unedited_count = 0, accepted_edited_count = 0
 WHERE id = YOUR_GENERATION_ID;
 ```
@@ -278,4 +278,3 @@ WHERE id = YOUR_GENERATION_ID;
 ---
 
 **Gotowe! Teraz możesz testować endpoint! 🚀**
-

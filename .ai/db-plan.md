@@ -1,6 +1,7 @@
 10xCards Database Schema
+
 1. Tabele
-1.1. users
+   1.1. users
 
 This table is managed by Supabase Auth.
 
@@ -49,22 +50,22 @@ Trigger: Automatically update the updated_at column on record updates.
 
 2. Relacje
 
-    Jeden użytkownik (users) ma wiele fiszek (flashcards).
-    Jeden użytkownik (users) ma wiele rekordów w tabeli generations.
-    Jeden użytkownik (users) ma wiele rekordów w tabeli generation_error_logs.
-    Każda fiszka (flashcards) może opcjonalnie odnosić się do jednej generacji (generations) poprzez generation_id.
+   Jeden użytkownik (users) ma wiele fiszek (flashcards).
+   Jeden użytkownik (users) ma wiele rekordów w tabeli generations.
+   Jeden użytkownik (users) ma wiele rekordów w tabeli generation_error_logs.
+   Każda fiszka (flashcards) może opcjonalnie odnosić się do jednej generacji (generations) poprzez generation_id.
 
 3. Indeksy
 
-    Indeks na kolumnie user_id w tabeli flashcards.
-    Indeks na kolumnie generation_id w tabeli flashcards.
-    Indeks na kolumnie user_id w tabeli generations.
-    Indeks na kolumnie user_id w tabeli generation_error_logs.
+   Indeks na kolumnie user_id w tabeli flashcards.
+   Indeks na kolumnie generation_id w tabeli flashcards.
+   Indeks na kolumnie user_id w tabeli generations.
+   Indeks na kolumnie user_id w tabeli generation_error_logs.
 
 4. Zasady RLS (Row-Level Security)
 
-    W tabelach flashcards, generations oraz generation_error_logs wdrożyć polityki RLS, które pozwalają użytkownikowi na dostęp tylko do rekordów, gdzie user_id odpowiada identyfikatorowi użytkownika z Supabase Auth (np. auth.uid() = user_id).
+   W tabelach flashcards, generations oraz generation_error_logs wdrożyć polityki RLS, które pozwalają użytkownikowi na dostęp tylko do rekordów, gdzie user_id odpowiada identyfikatorowi użytkownika z Supabase Auth (np. auth.uid() = user_id).
 
 5. Dodatkowe uwagi
 
-    Trigger w tabeli flashcards ma automatycznie aktualizować kolumnę updated_at przy każdej modyfikacji rekordu.
+   Trigger w tabeli flashcards ma automatycznie aktualizować kolumnę updated_at przy każdej modyfikacji rekordu.

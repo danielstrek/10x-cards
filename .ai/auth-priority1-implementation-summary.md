@@ -9,6 +9,7 @@
 ## 🎯 Zakres Implementacji
 
 Zaimplementowano wszystkie elementy Priorytetu 1:
+
 1. ✅ POST /api/auth/register - rejestracja użytkownika
 2. ✅ POST /api/auth/logout - wylogowanie
 3. ✅ UserNav.tsx - komponent nawigacji użytkownika
@@ -25,6 +26,7 @@ Zaimplementowano wszystkie elementy Priorytetu 1:
 **Endpoint**: `POST /api/auth/register`
 
 **Request Body**:
+
 ```json
 {
   "email": "user@example.com",
@@ -33,6 +35,7 @@ Zaimplementowano wszystkie elementy Priorytetu 1:
 ```
 
 **Response (201 Created)**:
+
 ```json
 {
   "userId": "uuid",
@@ -46,15 +49,18 @@ Zaimplementowano wszystkie elementy Priorytetu 1:
 ```
 
 **Walidacja Zod**:
+
 - Email: format RFC 5322
 - Password: min. 8 znaków, 1 wielka litera, 1 cyfra, 1 znak specjalny
 
 **Obsługa błędów**:
+
 - 400 Bad Request - nieprawidłowy JSON lub walidacja
 - 409 Conflict - email już zarejestrowany
 - 500 Internal Server Error - błąd Supabase
 
 **Kluczowe funkcje**:
+
 - Walidacja siły hasła (zgodnie ze spec)
 - Integracja z Supabase Auth
 - Auto-login jeśli email confirmation wyłączony
@@ -71,18 +77,20 @@ Zaimplementowano wszystkie elementy Priorytetu 1:
 **Response**: `204 No Content`
 
 **Kluczowe funkcje**:
+
 - Invalidacja sesji w Supabase
-- Usuwanie wszystkich cookies auth (sb-*)
+- Usuwanie wszystkich cookies auth (sb-\*)
 - Graceful error handling (usuwa cookies nawet przy błędzie)
 - Try-catch dla bezpieczeństwa
 
 **Implementacja**:
+
 ```typescript
 // Delete all Supabase auth cookies
 const allCookies = cookies.getAll();
-allCookies.forEach(cookie => {
-  if (cookie.name.startsWith('sb-')) {
-    cookies.delete(cookie.name, { path: '/' });
+allCookies.forEach((cookie) => {
+  if (cookie.name.startsWith("sb-")) {
+    cookies.delete(cookie.name, { path: "/" });
   }
 });
 ```
@@ -92,6 +100,7 @@ allCookies.forEach(cookie => {
 ### 3. **src/components/auth/UserNav.tsx** 🆕 NOWY
 
 **Props**:
+
 ```typescript
 interface UserNavProps {
   user: {
@@ -102,6 +111,7 @@ interface UserNavProps {
 ```
 
 **Funkcjonalności**:
+
 - ✅ Wyświetlanie avatara z inicjałami (2 pierwsze litery email)
 - ✅ Wyświetlanie email użytkownika
 - ✅ Przycisk "Wyloguj" z loading state
@@ -110,6 +120,7 @@ interface UserNavProps {
 - ✅ Error handling z fallback
 
 **UI/UX**:
+
 - Avatar component z Radix UI
 - Loading spinner podczas wylogowywania
 - Responsive design (flex layout)
@@ -122,18 +133,21 @@ interface UserNavProps {
 **Wielofunkcyjny formularz rejestracji**:
 
 **Walidacja client-side**:
+
 - ✅ Email format (regex)
 - ✅ Password strength (8+ chars, uppercase, digit, special)
 - ✅ Password confirmation (muszą być identyczne)
 - ✅ Real-time feedback (błędy wyświetlane na żywo)
 
 **Wskaźniki wizualne**:
+
 - ✅ Lista wymagań hasła (czerwone ✗ / zielone ✓)
 - ✅ Zgodność haseł (czerwone/zielone)
 - ✅ Disabled button jeśli formularz nieprawidłowy
 - ✅ Show/hide password toggles (oba pola)
 
 **Flow**:
+
 1. User wypełnia formularz
 2. Walidacja client-side w czasie rzeczywistym
 3. Submit → POST /api/auth/register
@@ -147,6 +161,7 @@ interface UserNavProps {
    - Link do logowania
 
 **Success Screen**:
+
 ```tsx
 if (state.success) {
   return (
@@ -159,9 +174,7 @@ if (state.success) {
         <p>Wysłaliśmy link weryfikacyjny na {email}</p>
       </CardContent>
       <CardFooter>
-        <Button onClick={() => window.location.href = '/auth/login'}>
-          Przejdź do logowania
-        </Button>
+        <Button onClick={() => (window.location.href = "/auth/login")}>Przejdź do logowania</Button>
       </CardFooter>
     </Card>
   );
@@ -180,7 +193,7 @@ import RegisterForm from "../../components/auth/RegisterForm";
 
 // Redirect if already logged in
 if (Astro.locals.user) {
-  return Astro.redirect('/generate');
+  return Astro.redirect("/generate");
 }
 ---
 
@@ -190,6 +203,7 @@ if (Astro.locals.user) {
 ```
 
 **Funkcje**:
+
 - ✅ Auto-redirect dla zalogowanych
 - ✅ Title meta tag
 - ✅ SSR rendering
@@ -220,6 +234,7 @@ const user = Astro.locals.user;
 ```
 
 **Zmiany**:
+
 - ✅ Guard clause - sprawdzenie `Astro.locals.user`
 - ✅ Redirect z parametrem `?redirect=/generate`
 - ✅ UserNav na górze strony
@@ -235,16 +250,18 @@ const user = Astro.locals.user;
 ---
 // If user is already logged in, redirect to generate page
 if (Astro.locals.user) {
-  return Astro.redirect('/generate');
+  return Astro.redirect("/generate");
 }
 ---
 ```
 
 **Logika**:
+
 - Zalogowany user → automatyczne przekierowanie na /generate
 - Niezalogowany → wyświetlenie Welcome page z przyciskami "Zaloguj się" / "Zarejestruj się"
 
 **Welcome.astro** (już istnieje):
+
 - ✅ Przyciski "Zaloguj się" i "Zarejestruj się" już dodane wcześniej
 - ✅ Piękny gradient UI
 - ✅ Responsive design
@@ -386,6 +403,7 @@ if (Astro.locals.user) {
      - "Secure email change" → Enable (opcjonalnie)
 
 2. **Zmienne środowiskowe** (`.env`):
+
 ```env
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-anon-key
@@ -395,6 +413,7 @@ PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 3. **Uruchom dev server**:
+
 ```bash
 npm run dev
 ```
@@ -404,6 +423,7 @@ npm run dev
 ### TEST 1: Rejestracja Nowego Użytkownika
 
 **Kroki**:
+
 1. Otwórz http://localhost:3000
 2. Kliknij "Zarejestruj się"
 3. Wypełnij formularz:
@@ -416,6 +436,7 @@ npm run dev
 5. Kliknij "Zarejestruj się"
 
 **Oczekiwany rezultat**:
+
 - ✅ Button pokazuje "Rejestracja..." ze spinnerem
 - ✅ Po ~1-2 sekundach → przekierowanie na `/generate`
 - ✅ UserNav wyświetlony na górze z:
@@ -429,6 +450,7 @@ npm run dev
   - `sb-refresh-token`
 
 **Weryfikacja w Supabase**:
+
 1. Dashboard → Authentication → Users
 2. Sprawdź czy użytkownik `newuser@example.com` istnieje
 3. Last Sign In timestamp powinien być aktualny
@@ -438,6 +460,7 @@ npm run dev
 ### TEST 2: Walidacja Formularza Rejestracji
 
 **Kroki**:
+
 1. Otwórz /auth/register
 2. Test A - Słabe hasło:
    - Email: `test@test.com`
@@ -445,6 +468,7 @@ npm run dev
    - Sprawdź błędy walidacji
 
 **Oczekiwany rezultat**:
+
 - ✅ Komunikaty błędów:
   - "Hasło musi mieć co najmniej 8 znaków"
   - "Hasło musi zawierać wielką literę"
@@ -452,23 +476,25 @@ npm run dev
   - "Hasło musi zawierać znak specjalny"
 - ✅ Przycisk "Zarejestruj się" disabled
 
-**Kroki**:
-3. Test B - Niezgodne hasła:
-   - Password: `TestPass123!`
-   - Confirm: `TestPass123` (brak !)
-   - Sprawdź komunikat
+**Kroki**: 3. Test B - Niezgodne hasła:
+
+- Password: `TestPass123!`
+- Confirm: `TestPass123` (brak !)
+- Sprawdź komunikat
 
 **Oczekiwany rezultat**:
+
 - ✅ "✗ Hasła nie są identyczne" (czerwony)
 - ✅ Przycisk disabled
 
-**Kroki**:
-4. Test C - Email już istnieje:
-   - Email: `newuser@example.com` (z TEST 1)
-   - Password: `AnotherPass123!`
-   - Submit
+**Kroki**: 4. Test C - Email już istnieje:
+
+- Email: `newuser@example.com` (z TEST 1)
+- Password: `AnotherPass123!`
+- Submit
 
 **Oczekiwany rezultat**:
+
 - ✅ ErrorNotification: "Email already registered"
 - ✅ HTTP 409 Conflict w Network tab
 
@@ -479,6 +505,7 @@ npm run dev
 **Przygotowanie**: Wyloguj się jeśli jesteś zalogowany
 
 **Kroki**:
+
 1. Wejdź na http://localhost:3000
 2. Kliknij "Zaloguj się"
 3. Wypełnij formularz:
@@ -488,6 +515,7 @@ npm run dev
 5. Kliknij "Zaloguj się"
 
 **Oczekiwany rezultat**:
+
 - ✅ Przekierowanie na /generate
 - ✅ UserNav wyświetlony
 - ✅ localStorage zawiera tokeny (nie sessionStorage)
@@ -499,9 +527,11 @@ npm run dev
 **Przygotowanie**: Wyloguj się lub otwórz incognito
 
 **Kroki**:
+
 1. Bezpośrednio wejdź na http://localhost:3000/generate
 
 **Oczekiwany rezultat**:
+
 - ✅ Natychmiastowe przekierowanie na `/auth/login?redirect=/generate`
 - ✅ Nie renderuje FlashcardGenerationView
 - ✅ W terminalu (server log):
@@ -510,10 +540,10 @@ npm run dev
   Redirecting to /auth/login
   ```
 
-**Kroki**:
-2. Zaloguj się przez formularz
+**Kroki**: 2. Zaloguj się przez formularz
 
 **Oczekiwany rezultat**:
+
 - ✅ Po zalogowaniu → automatyczny redirect na `/generate` (z parametru)
 - ✅ Strona /generate renderuje poprawnie
 
@@ -524,10 +554,12 @@ npm run dev
 **Przygotowanie**: Zaloguj się (TEST 3)
 
 **Kroki**:
+
 1. Będąc na /generate, sprawdź UserNav w górnej części
 2. Kliknij przycisk "Wyloguj"
 
 **Oczekiwany rezultat**:
+
 - ✅ Button zmienia się na "Wylogowywanie..." ze spinnerem
 - ✅ Po ~1 sekundzie → przekierowanie na `/auth/login`
 - ✅ DevTools → Application → Cookies: brak `sb-*` cookies
@@ -535,10 +567,10 @@ npm run dev
 - ✅ DevTools → Application → Session Storage: brak tokenów
 - ✅ Supabase Dashboard → Sessions: sesja invalidowana
 
-**Kroki**:
-3. Próbuj wejść na /generate
+**Kroki**: 3. Próbuj wejść na /generate
 
 **Oczekiwany rezultat**:
+
 - ✅ Przekierowanie na /auth/login (nie jesteś zalogowany)
 
 ---
@@ -548,22 +580,24 @@ npm run dev
 **Przygotowanie**: Zaloguj się
 
 **Kroki**:
+
 1. Wejdź na http://localhost:3000
 
 **Oczekiwany rezultat**:
+
 - ✅ Natychmiastowe przekierowanie na `/generate`
 - ✅ Nie widać Welcome page
 
-**Kroki**:
-2. Próbuj wejść na /auth/login
+**Kroki**: 2. Próbuj wejść na /auth/login
 
 **Oczekiwany rezultat**:
+
 - ✅ Natychmiastowe przekierowanie na `/generate`
 
-**Kroki**:
-3. Próbuj wejść na /auth/register
+**Kroki**: 3. Próbuj wejść na /auth/register
 
 **Oczekiwany rezultat**:
+
 - ✅ Natychmiastowe przekierowanie na `/generate`
 
 ---
@@ -573,18 +607,18 @@ npm run dev
 **Przygotowanie**: Wyloguj się
 
 **Kroki**:
+
 1. Wejdź bezpośrednio na: http://localhost:3000/auth/login?redirect=/generate
 2. Zaloguj się
 
 **Oczekiwany rezultat**:
+
 - ✅ Po zalogowaniu → redirect na `/generate` (z parametru)
 
-**Kroki**:
-3. Wyloguj się
-4. Wejdź na: http://localhost:3000/auth/login (bez parametru)
-5. Zaloguj się
+**Kroki**: 3. Wyloguj się 4. Wejdź na: http://localhost:3000/auth/login (bez parametru) 5. Zaloguj się
 
 **Oczekiwany rezultat**:
+
 - ✅ Po zalogowaniu → redirect na `/generate` (domyślne)
 
 ---
@@ -592,10 +626,12 @@ npm run dev
 ### TEST 8: Network Requests
 
 **Kroki**:
+
 1. Otwórz DevTools → Network tab
 2. Przeprowadź rejestrację
 
 **Oczekiwany rezultat w Network**:
+
 ```
 POST /api/auth/register
 Status: 201 Created
@@ -619,17 +655,21 @@ Headers (Set-Cookie):
 ### TEST 9: Middleware Session Check
 
 **Kroki**:
+
 1. Zaloguj się
 2. Dodaj tymczasowo w `generate.astro`:
+
 ```astro
 ---
-console.log('[SERVER] User from middleware:', Astro.locals.user);
+console.log("[SERVER] User from middleware:", Astro.locals.user);
 ---
 ```
+
 3. Odśwież stronę /generate
 4. Sprawdź terminal (server-side log)
 
 **Oczekiwany rezultat**:
+
 ```bash
 [SERVER] User from middleware: {
   id: 'uuid-here',
@@ -644,6 +684,7 @@ console.log('[SERVER] User from middleware:', Astro.locals.user);
 ### TEST 10: UserNav UI/UX
 
 **Kroki**:
+
 1. Zaloguj się jako `newuser@example.com`
 2. Sprawdź UserNav:
    - Avatar z inicjałami "NE"
@@ -652,15 +693,16 @@ console.log('[SERVER] User from middleware:', Astro.locals.user);
    - Przycisk "Wyloguj"
 
 **Oczekiwany rezultat**:
+
 - ✅ Avatar ma gradient background (primary color)
 - ✅ Inicjały białe (primary-foreground)
 - ✅ Email czyteln (foreground color)
 - ✅ Responsive layout (flex)
 
-**Kroki**:
-3. Hover nad przyciskiem "Wyloguj"
+**Kroki**: 3. Hover nad przyciskiem "Wyloguj"
 
 **Oczekiwany rezultat**:
+
 - ✅ Zmiana koloru (outline variant hover)
 
 ---
@@ -668,6 +710,7 @@ console.log('[SERVER] User from middleware:', Astro.locals.user);
 ## 📊 Pokrycie User Stories
 
 ### ✅ US-001: Rejestracja konta (COMPLETE)
+
 - [x] Formularz rejestracyjny (email + hasło)
 - [x] Walidacja danych (client + server)
 - [x] Potwierdzenie rejestracji
@@ -675,6 +718,7 @@ console.log('[SERVER] User from middleware:', Astro.locals.user);
 - **Status**: **FULLY IMPLEMENTED** 🎉
 
 ### ✅ US-002: Logowanie do aplikacji (COMPLETE)
+
 - [x] Formularz logowania
 - [x] Przekierowanie na /generate po sukcesie
 - [x] Komunikaty błędów
@@ -682,6 +726,7 @@ console.log('[SERVER] User from middleware:', Astro.locals.user);
 - **Status**: **FULLY IMPLEMENTED** 🎉
 
 ### ✅ US-009: Bezpieczny dostęp i autoryzacja (COMPLETE)
+
 - [x] Middleware weryfikuje sesję
 - [x] Chroniona strona /generate
 - [x] Astro.locals.user dostępny
@@ -724,20 +769,24 @@ console.log('[SERVER] User from middleware:', Astro.locals.user);
 ## 🐛 Known Issues / Edge Cases
 
 ### 1. Email Verification
+
 - **Status**: Opcjonalne (można włączyć w Supabase)
 - **MVP**: Zalecane wyłączenie dla prostoty
 - **Production**: Zalecane włączenie
 
 ### 2. Rate Limiting
+
 - **Status**: Nie zaimplementowane w MVP
 - **Supabase**: Ma wbudowany rate limiting
 - **Future**: Można dodać custom rate limiting
 
 ### 3. Password Reset
+
 - **Status**: Nie zaimplementowane (Priorytet 2)
 - **Plan**: Faza 5 według spec
 
 ### 4. Token Refresh
+
 - **Status**: Ręczny refresh (re-login)
 - **Auto-refresh**: Do implementacji w przyszłości (useAuth hook)
 
@@ -757,20 +806,23 @@ Po testach, sprawdź w Supabase Dashboard → Authentication:
 ## 🚀 Następne Kroki
 
 ### Priorytet 2: Password Recovery (Faza 5)
+
 - [ ] POST /api/auth/forgot-password
-- [ ] POST /api/auth/reset-password  
+- [ ] POST /api/auth/reset-password
 - [ ] ForgotPasswordForm.tsx
 - [ ] ResetPasswordForm.tsx
 - [ ] forgot-password.astro
 - [ ] reset-password.astro
 
 ### Priorytet 3: Account Management (Faza 8 - RODO)
+
 - [ ] DELETE /api/auth/account
 - [ ] UI w UserNav lub Settings
 - [ ] Potwierdzenie z hasłem
 - [ ] CASCADE delete dla danych użytkownika
 
 ### Priorytet 4: Integracja z Istniejącymi API (Faza 6)
+
 - [ ] Dodanie tokenu do FlashcardGenerationView
 - [ ] Obsługa 401 (wygasła sesja)
 - [ ] Auto-logout przy błędach auth
@@ -806,4 +858,3 @@ Po testach, sprawdź w Supabase Dashboard → Authentication:
 **Status**: ✅ **PRIORYTET 1 ZAKOŃCZONY - GOTOWE DO TESTOWANIA**
 
 Wszystkie 4 główne elementy + rejestracja + strona główna zaimplementowane poprawnie zgodnie ze specyfikacją i best practices.
-
