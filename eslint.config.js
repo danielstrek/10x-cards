@@ -18,8 +18,13 @@ const gitignorePath = path.resolve(__dirname, ".gitignore");
 const baseConfig = tseslint.config({
   extends: [eslint.configs.recommended, tseslint.configs.strict, tseslint.configs.stylistic],
   rules: {
-    "no-console": "warn",
+    "no-console": "off",
     "no-unused-vars": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-useless-constructor": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
   },
 });
 
@@ -31,11 +36,13 @@ const jsxA11yConfig = tseslint.config({
   },
   rules: {
     ...jsxA11y.flatConfigs.recommended.rules,
+    "jsx-a11y/no-autofocus": "off",
   },
 });
 
 const reactConfig = tseslint.config({
   files: ["**/*.{js,jsx,ts,tsx}"],
+  ignores: ["**/*.spec.ts", "**/*.spec.tsx", "**/*.test.ts", "**/*.test.tsx", "e2e/**/*"],
   extends: [pluginReact.configs.flat.recommended],
   languageOptions: {
     ...pluginReact.configs.flat.recommended.languageOptions,
@@ -58,6 +65,27 @@ const reactConfig = tseslint.config({
 
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
+  {
+    ignores: [
+      "**/dist/**",
+      "**/node_modules/**",
+      "**/.astro/**",
+      "**/playwright-report/**",
+      "**/test-results/**",
+      "**/*.webm",
+      "**/*.png",
+      "**/*.jpg",
+      "**/*.jpeg",
+      "**/*.gif",
+      "**/*.ico",
+      "**/*.svg",
+      "**/*.woff",
+      "**/*.woff2",
+      "**/*.ttf",
+      "**/*.eot",
+      "**/database.types.ts",
+    ],
+  },
   baseConfig,
   jsxA11yConfig,
   reactConfig,

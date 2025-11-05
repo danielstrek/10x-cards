@@ -1,14 +1,10 @@
-import { test, expect } from '../fixtures/auth.fixture';
-import { GeneratePage } from '../pages/GeneratePage';
-import { 
-  generateSampleText, 
-  generateShortText,
-  generateStudyMaterialText,
-} from '../helpers/test-data.helper';
+import { test, expect } from "../fixtures/auth.fixture";
+import { GeneratePage } from "../pages/GeneratePage";
+import { generateSampleText, generateShortText, generateStudyMaterialText } from "../helpers/test-data.helper";
 
 /**
  * E2E Tests for Scenario 2: Generating Flashcards with AI
- * 
+ *
  * Test Cases:
  * - TC-GEN-001: Successful flashcard generation
  * - TC-GEN-002: Text length validation (too short)
@@ -21,8 +17,8 @@ import {
  * - TC-GEN-009: Save all flashcards at once
  */
 
-test.describe('Scenario 2: Generating Flashcards with AI', () => {
-  test('TC-GEN-001: Should successfully generate flashcards from text', async ({ authenticatedPage }) => {
+test.describe("Scenario 2: Generating Flashcards with AI", () => {
+  test("TC-GEN-001: Should successfully generate flashcards from text", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const sampleText = generateSampleText(5000);
 
@@ -55,12 +51,12 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
 
     // Verify front is not too long (max 200 chars)
     expect(firstFlashcard?.front.length).toBeLessThanOrEqual(200);
-    
+
     // Verify back is not too long (max 500 chars)
     expect(firstFlashcard?.back.length).toBeLessThanOrEqual(500);
   });
 
-  test('TC-GEN-002: Should show error for text that is too short', async ({ authenticatedPage }) => {
+  test("TC-GEN-002: Should show error for text that is too short", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const shortText = generateShortText();
 
@@ -81,7 +77,7 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     expect(errorMessage?.toLowerCase()).toMatch(/(1000|długość|length|minimum)/);
   });
 
-  test('TC-GEN-003: Should show error for text that is too long', async ({ authenticatedPage }) => {
+  test("TC-GEN-003: Should show error for text that is too long", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const longText = generateSampleText(12000); // Over 10000 limit
 
@@ -101,7 +97,7 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     expect(hasError || isButtonDisabled).toBe(true);
   });
 
-  test('TC-GEN-004: Should generate flashcards from realistic study material', async ({ authenticatedPage }) => {
+  test("TC-GEN-004: Should generate flashcards from realistic study material", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const studyMaterial = generateStudyMaterialText();
 
@@ -118,19 +114,17 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     // Verify flashcards are related to the study material
     const firstFlashcard = await generatePage.getFlashcardContent(0);
     expect(firstFlashcard).toBeTruthy();
-    
+
     // Content should be in Polish (study material is in Polish)
-    const hasPollishContent = 
-      firstFlashcard?.front.match(/[ąćęłńóśźż]/i) || 
-      firstFlashcard?.back.match(/[ąćęłńóśźż]/i);
-    
+    const hasPollishContent = firstFlashcard?.front.match(/[ąćęłńóśźż]/i) || firstFlashcard?.back.match(/[ąćęłńóśźż]/i);
+
     // This is a soft check - may not always have Polish characters
     // The important thing is that we have content
     expect(firstFlashcard?.front.length).toBeGreaterThan(0);
     expect(firstFlashcard?.back.length).toBeGreaterThan(0);
   });
 
-  test('TC-GEN-005: Should accept individual flashcards', async ({ authenticatedPage }) => {
+  test("TC-GEN-005: Should accept individual flashcards", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const sampleText = generateSampleText(3000);
 
@@ -148,10 +142,10 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
 
     // Verify accepted count increased
     const acceptedCountText = await generatePage.getAcceptedCountText();
-    expect(acceptedCountText).toContain('1');
+    expect(acceptedCountText).toContain("1");
   });
 
-  test('TC-GEN-006: Should edit flashcard before accepting', async ({ authenticatedPage }) => {
+  test("TC-GEN-006: Should edit flashcard before accepting", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const sampleText = generateSampleText(3000);
 
@@ -162,9 +156,9 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     expect(flashcardsCount).toBeGreaterThan(0);
 
     // Edit first flashcard
-    const newFront = 'Edited Question?';
-    const newBack = 'Edited Answer!';
-    
+    const newFront = "Edited Question?";
+    const newBack = "Edited Answer!";
+
     await generatePage.editFlashcard(0, newFront, newBack);
 
     // Wait for edit to complete
@@ -176,7 +170,7 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     expect(editedFlashcard?.back).toContain(newBack);
   });
 
-  test('TC-GEN-007: Should reject unwanted flashcards', async ({ authenticatedPage }) => {
+  test("TC-GEN-007: Should reject unwanted flashcards", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const sampleText = generateSampleText(4000);
 
@@ -197,7 +191,7 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     expect(newCount).toBe(initialCount - 1);
   });
 
-  test('TC-GEN-008: Should save accepted flashcards only', async ({ authenticatedPage }) => {
+  test("TC-GEN-008: Should save accepted flashcards only", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const sampleText = generateSampleText(5000);
 
@@ -221,13 +215,13 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
 
     // Verify success message mentions 3 flashcards
     const successMessage = await generatePage.getSuccessMessage();
-    expect(successMessage).toContain('3');
+    expect(successMessage).toContain("3");
 
     // Close success dialog
     await generatePage.closeSuccessDialog();
   });
 
-  test('TC-GEN-009: Should save all flashcards at once', async ({ authenticatedPage }) => {
+  test("TC-GEN-009: Should save all flashcards at once", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const sampleText = generateSampleText(3000);
 
@@ -252,9 +246,9 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     await generatePage.closeSuccessDialog();
   });
 
-  test('TC-GEN-010: Should handle generation error gracefully', async ({ authenticatedPage }) => {
+  test("TC-GEN-010: Should handle generation error gracefully", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
-    
+
     // Use valid text
     const sampleText = generateSampleText(2000);
 
@@ -279,7 +273,7 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     }
   });
 
-  test('TC-GEN-011: Should clear previous results when generating again', async ({ authenticatedPage }) => {
+  test("TC-GEN-011: Should clear previous results when generating again", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const firstText = generateSampleText(2000);
 
@@ -303,7 +297,7 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     expect(secondCount).toBeGreaterThanOrEqual(5);
   });
 
-  test('TC-GEN-012: Should disable generate button while generating', async ({ authenticatedPage }) => {
+  test("TC-GEN-012: Should disable generate button while generating", async ({ authenticatedPage }) => {
     const generatePage = new GeneratePage(authenticatedPage);
     const sampleText = generateSampleText(3000);
 
@@ -325,4 +319,3 @@ test.describe('Scenario 2: Generating Flashcards with AI', () => {
     expect(isEnabledAfter).toBe(true);
   });
 });
-

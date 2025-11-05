@@ -1,13 +1,13 @@
 // src/components/StudyView.tsx
-import * as React from 'react';
-import { Button } from './ui/button';
-import { FlashcardStudyCard } from './FlashcardStudyCard';
-import { ErrorNotification } from './ErrorNotification';
-import { SkeletonLoader } from './SkeletonLoader';
-import { useStudySession } from './hooks/useStudySession';
-import { useReviewFlashcard } from './hooks/useReviewFlashcard';
-import { CheckCircleIcon, BookOpenIcon, TrophyIcon } from 'lucide-react';
-import type { StudyFlashcardDto } from '../types';
+import * as React from "react";
+import { Button } from "./ui/button";
+import { FlashcardStudyCard } from "./FlashcardStudyCard";
+import { ErrorNotification } from "./ErrorNotification";
+import { SkeletonLoader } from "./SkeletonLoader";
+import { useStudySession } from "./hooks/useStudySession";
+import { useReviewFlashcard } from "./hooks/useReviewFlashcard";
+import { CheckCircleIcon, BookOpenIcon, TrophyIcon } from "lucide-react";
+import type { StudyFlashcardDto } from "../types";
 
 export default function StudyView() {
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -15,21 +15,10 @@ export default function StudyView() {
   const [sessionFlashcards, setSessionFlashcards] = React.useState<StudyFlashcardDto[]>([]);
 
   // Fetch due flashcards
-  const {
-    flashcards,
-    statistics,
-    isLoading,
-    error: fetchError,
-    refetch,
-  } = useStudySession(20);
+  const { flashcards, statistics, isLoading, error: fetchError, refetch } = useStudySession(20);
 
   // Review flashcard hook
-  const {
-    reviewFlashcard,
-    isReviewing,
-    error: reviewError,
-    clearError: clearReviewError,
-  } = useReviewFlashcard();
+  const { reviewFlashcard, isReviewing, error: reviewError, clearError: clearReviewError } = useReviewFlashcard();
 
   // Initialize session flashcards when data loads
   React.useEffect(() => {
@@ -39,26 +28,29 @@ export default function StudyView() {
   }, [flashcards, sessionFlashcards.length]);
 
   // Handle rating
-  const handleRate = React.useCallback(async (rating: 'again' | 'hard' | 'good' | 'easy') => {
-    const currentFlashcard = sessionFlashcards[currentIndex];
-    if (!currentFlashcard) return;
+  const handleRate = React.useCallback(
+    async (rating: "again" | "hard" | "good" | "easy") => {
+      const currentFlashcard = sessionFlashcards[currentIndex];
+      if (!currentFlashcard) return;
 
-    const result = await reviewFlashcard(currentFlashcard.id, rating);
-    
-    if (result) {
-      setReviewedCount(prev => prev + 1);
-      
-      // Move to next card
-      if (currentIndex < sessionFlashcards.length - 1) {
-        setCurrentIndex(prev => prev + 1);
-      } else {
-        // Session complete - refetch to get new due cards
-        await refetch();
-        setCurrentIndex(0);
-        setReviewedCount(0);
+      const result = await reviewFlashcard(currentFlashcard.id, rating);
+
+      if (result) {
+        setReviewedCount((prev) => prev + 1);
+
+        // Move to next card
+        if (currentIndex < sessionFlashcards.length - 1) {
+          setCurrentIndex((prev) => prev + 1);
+        } else {
+          // Session complete - refetch to get new due cards
+          await refetch();
+          setCurrentIndex(0);
+          setReviewedCount(0);
+        }
       }
-    }
-  }, [currentIndex, sessionFlashcards, reviewFlashcard, refetch]);
+    },
+    [currentIndex, sessionFlashcards, reviewFlashcard, refetch]
+  );
 
   // Handle restart session
   const handleRestartSession = React.useCallback(async () => {
@@ -81,25 +73,34 @@ export default function StudyView() {
         {/* Header with statistics */}
         <div className="text-center space-y-4">
           <h1 className="text-3xl font-bold tracking-tight">Sesja Nauki</h1>
-          
+
           {statistics && (
             <div className="flex justify-center gap-6 text-sm" data-test-id="study-statistics">
               <div className="flex items-center gap-2">
                 <BookOpenIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">
-                  Do nauki: <strong className="text-foreground" data-test-id="study-due-count">{statistics.due}</strong>
+                  Do nauki:{" "}
+                  <strong className="text-foreground" data-test-id="study-due-count">
+                    {statistics.due}
+                  </strong>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircleIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">
-                  Dzisiaj: <strong className="text-foreground" data-test-id="study-reviewed-today-count">{statistics.reviewedToday}</strong>
+                  Dzisiaj:{" "}
+                  <strong className="text-foreground" data-test-id="study-reviewed-today-count">
+                    {statistics.reviewedToday}
+                  </strong>
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <TrophyIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">
-                  Łącznie: <strong className="text-foreground" data-test-id="study-total-count">{statistics.total}</strong>
+                  Łącznie:{" "}
+                  <strong className="text-foreground" data-test-id="study-total-count">
+                    {statistics.total}
+                  </strong>
                 </span>
               </div>
             </div>
@@ -164,11 +165,7 @@ export default function StudyView() {
 
         {/* Study card */}
         {!isLoading && currentFlashcard && (
-          <FlashcardStudyCard
-            flashcard={currentFlashcard}
-            onRate={handleRate}
-            isRating={isReviewing}
-          />
+          <FlashcardStudyCard flashcard={currentFlashcard} onRate={handleRate} isRating={isReviewing} />
         )}
 
         {/* Session complete */}
@@ -178,9 +175,7 @@ export default function StudyView() {
               <TrophyIcon className="h-8 w-8 text-green-600" />
             </div>
             <h2 className="text-xl font-semibold mb-2">Sesja zakończona!</h2>
-            <p className="text-muted-foreground mb-6">
-              Przejrzałeś {reviewedCount} fiszek. Świetna robota!
-            </p>
+            <p className="text-muted-foreground mb-6">Przejrzałeś {reviewedCount} fiszek. Świetna robota!</p>
             <Button onClick={handleRestartSession} data-test-id="study-restart-button">
               Rozpocznij nową sesję
             </Button>
@@ -190,4 +185,3 @@ export default function StudyView() {
     </div>
   );
 }
-

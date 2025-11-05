@@ -1,5 +1,5 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { Page, Locator } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 /**
  * Page Object Model for Generate Flashcards Page
@@ -23,29 +23,29 @@ export class GeneratePage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators using test IDs
-    this.sourceTextInput = page.getByTestId('generate-source-text-input');
-    this.generateButton = page.getByTestId('generate-flashcards-button');
-    this.loadingIndicator = page.getByTestId('generate-loading-indicator');
-    this.errorNotification = page.getByTestId('generate-error-notification');
-    this.saveErrorNotification = page.getByTestId('generate-save-error-notification');
-    this.flashcardsResults = page.getByTestId('generate-flashcards-results');
-    this.flashcardsCount = page.getByTestId('generate-flashcards-count');
-    this.acceptedCount = page.getByTestId('generate-accepted-count');
-    this.flashcardList = page.getByTestId('flashcard-list');
-    this.flashcardItems = page.getByTestId('flashcard-item');
-    this.saveAcceptedButton = page.getByTestId('save-accepted-button');
-    this.saveAllButton = page.getByTestId('save-all-button');
-    this.successDialog = page.getByTestId('success-dialog');
-    this.successDialogContinueButton = page.getByTestId('success-dialog-continue-button');
+    this.sourceTextInput = page.getByTestId("generate-source-text-input");
+    this.generateButton = page.getByTestId("generate-flashcards-button");
+    this.loadingIndicator = page.getByTestId("generate-loading-indicator");
+    this.errorNotification = page.getByTestId("generate-error-notification");
+    this.saveErrorNotification = page.getByTestId("generate-save-error-notification");
+    this.flashcardsResults = page.getByTestId("generate-flashcards-results");
+    this.flashcardsCount = page.getByTestId("generate-flashcards-count");
+    this.acceptedCount = page.getByTestId("generate-accepted-count");
+    this.flashcardList = page.getByTestId("flashcard-list");
+    this.flashcardItems = page.getByTestId("flashcard-item");
+    this.saveAcceptedButton = page.getByTestId("save-accepted-button");
+    this.saveAllButton = page.getByTestId("save-all-button");
+    this.successDialog = page.getByTestId("success-dialog");
+    this.successDialogContinueButton = page.getByTestId("success-dialog-continue-button");
   }
 
   /**
    * Navigate to generate page
    */
   async navigate(): Promise<void> {
-    await this.goto('/generate');
+    await this.goto("/generate");
     await this.waitForPageLoad();
   }
 
@@ -68,10 +68,10 @@ export class GeneratePage extends BasePage {
    */
   async waitForGenerationComplete(timeout = 30000): Promise<void> {
     // Wait for loading indicator to appear
-    await this.loadingIndicator.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
-    
+    await this.loadingIndicator.waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
+
     // Wait for loading indicator to disappear
-    await this.loadingIndicator.waitFor({ state: 'hidden', timeout });
+    await this.loadingIndicator.waitFor({ state: "hidden", timeout });
   }
 
   /**
@@ -130,7 +130,7 @@ export class GeneratePage extends BasePage {
    */
   async acceptFlashcard(index: number): Promise<void> {
     const flashcard = this.flashcardItems.nth(index);
-    const acceptButton = flashcard.getByTestId('flashcard-accept-button');
+    const acceptButton = flashcard.getByTestId("flashcard-accept-button");
     await acceptButton.click();
   }
 
@@ -148,12 +148,12 @@ export class GeneratePage extends BasePage {
    */
   async editFlashcard(index: number, front: string, back: string): Promise<void> {
     const flashcard = this.flashcardItems.nth(index);
-    const editButton = flashcard.getByTestId('flashcard-edit-button');
+    const editButton = flashcard.getByTestId("flashcard-edit-button");
     await editButton.click();
 
-    const frontInput = flashcard.getByTestId('flashcard-edit-front-input');
-    const backInput = flashcard.getByTestId('flashcard-edit-back-input');
-    const saveButton = flashcard.getByTestId('flashcard-save-edit-button');
+    const frontInput = flashcard.getByTestId("flashcard-edit-front-input");
+    const backInput = flashcard.getByTestId("flashcard-edit-back-input");
+    const saveButton = flashcard.getByTestId("flashcard-save-edit-button");
 
     await frontInput.fill(front);
     await backInput.fill(back);
@@ -165,7 +165,7 @@ export class GeneratePage extends BasePage {
    */
   async rejectFlashcard(index: number): Promise<void> {
     const flashcard = this.flashcardItems.nth(index);
-    const rejectButton = flashcard.getByTestId('flashcard-reject-button');
+    const rejectButton = flashcard.getByTestId("flashcard-reject-button");
     await rejectButton.click();
   }
 
@@ -187,7 +187,7 @@ export class GeneratePage extends BasePage {
    * Wait for success dialog
    */
   async waitForSuccessDialog(timeout = 5000): Promise<void> {
-    await this.successDialog.waitFor({ state: 'visible', timeout });
+    await this.successDialog.waitFor({ state: "visible", timeout });
   }
 
   /**
@@ -205,7 +205,7 @@ export class GeneratePage extends BasePage {
    */
   async closeSuccessDialog(): Promise<void> {
     await this.successDialogContinueButton.click();
-    await this.successDialog.waitFor({ state: 'hidden', timeout: 3000 });
+    await this.successDialog.waitFor({ state: "hidden", timeout: 3000 });
   }
 
   /**
@@ -220,8 +220,8 @@ export class GeneratePage extends BasePage {
    */
   async getFlashcardContent(index: number): Promise<{ front: string; back: string } | null> {
     const flashcard = this.flashcardItems.nth(index);
-    
-    if (!await flashcard.isVisible()) {
+
+    if (!(await flashcard.isVisible())) {
       return null;
     }
 
@@ -229,9 +229,8 @@ export class GeneratePage extends BasePage {
     const backText = await flashcard.locator('[data-label="Tył"]').textContent();
 
     return {
-      front: frontText?.trim() || '',
-      back: backText?.trim() || '',
+      front: frontText?.trim() || "",
+      back: backText?.trim() || "",
     };
   }
 }
-

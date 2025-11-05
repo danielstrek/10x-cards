@@ -1,5 +1,5 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { Page, Locator } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 /**
  * Page Object Model for Login Page
@@ -17,23 +17,23 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators using test IDs
-    this.emailInput = page.getByTestId('login-email-input');
-    this.passwordInput = page.getByTestId('login-password-input');
-    this.passwordToggle = page.getByTestId('login-password-toggle');
-    this.rememberMeCheckbox = page.getByTestId('login-remember-me-checkbox');
-    this.submitButton = page.getByTestId('login-submit-button');
-    this.forgotPasswordLink = page.getByTestId('login-forgot-password-link');
-    this.registerLink = page.getByTestId('login-register-link');
-    this.errorNotification = page.getByTestId('login-error-notification');
+    this.emailInput = page.getByTestId("login-email-input");
+    this.passwordInput = page.getByTestId("login-password-input");
+    this.passwordToggle = page.getByTestId("login-password-toggle");
+    this.rememberMeCheckbox = page.getByTestId("login-remember-me-checkbox");
+    this.submitButton = page.getByTestId("login-submit-button");
+    this.forgotPasswordLink = page.getByTestId("login-forgot-password-link");
+    this.registerLink = page.getByTestId("login-register-link");
+    this.errorNotification = page.getByTestId("login-error-notification");
   }
 
   /**
    * Navigate to login page
    */
   async navigate(): Promise<void> {
-    await this.goto('/auth/login');
+    await this.goto("/auth/login");
     await this.waitForPageLoad();
   }
 
@@ -43,7 +43,7 @@ export class LoginPage extends BasePage {
   async fillForm(email: string, password: string, rememberMe = false): Promise<void> {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
-    
+
     if (rememberMe) {
       await this.rememberMeCheckbox.check();
     }
@@ -109,4 +109,3 @@ export class LoginPage extends BasePage {
     await this.page.waitForURL(/\/generate/, { timeout });
   }
 }
-

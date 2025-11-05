@@ -1,5 +1,5 @@
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { Page, Locator } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 /**
  * Page Object Model for Register Page
@@ -18,16 +18,16 @@ export class RegisterPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // Initialize locators using test IDs
-    this.emailInput = page.getByTestId('register-email-input');
-    this.passwordInput = page.getByTestId('register-password-input');
-    this.confirmPasswordInput = page.getByTestId('register-confirm-password-input');
-    this.passwordToggle = page.getByTestId('register-password-toggle');
-    this.confirmPasswordToggle = page.getByTestId('register-confirm-password-toggle');
-    this.submitButton = page.getByTestId('register-submit-button');
-    this.loginLink = page.getByTestId('register-login-link');
-    this.errorNotification = page.getByTestId('register-error-notification');
+    this.emailInput = page.getByTestId("register-email-input");
+    this.passwordInput = page.getByTestId("register-password-input");
+    this.confirmPasswordInput = page.getByTestId("register-confirm-password-input");
+    this.passwordToggle = page.getByTestId("register-password-toggle");
+    this.confirmPasswordToggle = page.getByTestId("register-confirm-password-toggle");
+    this.submitButton = page.getByTestId("register-submit-button");
+    this.loginLink = page.getByTestId("register-login-link");
+    this.errorNotification = page.getByTestId("register-error-notification");
     this.successMessage = page.getByText(/rejestracja zakończona/i);
   }
 
@@ -35,7 +35,7 @@ export class RegisterPage extends BasePage {
    * Navigate to register page
    */
   async navigate(): Promise<void> {
-    await this.goto('/auth/register');
+    await this.goto("/auth/register");
     await this.waitForPageLoad();
   }
 
@@ -92,14 +92,17 @@ export class RegisterPage extends BasePage {
    */
   async hasPasswordValidationError(): Promise<boolean> {
     const errorText = this.page.getByText(/hasło musi/i);
-    return await errorText.first().isVisible({ timeout: 1000 }).catch(() => false);
+    return await errorText
+      .first()
+      .isVisible({ timeout: 1000 })
+      .catch(() => false);
   }
 
   /**
    * Get password validation errors
    */
   async getPasswordValidationErrors(): Promise<string[]> {
-    const errors = await this.page.locator('p.text-xs.text-destructive').allTextContents();
+    const errors = await this.page.locator("p.text-xs.text-destructive").allTextContents();
     return errors;
   }
 
@@ -117,4 +120,3 @@ export class RegisterPage extends BasePage {
     await this.loginLink.click();
   }
 }
-

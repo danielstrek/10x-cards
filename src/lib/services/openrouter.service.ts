@@ -10,7 +10,7 @@ import type {
   OpenRouterMessage,
   OpenRouterResponseFormat,
   OpenRouterRequestParams,
-} from './openrouter.types';
+} from "./openrouter.types";
 
 import {
   OpenRouterValidationError,
@@ -20,7 +20,7 @@ import {
   OpenRouterAPIError,
   OpenRouterNetworkError,
   OpenRouterParseError,
-} from './openrouter.errors';
+} from "./openrouter.errors";
 
 /**
  * Usługa do komunikacji z OpenRouter API
@@ -44,11 +44,11 @@ export class OpenRouterService {
   constructor(config: OpenRouterServiceConfig) {
     // Walidacja wymaganych parametrów
     if (!config.apiKey) {
-      throw new OpenRouterValidationError('API key is required');
+      throw new OpenRouterValidationError("API key is required");
     }
 
     this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl || 'https://openrouter.ai/api/v1';
+    this.baseUrl = config.baseUrl || "https://openrouter.ai/api/v1";
     this.defaultModel = config.defaultModel;
     this.defaultParams = config.defaultParams || {};
     this.appInfo = config.appInfo;
@@ -58,9 +58,7 @@ export class OpenRouterService {
     this.retryConfig = {
       maxRetries: config.retryConfig?.maxRetries ?? 3,
       retryDelay: config.retryConfig?.retryDelay ?? 1000,
-      retryableStatuses: config.retryConfig?.retryableStatuses ?? [
-        429, 500, 502, 503, 504,
-      ],
+      retryableStatuses: config.retryConfig?.retryableStatuses ?? [429, 500, 502, 503, 504],
     };
   }
 
@@ -95,11 +93,7 @@ export class OpenRouterService {
     const requestBody = this.buildRequestBody(request);
 
     // Wykonaj zapytanie z retry logic
-    const apiResponse = await this.makeRequest<OpenRouterAPIResponse>(
-      '/chat/completions',
-      'POST',
-      requestBody
-    );
+    const apiResponse = await this.makeRequest<OpenRouterAPIResponse>("/chat/completions", "POST", requestBody);
 
     // Parsuj i zwróć odpowiedź
     return this.parseResponse(apiResponse);
@@ -109,10 +103,7 @@ export class OpenRouterService {
    * Pobiera listę dostępnych modeli
    */
   async getAvailableModels(): Promise<OpenRouterModel[]> {
-    const response = await this.makeRequest<{ data: OpenRouterModel[] }>(
-      '/models',
-      'GET'
-    );
+    const response = await this.makeRequest<{ data: OpenRouterModel[] }>("/models", "GET");
 
     return response.data;
   }
@@ -122,13 +113,13 @@ export class OpenRouterService {
    */
   private buildHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${this.apiKey}`,
     };
 
     if (this.appInfo) {
-      headers['HTTP-Referer'] = this.appInfo.referer;
-      headers['X-Title'] = this.appInfo.title;
+      headers["HTTP-Referer"] = this.appInfo.referer;
+      headers["X-Title"] = this.appInfo.title;
     }
 
     return headers;
@@ -137,16 +128,12 @@ export class OpenRouterService {
   /**
    * Buduje ciało zapytania dla OpenRouter API
    */
-  private buildRequestBody(
-    request: OpenRouterChatRequest
-  ): OpenRouterAPIRequestBody {
+  private buildRequestBody(request: OpenRouterChatRequest): OpenRouterAPIRequestBody {
     // Użyj modelu z requestu lub domyślnego
     const model = request.model || this.defaultModel;
 
     if (!model) {
-      throw new OpenRouterValidationError(
-        'Model must be specified in request or as default in config'
-      );
+      throw new OpenRouterValidationError("Model must be specified in request or as default in config");
     }
 
     // Połącz parametry
@@ -173,20 +160,16 @@ export class OpenRouterService {
   /**
    * Wykonuje zapytanie HTTP z retry logic
    */
-  private async makeRequest<T>(
-    endpoint: string,
-    method: 'GET' | 'POST',
-    body?: unknown
-  ): Promise<T> {
+  private async makeRequest<T>(endpoint: string, method: "GET" | "POST", body?: unknown): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     let lastError: Error | null = null;
 
     // Loguj informacje o requestcie (bez wrażliwych danych)
-    console.log('[OpenRouter] Making request:', {
+    console.log("[OpenRouter] Making request:", {
       endpoint,
       method,
       hasBody: !!body,
-      model: body && typeof body === 'object' && 'model' in body ? body.model : 'unknown'
+      model: body && typeof body === "object" && "model" in body ? body.model : "unknown",
     });
 
     for (let attempt = 0; attempt <= this.retryConfig.maxRetries; attempt++) {
@@ -209,34 +192,34 @@ export class OpenRouterService {
           // Check if we should retry for retryable status codes
           const statusCode = response.status;
           const shouldRetry = this.shouldRetry(statusCode, attempt);
-          
+
           if (shouldRetry) {
             // Store error info for retry
             try {
               const errorData = await response.json();
-              const errorMessage = errorData.error?.message || errorData.message || 'Unknown error';
-              console.error('[OpenRouter] HTTP Error:', {
+              const errorMessage = errorData.error?.message || errorData.message || "Unknown error";
+              console.error("[OpenRouter] HTTP Error:", {
                 statusCode,
                 errorMessage,
-                attempt
+                attempt,
               });
               lastError = new OpenRouterAPIError(errorMessage, statusCode, errorData);
             } catch {
               const errorMessage = await response.text();
-              console.error('[OpenRouter] HTTP Error (text):', {
+              console.error("[OpenRouter] HTTP Error (text):", {
                 statusCode,
                 errorMessage,
-                attempt
+                attempt,
               });
               lastError = new OpenRouterAPIError(errorMessage, statusCode, errorMessage);
             }
-            
+
             // Wait and retry
             const delay = this.calculateRetryDelay(attempt, statusCode);
             await this.sleep(delay);
             continue;
           }
-          
+
           // Non-retryable error or max retries reached - throw immediately
           await this.handleHttpError(response, attempt);
         }
@@ -260,13 +243,13 @@ export class OpenRouterService {
         lastError = error as Error;
 
         // Obsługa timeout
-        if (lastError.name === 'AbortError') {
+        if (lastError.name === "AbortError") {
           if (attempt < this.retryConfig.maxRetries) {
             const delay = this.calculateRetryDelay(attempt, 0);
             await this.sleep(delay);
             continue;
           }
-          throw new OpenRouterNetworkError('Request timeout');
+          throw new OpenRouterNetworkError("Request timeout");
         }
 
         // Obsługa błędów sieci
@@ -276,9 +259,7 @@ export class OpenRouterService {
           continue;
         }
 
-        throw new OpenRouterNetworkError(
-          `Network error: ${lastError.message}`
-        );
+        throw new OpenRouterNetworkError(`Network error: ${lastError.message}`);
       }
     }
 
@@ -286,41 +267,38 @@ export class OpenRouterService {
     if (lastError) {
       throw lastError;
     }
-    throw new OpenRouterNetworkError('All retry attempts failed');
+    throw new OpenRouterNetworkError("All retry attempts failed");
   }
 
   /**
    * Obsługuje błędy HTTP
    */
-  private async handleHttpError(
-    response: Response,
-    attempt: number
-  ): Promise<never> {
+  private async handleHttpError(response: Response, attempt: number): Promise<never> {
     const statusCode = response.status;
     let errorMessage: string;
     let errorDetails: unknown;
 
     try {
       const errorData = await response.json();
-      errorMessage = errorData.error?.message || errorData.message || 'Unknown error';
+      errorMessage = errorData.error?.message || errorData.message || "Unknown error";
       errorDetails = errorData;
-      
+
       // Loguj szczegóły błędu dla debugowania (stringify dla pełnego podglądu)
-      console.error('[OpenRouter] HTTP Error:', {
+      console.error("[OpenRouter] HTTP Error:", {
         statusCode,
         errorMessage,
         errorDetails: JSON.stringify(errorData, null, 2),
         metadata: errorData.error?.metadata,
-        attempt
+        attempt,
       });
     } catch {
       errorMessage = await response.text();
       errorDetails = errorMessage;
-      
-      console.error('[OpenRouter] HTTP Error (text):', {
+
+      console.error("[OpenRouter] HTTP Error (text):", {
         statusCode,
         errorMessage,
-        attempt
+        attempt,
       });
     }
 
@@ -330,7 +308,7 @@ export class OpenRouterService {
     }
 
     // Błędy modelu
-    if (statusCode === 400 && errorMessage.toLowerCase().includes('model')) {
+    if (statusCode === 400 && errorMessage.toLowerCase().includes("model")) {
       throw new OpenRouterModelError(errorMessage);
     }
 
@@ -348,10 +326,7 @@ export class OpenRouterService {
    * Sprawdza czy należy ponowić zapytanie
    */
   private shouldRetry(statusCode: number, attempt: number): boolean {
-    return (
-      attempt < this.retryConfig.maxRetries &&
-      this.retryConfig.retryableStatuses.includes(statusCode)
-    );
+    return attempt < this.retryConfig.maxRetries && this.retryConfig.retryableStatuses.includes(statusCode);
   }
 
   /**
@@ -359,8 +334,7 @@ export class OpenRouterService {
    */
   private calculateRetryDelay(attempt: number, statusCode: number): number {
     // Dla rate limit, użyj większego opóźnienia
-    const baseDelay =
-      statusCode === 429 ? this.retryConfig.retryDelay * 2 : this.retryConfig.retryDelay;
+    const baseDelay = statusCode === 429 ? this.retryConfig.retryDelay * 2 : this.retryConfig.retryDelay;
 
     // Exponential backoff: baseDelay * 2^attempt
     const exponentialDelay = baseDelay * Math.pow(2, attempt);
@@ -375,7 +349,7 @@ export class OpenRouterService {
    * Parsuje Retry-After header
    */
   private parseRetryAfter(headers: Headers): number | undefined {
-    const retryAfter = headers.get('Retry-After');
+    const retryAfter = headers.get("Retry-After");
     if (!retryAfter) return undefined;
 
     const seconds = parseInt(retryAfter, 10);
@@ -392,23 +366,15 @@ export class OpenRouterService {
   /**
    * Parsuje odpowiedź z OpenRouter API
    */
-  private parseResponse(
-    apiResponse: OpenRouterAPIResponse
-  ): OpenRouterChatResponse {
+  private parseResponse(apiResponse: OpenRouterAPIResponse): OpenRouterChatResponse {
     if (!apiResponse.choices || apiResponse.choices.length === 0) {
-      throw new OpenRouterParseError(
-        'No choices in response',
-        JSON.stringify(apiResponse)
-      );
+      throw new OpenRouterParseError("No choices in response", JSON.stringify(apiResponse));
     }
 
     const choice = apiResponse.choices[0];
 
     if (!choice.message || !choice.message.content) {
-      throw new OpenRouterParseError(
-        'No content in response',
-        JSON.stringify(apiResponse)
-      );
+      throw new OpenRouterParseError("No content in response", JSON.stringify(apiResponse));
     }
 
     return {
@@ -430,39 +396,31 @@ export class OpenRouterService {
    */
   private validateMessages(messages: OpenRouterMessage[]): void {
     if (!Array.isArray(messages) || messages.length === 0) {
-      throw new OpenRouterValidationError('Messages array cannot be empty');
+      throw new OpenRouterValidationError("Messages array cannot be empty");
     }
 
-    const validRoles = ['system', 'user', 'assistant'];
+    const validRoles = ["system", "user", "assistant"];
 
     for (let i = 0; i < messages.length; i++) {
       const msg = messages[i];
 
       if (!msg.role || !validRoles.includes(msg.role)) {
-        throw new OpenRouterValidationError(
-          `Invalid role at message ${i}: ${msg.role}`
-        );
+        throw new OpenRouterValidationError(`Invalid role at message ${i}: ${msg.role}`);
       }
 
-      if (!msg.content || typeof msg.content !== 'string') {
-        throw new OpenRouterValidationError(
-          `Invalid content at message ${i}: content must be a non-empty string`
-        );
+      if (!msg.content || typeof msg.content !== "string") {
+        throw new OpenRouterValidationError(`Invalid content at message ${i}: content must be a non-empty string`);
       }
 
       if (msg.content.trim().length === 0) {
-        throw new OpenRouterValidationError(
-          `Empty content at message ${i}`
-        );
+        throw new OpenRouterValidationError(`Empty content at message ${i}`);
       }
     }
 
     // Sprawdź czy pierwsza wiadomość to system lub user
     const firstRole = messages[0].role;
-    if (firstRole !== 'system' && firstRole !== 'user') {
-      throw new OpenRouterValidationError(
-        'First message must have role "system" or "user"'
-      );
+    if (firstRole !== "system" && firstRole !== "user") {
+      throw new OpenRouterValidationError('First message must have role "system" or "user"');
     }
   }
 
@@ -470,59 +428,45 @@ export class OpenRouterService {
    * Waliduje response format
    */
   private validateResponseFormat(responseFormat: OpenRouterResponseFormat): void {
-    if (responseFormat.type !== 'json_schema') {
-      throw new OpenRouterValidationError(
-        'Only "json_schema" response format is supported'
-      );
+    if (responseFormat.type !== "json_schema") {
+      throw new OpenRouterValidationError('Only "json_schema" response format is supported');
     }
 
     const jsonSchema = responseFormat.json_schema;
 
-    if (!jsonSchema.name || typeof jsonSchema.name !== 'string') {
-      throw new OpenRouterValidationError(
-        'response_format.json_schema.name is required'
-      );
+    if (!jsonSchema.name || typeof jsonSchema.name !== "string") {
+      throw new OpenRouterValidationError("response_format.json_schema.name is required");
     }
 
     if (jsonSchema.strict !== true) {
-      throw new OpenRouterValidationError(
-        'response_format.json_schema.strict must be true for structured outputs'
-      );
+      throw new OpenRouterValidationError("response_format.json_schema.strict must be true for structured outputs");
     }
 
-    if (!jsonSchema.schema || typeof jsonSchema.schema !== 'object') {
-      throw new OpenRouterValidationError(
-        'response_format.json_schema.schema is required'
-      );
+    if (!jsonSchema.schema || typeof jsonSchema.schema !== "object") {
+      throw new OpenRouterValidationError("response_format.json_schema.schema is required");
     }
 
-    if (jsonSchema.schema.type !== 'object') {
-      throw new OpenRouterValidationError(
-        'response_format.json_schema.schema.type must be "object"'
-      );
+    if (jsonSchema.schema.type !== "object") {
+      throw new OpenRouterValidationError('response_format.json_schema.schema.type must be "object"');
     }
 
     if (!jsonSchema.schema.properties) {
-      throw new OpenRouterValidationError(
-        'response_format.json_schema.schema must have properties'
-      );
+      throw new OpenRouterValidationError("response_format.json_schema.schema must have properties");
     }
 
     // Sprawdź maksymalną głębokość zagnieżdżenia (max 5 poziomów)
     const maxDepth = 5;
     const depth = this.calculateSchemaDepth(jsonSchema.schema);
     if (depth > maxDepth) {
-      throw new OpenRouterValidationError(
-        `Schema nesting depth (${depth}) exceeds maximum allowed (${maxDepth})`
-      );
+      throw new OpenRouterValidationError(`Schema nesting depth (${depth}) exceeds maximum allowed (${maxDepth})`);
     }
   }
 
   /**
    * Oblicza głębokość zagnieżdżenia schematu JSON
    */
-  private calculateSchemaDepth(schema: any, currentDepth: number = 0): number {
-    if (!schema || typeof schema !== 'object') {
+  private calculateSchemaDepth(schema: any, currentDepth = 0): number {
+    if (!schema || typeof schema !== "object") {
       return currentDepth;
     }
 
@@ -530,23 +474,16 @@ export class OpenRouterService {
 
     if (schema.properties) {
       for (const key in schema.properties) {
-        const propertyDepth = this.calculateSchemaDepth(
-          schema.properties[key],
-          currentDepth + 1
-        );
+        const propertyDepth = this.calculateSchemaDepth(schema.properties[key], currentDepth + 1);
         maxDepth = Math.max(maxDepth, propertyDepth);
       }
     }
 
     if (schema.items) {
-      const itemsDepth = this.calculateSchemaDepth(
-        schema.items,
-        currentDepth + 1
-      );
+      const itemsDepth = this.calculateSchemaDepth(schema.items, currentDepth + 1);
       maxDepth = Math.max(maxDepth, itemsDepth);
     }
 
     return maxDepth;
   }
 }
-

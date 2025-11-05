@@ -1,16 +1,13 @@
 // src/components/hooks/useSaveFlashcards.ts
-import { useState } from 'react';
-import type { BulkCreateFlashcardsResponseDto } from '../../types';
-import type { FlashcardProposalViewModel } from '../types';
+import { useState } from "react";
+import type { BulkCreateFlashcardsResponseDto } from "../../types";
+import type { FlashcardProposalViewModel } from "../types";
 
 interface UseSaveFlashcardsResult {
   isSaving: boolean;
   saveError: string | null;
   savedCount: number | null;
-  saveFlashcards: (
-    flashcards: FlashcardProposalViewModel[],
-    generationId: number
-  ) => Promise<boolean>;
+  saveFlashcards: (flashcards: FlashcardProposalViewModel[], generationId: number) => Promise<boolean>;
   clearSaveError: () => void;
 }
 
@@ -27,18 +24,15 @@ export function useSaveFlashcards(): UseSaveFlashcardsResult {
     setSaveError(null);
   };
 
-  const saveFlashcards = async (
-    flashcards: FlashcardProposalViewModel[],
-    generationId: number
-  ): Promise<boolean> => {
+  const saveFlashcards = async (flashcards: FlashcardProposalViewModel[], generationId: number): Promise<boolean> => {
     // Validation
     if (!flashcards || flashcards.length === 0) {
-      setSaveError('No flashcards to save');
+      setSaveError("No flashcards to save");
       return false;
     }
 
     if (!generationId) {
-      setSaveError('Generation ID is required');
+      setSaveError("Generation ID is required");
       return false;
     }
 
@@ -49,25 +43,25 @@ export function useSaveFlashcards(): UseSaveFlashcardsResult {
 
     try {
       // Get auth token from localStorage or sessionStorage
-      const token = localStorage.getItem('sb-access-token') || sessionStorage.getItem('sb-access-token');
-      
+      const token = localStorage.getItem("sb-access-token") || sessionStorage.getItem("sb-access-token");
+
       if (!token) {
-        throw new Error('Not authenticated. Please log in first.');
+        throw new Error("Not authenticated. Please log in first.");
       }
 
       // Transform view models to API format
-      const flashcardsToSave = flashcards.map(card => ({
+      const flashcardsToSave = flashcards.map((card) => ({
         front: card.front,
         back: card.back,
         source: card.source,
       }));
 
       // Call API
-      const response = await fetch('/api/flashcards', {
-        method: 'POST',
+      const response = await fetch("/api/flashcards", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           generationId,
@@ -78,13 +72,11 @@ export function useSaveFlashcards(): UseSaveFlashcardsResult {
       // Handle non-OK responses
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({
-          error: 'Unknown Error',
+          error: "Unknown Error",
           message: `Server returned ${response.status}`,
         }));
 
-        throw new Error(
-          errorData.message || errorData.error || `Request failed with status ${response.status}`
-        );
+        throw new Error(errorData.message || errorData.error || `Request failed with status ${response.status}`);
       }
 
       // Parse successful response
@@ -95,9 +87,9 @@ export function useSaveFlashcards(): UseSaveFlashcardsResult {
 
       return true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to save flashcards';
+      const errorMessage = err instanceof Error ? err.message : "Failed to save flashcards";
       setSaveError(errorMessage);
-      console.error('Error saving flashcards:', err);
+      console.error("Error saving flashcards:", err);
       return false;
     } finally {
       setIsSaving(false);
@@ -112,4 +104,3 @@ export function useSaveFlashcards(): UseSaveFlashcardsResult {
     clearSaveError,
   };
 }
-

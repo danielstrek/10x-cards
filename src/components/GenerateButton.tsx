@@ -1,6 +1,6 @@
 // src/components/GenerateButton.tsx
-import * as React from 'react';
-import { Button } from '@/components/ui/button';
+import * as React from "react";
+import { Button } from "@/components/ui/button";
 
 interface GenerateButtonProps {
   onClick: () => void;
@@ -8,11 +8,7 @@ interface GenerateButtonProps {
   isLoading?: boolean;
 }
 
-export function GenerateButton({
-  onClick,
-  disabled = false,
-  isLoading = false,
-}: GenerateButtonProps) {
+export function GenerateButton({ onClick, disabled = false, isLoading = false }: GenerateButtonProps) {
   return (
     <Button
       onClick={onClick}
@@ -31,14 +27,7 @@ export function GenerateButton({
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path
               className="opacity-75"
               fill="currentColor"
@@ -48,9 +37,8 @@ export function GenerateButton({
           Generating...
         </>
       ) : (
-        'Generate Flashcards'
+        "Generate Flashcards"
       )}
     </Button>
   );
 }
-

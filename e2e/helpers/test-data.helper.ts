@@ -9,24 +9,24 @@
 export function generateSampleText(length: number): string {
   const minLength = 1000;
   const maxLength = 10000;
-  
+
   const targetLength = Math.max(minLength, Math.min(maxLength, length));
 
   const topics = [
-    'JavaScript to wieloparadygmatowy język programowania. Obsługuje programowanie obiektowe, imperatywne i funkcyjne. JavaScript jest jednym z najpopularniejszych języków programowania na świecie.',
-    'React to biblioteka JavaScript służąca do budowania interfejsów użytkownika. Została stworzona przez Facebook i jest szeroko wykorzystywana w tworzeniu aplikacji webowych.',
-    'TypeScript to nadzbiór JavaScriptu, który dodaje statyczne typowanie. Pomaga w wykrywaniu błędów na etapie kompilacji i ułatwia utrzymanie dużych projektów.',
-    'Node.js to środowisko uruchomieniowe JavaScript zbudowane na silniku V8 przeglądarki Chrome. Pozwala na uruchamianie JavaScript po stronie serwera.',
-    'Astro to nowoczesny framework do budowania stron internetowych. Generuje statyczne strony HTML z minimalną ilością JavaScriptu po stronie klienta.',
-    'Playwright to framework do testowania end-to-end aplikacji webowych. Obsługuje wiele przeglądarek i oferuje bogate API do automatyzacji testów.',
+    "JavaScript to wieloparadygmatowy język programowania. Obsługuje programowanie obiektowe, imperatywne i funkcyjne. JavaScript jest jednym z najpopularniejszych języków programowania na świecie.",
+    "React to biblioteka JavaScript służąca do budowania interfejsów użytkownika. Została stworzona przez Facebook i jest szeroko wykorzystywana w tworzeniu aplikacji webowych.",
+    "TypeScript to nadzbiór JavaScriptu, który dodaje statyczne typowanie. Pomaga w wykrywaniu błędów na etapie kompilacji i ułatwia utrzymanie dużych projektów.",
+    "Node.js to środowisko uruchomieniowe JavaScript zbudowane na silniku V8 przeglądarki Chrome. Pozwala na uruchamianie JavaScript po stronie serwera.",
+    "Astro to nowoczesny framework do budowania stron internetowych. Generuje statyczne strony HTML z minimalną ilością JavaScriptu po stronie klienta.",
+    "Playwright to framework do testowania end-to-end aplikacji webowych. Obsługuje wiele przeglądarek i oferuje bogate API do automatyzacji testów.",
   ];
 
-  let text = '';
+  let text = "";
   let currentLength = 0;
 
   while (currentLength < targetLength) {
     const topic = topics[Math.floor(Math.random() * topics.length)];
-    text += topic + ' ';
+    text += topic + " ";
     currentLength = text.length;
   }
 
@@ -37,7 +37,7 @@ export function generateSampleText(length: number): string {
  * Generate short sample text (below minimum for testing validation)
  */
 export function generateShortText(): string {
-  return 'To jest zbyt krótki tekst do wygenerowania fiszek.';
+  return "To jest zbyt krótki tekst do wygenerowania fiszek.";
 }
 
 /**
@@ -53,20 +53,20 @@ export function generateLongText(): string {
 export function generateFlashcardData(): { front: string; back: string } {
   const examples = [
     {
-      front: 'Co to jest React?',
-      back: 'React to biblioteka JavaScript do budowania interfejsów użytkownika, stworzona przez Facebook.',
+      front: "Co to jest React?",
+      back: "React to biblioteka JavaScript do budowania interfejsów użytkownika, stworzona przez Facebook.",
     },
     {
-      front: 'Czym jest TypeScript?',
-      back: 'TypeScript to nadzbiór JavaScriptu, który dodaje statyczne typowanie do języka.',
+      front: "Czym jest TypeScript?",
+      back: "TypeScript to nadzbiór JavaScriptu, który dodaje statyczne typowanie do języka.",
     },
     {
-      front: 'Co to jest Node.js?',
-      back: 'Node.js to środowisko uruchomieniowe JavaScript zbudowane na silniku V8, pozwalające na uruchamianie JS po stronie serwera.',
+      front: "Co to jest Node.js?",
+      back: "Node.js to środowisko uruchomieniowe JavaScript zbudowane na silniku V8, pozwalające na uruchamianie JS po stronie serwera.",
     },
     {
-      front: 'Czym się charakteryzuje Astro?',
-      back: 'Astro to framework do budowania stron generujący statyczne HTML z minimalną ilością JavaScriptu.',
+      front: "Czym się charakteryzuje Astro?",
+      back: "Astro to framework do budowania stron generujący statyczne HTML z minimalną ilością JavaScriptu.",
     },
   ];
 
@@ -76,9 +76,9 @@ export function generateFlashcardData(): { front: string; back: string } {
 /**
  * Generate multiple flashcard data
  */
-export function generateMultipleFlashcards(count: number): Array<{ front: string; back: string }> {
-  const flashcards: Array<{ front: string; back: string }> = [];
-  
+export function generateMultipleFlashcards(count: number): { front: string; back: string }[] {
+  const flashcards: { front: string; back: string }[] = [];
+
   for (let i = 0; i < count; i++) {
     const data = generateFlashcardData();
     flashcards.push({
@@ -95,8 +95,8 @@ export function generateMultipleFlashcards(count: number): Array<{ front: string
  */
 export function generateInvalidFlashcard(): { front: string; back: string } {
   return {
-    front: 'A'.repeat(250), // Over 200 character limit
-    back: 'B'.repeat(600), // Over 500 character limit
+    front: "A".repeat(250), // Over 200 character limit
+    back: "B".repeat(600), // Over 500 character limit
   };
 }
 
@@ -105,8 +105,8 @@ export function generateInvalidFlashcard(): { front: string; back: string } {
  */
 export function generateEmptyFlashcard(): { front: string; back: string } {
   return {
-    front: '',
-    back: '',
+    front: "",
+    back: "",
   };
 }
 
@@ -160,4 +160,3 @@ Popularne biblioteki wspierające programowanie funkcyjne w JavaScript:
 - Immutable.js
 `.trim();
 }
-

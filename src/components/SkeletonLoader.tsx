@@ -1,7 +1,7 @@
 // src/components/SkeletonLoader.tsx
-import * as React from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import * as React from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 interface SkeletonLoaderProps {
   count?: number;
@@ -34,4 +34,3 @@ export function SkeletonLoader({ count = 5 }: SkeletonLoaderProps) {
     </div>
   );
 }
-

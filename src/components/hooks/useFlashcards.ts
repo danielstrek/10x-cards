@@ -1,6 +1,6 @@
 // src/components/hooks/useFlashcards.ts
-import * as React from 'react';
-import type { FlashcardListItemDto, FlashcardListResponseDto } from '../../types';
+import * as React from "react";
+import type { FlashcardListItemDto, FlashcardListResponseDto } from "../../types";
 
 interface UseFlashcardsResult {
   flashcards: FlashcardListItemDto[];
@@ -15,7 +15,7 @@ interface UseFlashcardsResult {
 /**
  * Hook to fetch user's flashcards
  */
-export function useFlashcards(initialPage: number = 1, initialLimit: number = 50): UseFlashcardsResult {
+export function useFlashcards(initialPage = 1, initialLimit = 50): UseFlashcardsResult {
   const [flashcards, setFlashcards] = React.useState<FlashcardListItemDto[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -29,23 +29,23 @@ export function useFlashcards(initialPage: number = 1, initialLimit: number = 50
 
     try {
       const response = await fetch(`/api/flashcards?page=${page}&limit=${limit}`, {
-        credentials: 'include',
+        credentials: "include",
       });
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error('Not authenticated');
+          throw new Error("Not authenticated");
         }
-        throw new Error('Failed to fetch flashcards');
+        throw new Error("Failed to fetch flashcards");
       }
 
       const data: FlashcardListResponseDto = await response.json();
       setFlashcards(data.data);
       setTotal(data.total);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError(errorMessage);
-      console.error('Error fetching flashcards:', err);
+      console.error("Error fetching flashcards:", err);
     } finally {
       setIsLoading(false);
     }
@@ -65,4 +65,3 @@ export function useFlashcards(initialPage: number = 1, initialLimit: number = 50
     refetch: fetchFlashcards,
   };
 }
-

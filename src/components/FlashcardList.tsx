@@ -1,7 +1,7 @@
 // src/components/FlashcardList.tsx
-import * as React from 'react';
-import { FlashcardListItem } from './FlashcardListItem';
-import type { FlashcardProposalViewModel } from './types';
+import * as React from "react";
+import { FlashcardListItem } from "./FlashcardListItem";
+import type { FlashcardProposalViewModel } from "./types";
 
 interface FlashcardListProps {
   flashcards: FlashcardProposalViewModel[];
@@ -10,12 +10,7 @@ interface FlashcardListProps {
   onReject: (proposalId: string) => void;
 }
 
-export function FlashcardList({
-  flashcards,
-  onAccept,
-  onEdit,
-  onReject,
-}: FlashcardListProps) {
+export function FlashcardList({ flashcards, onAccept, onEdit, onReject }: FlashcardListProps) {
   if (flashcards.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -28,15 +23,9 @@ export function FlashcardList({
     <div className="space-y-4" role="list" aria-label="Generated flashcards" data-test-id="flashcard-list">
       {flashcards.map((flashcard) => (
         <div key={flashcard.proposalId} role="listitem">
-          <FlashcardListItem
-            flashcard={flashcard}
-            onAccept={onAccept}
-            onEdit={onEdit}
-            onReject={onReject}
-          />
+          <FlashcardListItem flashcard={flashcard} onAccept={onAccept} onEdit={onEdit} onReject={onReject} />
         </div>
       ))}
     </div>
   );
 }
-

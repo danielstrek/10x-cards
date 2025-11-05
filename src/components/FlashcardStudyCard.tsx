@@ -1,13 +1,13 @@
 // src/components/FlashcardStudyCard.tsx
-import * as React from 'react';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { RotateCcwIcon } from 'lucide-react';
-import type { StudyFlashcardDto } from '../types';
+import * as React from "react";
+import { Card, CardContent } from "./ui/card";
+import { Button } from "./ui/button";
+import { RotateCcwIcon } from "lucide-react";
+import type { StudyFlashcardDto } from "../types";
 
 interface FlashcardStudyCardProps {
   flashcard: StudyFlashcardDto;
-  onRate: (rating: 'again' | 'hard' | 'good' | 'easy') => void;
+  onRate: (rating: "again" | "hard" | "good" | "easy") => void;
   isRating: boolean;
 }
 
@@ -23,7 +23,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
     setIsFlipped(!isFlipped);
   };
 
-  const handleRate = (rating: 'again' | 'hard' | 'good' | 'easy') => {
+  const handleRate = (rating: "again" | "hard" | "good" | "easy") => {
     onRate(rating);
   };
 
@@ -36,27 +36,17 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
             {!isFlipped ? (
               /* Front side */
               <div className="space-y-6" data-test-id="study-flashcard-front">
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                  Pytanie
-                </h2>
-                <p className="text-2xl font-medium leading-relaxed">
-                  {flashcard.front}
-                </p>
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Pytanie</h2>
+                <p className="text-2xl font-medium leading-relaxed">{flashcard.front}</p>
               </div>
             ) : (
               /* Back side */
               <div className="space-y-6" data-test-id="study-flashcard-back">
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                  Odpowiedź
-                </h2>
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Odpowiedź</h2>
                 <div className="space-y-4">
-                  <p className="text-xl text-muted-foreground leading-relaxed">
-                    {flashcard.front}
-                  </p>
+                  <p className="text-xl text-muted-foreground leading-relaxed">{flashcard.front}</p>
                   <div className="border-t pt-4">
-                    <p className="text-2xl font-medium leading-relaxed">
-                      {flashcard.back}
-                    </p>
+                    <p className="text-2xl font-medium leading-relaxed">{flashcard.back}</p>
                   </div>
                 </div>
               </div>
@@ -82,12 +72,10 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
         ) : (
           /* Rating buttons */
           <div className="space-y-3" data-test-id="study-rating-buttons">
-            <p className="text-center text-sm text-muted-foreground mb-4">
-              Jak dobrze pamiętałeś tę fiszkę?
-            </p>
+            <p className="text-center text-sm text-muted-foreground mb-4">Jak dobrze pamiętałeś tę fiszkę?</p>
             <div className="grid grid-cols-2 gap-3">
               <Button
-                onClick={() => handleRate('again')}
+                onClick={() => handleRate("again")}
                 variant="outline"
                 size="lg"
                 disabled={isRating}
@@ -97,7 +85,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
                 Wcale
               </Button>
               <Button
-                onClick={() => handleRate('hard')}
+                onClick={() => handleRate("hard")}
                 variant="outline"
                 size="lg"
                 disabled={isRating}
@@ -107,7 +95,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
                 Trudno
               </Button>
               <Button
-                onClick={() => handleRate('good')}
+                onClick={() => handleRate("good")}
                 variant="outline"
                 size="lg"
                 disabled={isRating}
@@ -117,7 +105,7 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
                 Dobrze
               </Button>
               <Button
-                onClick={() => handleRate('easy')}
+                onClick={() => handleRate("easy")}
                 variant="outline"
                 size="lg"
                 disabled={isRating}
@@ -133,12 +121,16 @@ export function FlashcardStudyCard({ flashcard, onRate, isRating }: FlashcardStu
 
       {/* Metadata */}
       {isFlipped && (
-        <div className="mt-6 text-center text-xs text-muted-foreground space-y-1" data-test-id="study-flashcard-metadata">
-          <p>Powtórzenia: {flashcard.repetitions} | Interwał: {flashcard.interval} dni</p>
+        <div
+          className="mt-6 text-center text-xs text-muted-foreground space-y-1"
+          data-test-id="study-flashcard-metadata"
+        >
+          <p>
+            Powtórzenia: {flashcard.repetitions} | Interwał: {flashcard.interval} dni
+          </p>
           <p>Współczynnik łatwości: {flashcard.easinessFactor.toFixed(2)}</p>
         </div>
       )}
     </div>
   );
 }
-
