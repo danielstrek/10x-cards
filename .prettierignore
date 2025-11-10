@@ -14,3 +14,5 @@ coverage/
 src/db/database.types.ts
 src/pages/auth/verify-email.astro
 
+#Others:
+eslint.config.js

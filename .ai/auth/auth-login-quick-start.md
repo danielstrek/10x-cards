@@ -11,6 +11,7 @@
 ## Krok 1: Utworzenie testowego użytkownika w Supabase
 
 ### Opcja A: Przez Supabase Dashboard
+
 1. Otwórz Supabase Dashboard
 2. Idź do **Authentication** → **Users**
 3. Kliknij **Add user** → **Create new user**
@@ -21,8 +22,10 @@
 5. Kliknij **Create user**
 
 ### Opcja B: Przez SQL (szybsza)
+
 1. W Supabase Dashboard → **SQL Editor**
 2. Uruchom:
+
 ```sql
 -- Sprawdź czy istnieje
 SELECT email FROM auth.users WHERE email = 'test@example.com';
@@ -61,6 +64,7 @@ Powinno otworzyć się na http://localhost:3000
 ## Krok 4: Testuj logowanie
 
 ### Test podstawowy:
+
 1. Otwórz http://localhost:3000/auth/login
 2. Wprowadź dane:
    - Email: `test@example.com`
@@ -68,6 +72,7 @@ Powinno otworzyć się na http://localhost:3000
 3. Kliknij **"Zaloguj się"**
 
 ### ✅ Oczekiwany rezultat:
+
 - Przycisk pokazuje "Logowanie..." ze spinnerem
 - Po ~1-2 sekundach → przekierowanie na `/generate`
 - W DevTools (F12) → Application → Cookies:
@@ -77,16 +82,19 @@ Powinno otworzyć się na http://localhost:3000
 ### ❌ Jeśli coś nie działa:
 
 **Błąd: "Invalid email or password"**
+
 - Sprawdź czy użytkownik istnieje w Supabase Dashboard
 - Sprawdź czy hasło jest poprawne
 - Sprawdź czy email jest confirmed (Auto Confirm User)
 
 **Błąd: "Nie udało się połączyć z serwerem"**
+
 - Sprawdź czy dev server działa
 - Sprawdź Console (F12) - czy są błędy 500?
 - Sprawdź terminal - czy endpoint `/api/auth/login` zwraca błędy?
 
 **Błąd: "SUPABASE_URL is not defined"**
+
 - Sprawdź plik `.env`
 - Zrestartuj dev server (`Ctrl+C` i `npm run dev`)
 
@@ -95,6 +103,7 @@ Powinno otworzyć się na http://localhost:3000
 ## Krok 5: Sprawdź cookies i tokens
 
 ### W przeglądarce (Chrome/Edge):
+
 1. Naciśnij `F12` → zakładka **Application**
 2. W lewym menu:
    - **Cookies** → `http://localhost:3000`:
@@ -108,10 +117,12 @@ Powinno otworzyć się na http://localhost:3000
      - `sb-refresh-token`
 
 ### Dekodowanie JWT tokenu (opcjonalnie):
+
 1. Skopiuj wartość `sb-access-token`
 2. Otwórz https://jwt.io
 3. Wklej token
 4. Sprawdź payload:
+
 ```json
 {
   "sub": "user-uuid-here",
@@ -136,12 +147,13 @@ Dodaj tymczasowo w `src/pages/auth/login.astro` (na początku `---` bloku):
 
 ```astro
 ---
-console.log('User from middleware:', Astro.locals.user);
+console.log("User from middleware:", Astro.locals.user);
 // reszta kodu...
 ---
 ```
 
 **Wynik w terminalu (server-side log)**:
+
 - Przed zalogowaniem: `User from middleware: undefined`
 - Po zalogowaniu: `User from middleware: { id: '...', email: 'test@example.com' }`
 
@@ -152,12 +164,14 @@ console.log('User from middleware:', Astro.locals.user);
 ## 🐛 Debugging
 
 ### Sprawdź logi serwera (terminal):
+
 ```
 [11:30:45] GET /auth/login 200 (middleware executed)
 [11:30:50] POST /api/auth/login 200 (login successful)
 ```
 
 ### Sprawdź Network tab (F12):
+
 1. Otwórz **Network** tab przed kliknięciem "Zaloguj się"
 2. Po kliknięciu powinien pojawić się:
    - `POST /api/auth/login` → Status 200
@@ -177,10 +191,12 @@ console.log('User from middleware:', Astro.locals.user);
 ### Common issues:
 
 **CORS error w konsoli**:
+
 - Nie powinno się zdarzyć (same-origin)
 - Jeśli wystąpi, sprawdź czy endpoint ma `export const prerender = false;`
 
 **TypeError: Cannot read property 'email' of undefined**:
+
 - Supabase nie zwrócił użytkownika
 - Sprawdź Supabase credentials w `.env`
 - Sprawdź Supabase Dashboard → Settings → API (URL i Keys)
@@ -192,6 +208,7 @@ console.log('User from middleware:', Astro.locals.user);
 Jeśli wszystkie testy przeszły, integracja logowania działa poprawnie! 🎉
 
 ### Następne kroki:
+
 1. Implementacja `/api/auth/logout`
 2. Implementacja `/api/auth/register`
 3. Ochrona strony `/generate` (sprawdzenie `Astro.locals.user`)
@@ -204,4 +221,3 @@ Jeśli wszystkie testy przeszły, integracja logowania działa poprawnie! 🎉
 Pełna dokumentacja implementacji: `.ai/auth-login-implementation-summary.md`
 
 Specyfikacja techniczna: `.ai/auth-spec.md`
-

@@ -24,12 +24,14 @@ OPENROUTER_API_KEY=your_api_key
 ```
 
 **Get Supabase credentials:**
+
 ```bash
 npx supabase start
 # Copy the anon key from output
 ```
 
 **Get OpenRouter API key:**
+
 - Visit https://openrouter.ai/keys
 - Create a new key (free tier available)
 
@@ -109,6 +111,7 @@ npm run test:e2e:codegen
 ## What Gets Tested?
 
 ### ✅ Authentication (17 tests)
+
 - User registration
 - Login/logout
 - Password validation
@@ -116,6 +119,7 @@ npm run test:e2e:codegen
 - Remember me functionality
 
 ### ✅ Flashcard Generation (12 tests)
+
 - AI-powered flashcard generation
 - Text validation (1000-10000 chars)
 - Accept/reject flashcards
@@ -123,6 +127,7 @@ npm run test:e2e:codegen
 - Save operations
 
 ### ✅ Flashcard Management (12 tests)
+
 - Create flashcards manually
 - Edit existing flashcards
 - Delete flashcards
@@ -130,6 +135,7 @@ npm run test:e2e:codegen
 - Data persistence
 
 ### ✅ Data Security (included in tests)
+
 - Row Level Security (RLS)
 - User data isolation
 - Session persistence
@@ -146,6 +152,7 @@ npm run test:e2e:codegen
 ### Problem: Tests fail with "Connection refused"
 
 **Solution:** Make sure dev server is running
+
 ```bash
 npm run dev
 ```
@@ -153,6 +160,7 @@ npm run dev
 ### Problem: "SUPABASE_URL is not defined"
 
 **Solution:** Create `.env.test` file with proper values
+
 ```bash
 cp .env .env.test
 # Edit .env.test
@@ -161,6 +169,7 @@ cp .env .env.test
 ### Problem: Generation tests timeout
 
 **Solution:** Check OpenRouter API key is valid and has credits
+
 ```env
 # In .env.test
 OPENROUTER_API_KEY=sk-or-v1-your-key-here
@@ -169,6 +178,7 @@ OPENROUTER_API_KEY=sk-or-v1-your-key-here
 ### Problem: "Browser not found"
 
 **Solution:** Install Playwright browsers
+
 ```bash
 npx playwright install
 ```
@@ -183,9 +193,11 @@ npx playwright install
 ## Tips
 
 💡 **Use UI mode during development:**
+
 ```bash
 npm run test:e2e:ui
 ```
+
 - See tests run in real-time
 - Step through test execution
 - Pick which tests to run
@@ -194,9 +206,11 @@ npm run test:e2e:ui
 Tests are configured to run in parallel for faster execution
 
 💡 **Check the report on failure:**
+
 ```bash
 npm run test:e2e:report
 ```
+
 - View screenshots
 - See error traces
 - Analyze test timeline
@@ -211,7 +225,7 @@ npm run test:e2e:report
 ---
 
 **Ready to test?** Start with:
+
 ```bash
 npm run test:e2e:ui
 ```
-

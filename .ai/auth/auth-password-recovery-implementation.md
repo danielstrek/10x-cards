@@ -9,6 +9,7 @@
 ## 🎯 Zakres Implementacji
 
 Zaimplementowano kompletny system resetowania hasła:
+
 1. ✅ POST /api/auth/forgot-password - wysyłanie linku resetującego
 2. ✅ POST /api/auth/reset-password - ustawianie nowego hasła
 3. ✅ ForgotPasswordForm.tsx - formularz żądania resetu
@@ -25,6 +26,7 @@ Zaimplementowano kompletny system resetowania hasła:
 **Endpoint**: `POST /api/auth/forgot-password`
 
 **Request Body**:
+
 ```json
 {
   "email": "user@example.com"
@@ -32,6 +34,7 @@ Zaimplementowano kompletny system resetowania hasła:
 ```
 
 **Response (200 OK)** - Zawsze sukces (security):
+
 ```json
 {
   "message": "If the email exists, a password reset link has been sent"
@@ -39,6 +42,7 @@ Zaimplementowano kompletny system resetowania hasła:
 ```
 
 **Kluczowe funkcje**:
+
 - ✅ Walidacja email (Zod)
 - ✅ `supabase.auth.resetPasswordForEmail()`
 - ✅ **Security**: Zawsze zwraca sukces (zapobiega email enumeration)
@@ -46,11 +50,12 @@ Zaimplementowano kompletny system resetowania hasła:
 - ✅ PUBLIC_SITE_URL support
 
 **Security Best Practice**:
+
 ```typescript
 // IMPORTANT: Always return success (security best practice)
 // Don't reveal whether the email exists in the system
 if (error) {
-  console.error('Supabase password reset error:', error);
+  console.error("Supabase password reset error:", error);
   // Still return success to user (don't reveal error details)
 }
 ```
@@ -62,6 +67,7 @@ if (error) {
 **Endpoint**: `POST /api/auth/reset-password`
 
 **Request Body**:
+
 ```json
 {
   "password": "NewSecurePass123!"
@@ -71,6 +77,7 @@ if (error) {
 **Uwaga**: Token resetowania jest w cookies (Supabase SSR)
 
 **Response (200 OK)**:
+
 ```json
 {
   "message": "Password has been reset successfully"
@@ -78,6 +85,7 @@ if (error) {
 ```
 
 **Response (401 Unauthorized)**:
+
 ```json
 {
   "error": "Unauthorized",
@@ -86,12 +94,14 @@ if (error) {
 ```
 
 **Kluczowe funkcje**:
+
 - ✅ Walidacja hasła (8+, uppercase, digit, special)
 - ✅ `supabase.auth.getUser()` - sprawdza token z cookies
 - ✅ `supabase.auth.updateUser({ password })` - update hasła
 - ✅ Automatyczne logowanie po zmianie hasła
 
 **Flow**:
+
 1. User klika link z emaila → Supabase ustawia token w cookies
 2. POST /api/auth/reset-password z nowym hasłem
 3. getUser() sprawdza token z cookies
@@ -103,6 +113,7 @@ if (error) {
 ### 3. **src/components/auth/ForgotPasswordForm.tsx** 🆕
 
 **Stan komponentu**:
+
 ```typescript
 interface ForgotPasswordFormState {
   email: string;
@@ -113,6 +124,7 @@ interface ForgotPasswordFormState {
 ```
 
 **Funkcjonalności**:
+
 - ✅ Input email z walidacją client-side
 - ✅ Submit → POST /api/auth/forgot-password
 - ✅ Success screen po wysłaniu
@@ -122,6 +134,7 @@ interface ForgotPasswordFormState {
 - ✅ Error handling z ErrorNotification
 
 **Success Screen**:
+
 ```tsx
 if (state.emailSent) {
   return (
@@ -136,9 +149,7 @@ if (state.emailSent) {
         <p>Link ważny przez 60 minut</p>
       </CardContent>
       <CardFooter>
-        <Button onClick={() => window.location.href = '/auth/login'}>
-          Powrót do logowania
-        </Button>
+        <Button onClick={() => (window.location.href = "/auth/login")}>Powrót do logowania</Button>
         <Button variant="outline" onClick={resetForm}>
           Wyślij ponownie
         </Button>
@@ -153,6 +164,7 @@ if (state.emailSent) {
 ### 4. **src/components/auth/ResetPasswordForm.tsx** 🆕
 
 **Stan komponentu**:
+
 ```typescript
 interface ResetPasswordFormState {
   password: string;
@@ -164,6 +176,7 @@ interface ResetPasswordFormState {
 ```
 
 **Funkcjonalności**:
+
 - ✅ Dwa inputy: password + confirmPassword
 - ✅ Show/hide password toggles (oba pola)
 - ✅ Real-time password validation:
@@ -177,27 +190,29 @@ interface ResetPasswordFormState {
 - ✅ Obsługa wygasłego tokenu (401)
 
 **Password Validation UI**:
+
 ```tsx
-{passwordValidation.errors.map((error, index) => (
-  <p key={index} className="text-xs text-destructive">
-    • {error}
-  </p>
-))}
-{passwordValidation.valid && (
-  <p className="text-xs text-green-600">
-    ✓ Hasło spełnia wymagania
-  </p>
-)}
+{
+  passwordValidation.errors.map((error, index) => (
+    <p key={index} className="text-xs text-destructive">
+      • {error}
+    </p>
+  ));
+}
+{
+  passwordValidation.valid && <p className="text-xs text-green-600">✓ Hasło spełnia wymagania</p>;
+}
 ```
 
 **Success Screen z Auto-Redirect**:
+
 ```tsx
 if (state.success) {
   // Auto-redirect after 3 seconds
   setTimeout(() => {
-    window.location.href = '/auth/login';
+    window.location.href = "/auth/login";
   }, 3000);
-  
+
   return (
     <Card>
       <CardHeader>
@@ -219,6 +234,7 @@ if (state.success) {
 ### 5. **src/pages/auth/forgot-password.astro** 🆕
 
 **Strona SSR**:
+
 ```astro
 ---
 import ForgotPasswordForm from "../../components/auth/ForgotPasswordForm";
@@ -236,6 +252,7 @@ import ForgotPasswordForm from "../../components/auth/ForgotPasswordForm";
 ### 6. **src/pages/auth/reset-password.astro** 🆕
 
 **Strona SSR**:
+
 ```astro
 ---
 import ResetPasswordForm from "../../components/auth/ResetPasswordForm";
@@ -314,12 +331,14 @@ import ResetPasswordForm from "../../components/auth/ResetPasswordForm";
 ### Krok 1: Email Templates
 
 Przejdź do Supabase Dashboard:
+
 1. **Authentication** → **Email Templates**
 2. Znajdź template: **"Reset Password"**
 
 ### Krok 2: Dostosuj Template (Opcjonalnie)
 
 **Domyślny template Supabase**:
+
 ```html
 <h2>Reset Your Password</h2>
 <p>Follow this link to reset the password for your user:</p>
@@ -327,6 +346,7 @@ Przejdź do Supabase Dashboard:
 ```
 
 **Zalecany template (po polsku)**:
+
 ```html
 <h2>Resetowanie hasła - 10x Cards</h2>
 
@@ -335,8 +355,10 @@ Przejdź do Supabase Dashboard:
 <p>Kliknij poniższy przycisk, aby ustawić nowe hasło:</p>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="{{ .SiteURL }}/auth/reset-password?token={{ .TokenHash }}&type=recovery" 
-     style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+  <a
+    href="{{ .SiteURL }}/auth/reset-password?token={{ .TokenHash }}&type=recovery"
+    style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;"
+  >
     Zresetuj hasło
   </a>
 </p>
@@ -346,15 +368,13 @@ Przejdź do Supabase Dashboard:
 <p>Jeśli nie prosiłeś o reset hasła, zignoruj tę wiadomość.</p>
 
 <p style="color: #666; font-size: 12px;">
-  Lub skopiuj i wklej ten link do przeglądarki:<br>
+  Lub skopiuj i wklej ten link do przeglądarki:<br />
   {{ .SiteURL }}/auth/reset-password?token={{ .TokenHash }}&type=recovery
 </p>
 
-<hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+<hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
 
-<p style="color: #999; font-size: 11px;">
-  Ta wiadomość została wysłana automatycznie. Nie odpowiadaj na nią.
-</p>
+<p style="color: #999; font-size: 11px;">Ta wiadomość została wysłana automatycznie. Nie odpowiadaj na nią.</p>
 ```
 
 ### Krok 3: Ustaw Site URL
@@ -389,6 +409,7 @@ Przejdź do Supabase Dashboard:
 ### TEST 1: Forgot Password Flow
 
 **Kroki**:
+
 1. Otwórz http://localhost:3000/auth/login
 2. Kliknij link **"Zapomniałeś hasła?"**
 3. Sprawdź URL: `/auth/forgot-password`
@@ -396,6 +417,7 @@ Przejdź do Supabase Dashboard:
 5. Kliknij **"Wyślij link resetujący"**
 
 **Oczekiwany rezultat**:
+
 - ✅ Button: "Wysyłanie..." ze spinnerem
 - ✅ Po 1-2 sek → Success screen:
   - "📧 Email wysłany!"
@@ -407,15 +429,18 @@ Przejdź do Supabase Dashboard:
 ### TEST 2: Email Delivery
 
 **Kroki**:
+
 1. Sprawdź skrzynkę email: `test@example.com`
 2. Poczekaj ~30 sekund (Supabase wysyła async)
 
 **Oczekiwany rezultat**:
+
 - ✅ Email od Supabase z tematem "Reset Your Password" (lub custom)
 - ✅ Link w emailu: `http://localhost:3000/auth/reset-password?token=...&type=recovery`
 - ✅ Token jest długim stringiem (JWT)
 
 **Jeśli email nie przyszedł**:
+
 - Sprawdź folder spam
 - Sprawdź Supabase Dashboard → Logs → Email logs
 - Sprawdź czy email istnieje w Users
@@ -425,6 +450,7 @@ Przejdź do Supabase Dashboard:
 ### TEST 3: Reset Password (Poprawny Token)
 
 **Kroki**:
+
 1. Kliknij link z emaila
 2. Browser otwiera: `/auth/reset-password`
 3. Sprawdź DevTools → Application → Cookies:
@@ -436,6 +462,7 @@ Przejdź do Supabase Dashboard:
 6. Kliknij **"Ustaw nowe hasło"**
 
 **Oczekiwany rezultat**:
+
 - ✅ Button: "Resetowanie..." ze spinnerem
 - ✅ Po 1-2 sek → Success screen:
   - "✅ Hasło zmienione!"
@@ -447,12 +474,14 @@ Przejdź do Supabase Dashboard:
 ### TEST 4: Login z Nowym Hasłem
 
 **Kroki**:
+
 1. Na stronie login wypełnij:
    - Email: `test@example.com`
    - Password: `NewTestPass123!` (nowe hasło!)
 2. Kliknij "Zaloguj się"
 
 **Oczekiwany rezultat**:
+
 - ✅ Sukces! Redirect na `/generate`
 - ✅ UserNav wyświetlony
 - ✅ Nowe hasło działa!
@@ -462,11 +491,13 @@ Przejdź do Supabase Dashboard:
 ### TEST 5: Reset z Nieistniejącym Emailem (Security)
 
 **Kroki**:
+
 1. /auth/forgot-password
 2. Wpisz: `nonexistent@example.com`
 3. Submit
 
 **Oczekiwany rezultat**:
+
 - ✅ Success screen: "Email wysłany!" (nie ujawnia że email nie istnieje!)
 - ✅ Brak emaila wysłanego (security best practice)
 - ✅ Network tab: 200 OK (nie 404!)
@@ -476,11 +507,13 @@ Przejdź do Supabase Dashboard:
 ### TEST 6: Reset z Wygasłym Tokenem
 
 **Kroki**:
+
 1. Kliknij stary link reset (> 60 min) lub użyj invalid token
 2. Wypełnij formularz nowego hasła
 3. Submit
 
 **Oczekiwany rezultat**:
+
 - ✅ ErrorNotification:
   - "Link resetujący wygasł lub jest nieprawidłowy. Spróbuj ponownie."
 - ✅ HTTP 401 Unauthorized
@@ -491,11 +524,13 @@ Przejdź do Supabase Dashboard:
 ### TEST 7: Walidacja Hasła
 
 **Kroki**:
+
 1. Na /auth/reset-password wpisz słabe hasło:
    - Password: `short` (za krótkie)
    - Obserwuj błędy
 
 **Oczekiwany rezultat**:
+
 - ✅ Komunikaty błędów (real-time):
   - "• Hasło musi mieć co najmniej 8 znaków"
   - "• Hasło musi zawierać wielką literę"
@@ -503,11 +538,10 @@ Przejdź do Supabase Dashboard:
   - "• Hasło musi zawierać znak specjalny"
 - ✅ Przycisk "Ustaw nowe hasło" disabled
 
-**Kroki**:
-2. Popraw hasło stopniowo: `Short1!`
-3. Obserwuj jak błędy znikają
+**Kroki**: 2. Popraw hasło stopniowo: `Short1!` 3. Obserwuj jak błędy znikają
 
 **Oczekiwany rezultat**:
+
 - ✅ Każdy spełniony wymóg znika z listy
 - ✅ Gdy wszystkie spełnione: "✓ Hasło spełnia wymagania"
 - ✅ Przycisk enabled
@@ -517,18 +551,20 @@ Przejdź do Supabase Dashboard:
 ### TEST 8: Password Mismatch
 
 **Kroki**:
+
 1. Password: `NewPass123!`
 2. Confirm: `NewPass123` (brak !)
 3. Obserwuj komunikat
 
 **Oczekiwany rezultat**:
+
 - ✅ "✗ Hasła nie są identyczne" (czerwony)
 - ✅ Przycisk disabled
 
-**Kroki**:
-4. Popraw confirm: `NewPass123!`
+**Kroki**: 4. Popraw confirm: `NewPass123!`
 
 **Oczekiwany rezultat**:
+
 - ✅ "✓ Hasła są identyczne" (zielony)
 - ✅ Przycisk enabled
 
@@ -537,10 +573,12 @@ Przejdź do Supabase Dashboard:
 ### TEST 9: Network Requests
 
 **Kroki**:
+
 1. DevTools → Network tab
 2. Submit forgot-password form
 
 **Oczekiwany rezultat**:
+
 ```
 POST /api/auth/forgot-password
 Status: 200 OK
@@ -550,10 +588,10 @@ Response:
 }
 ```
 
-**Kroki**:
-3. Reset password form submit
+**Kroki**: 3. Reset password form submit
 
 **Oczekiwany rezultat**:
+
 ```
 POST /api/auth/reset-password
 Status: 200 OK
@@ -571,11 +609,13 @@ Headers (Set-Cookie):
 ### TEST 10: Auto-Redirect Timer
 
 **Kroki**:
+
 1. Po sukcesie reset password, obserwuj timer
 2. Sprawdź czy pokazuje "Przekierowanie za 3 sekundy..."
 3. Czekaj 3 sekundy
 
 **Oczekiwany rezultat**:
+
 - ✅ Automatyczny redirect na `/auth/login` po 3 sek
 - ✅ Nie trzeba klikać przycisku
 
@@ -584,28 +624,32 @@ Headers (Set-Cookie):
 ## 🔒 Security Features
 
 ### 1. Email Enumeration Prevention
+
 ```typescript
 // ALWAYS return success - don't reveal if email exists
 return new Response(
   JSON.stringify({
-    message: 'If the email exists, a password reset link has been sent',
+    message: "If the email exists, a password reset link has been sent",
   }),
   { status: 200 }
 );
 ```
 
 ### 2. Token w Cookies (httpOnly)
+
 - ✅ Token nigdy nie jest w URL params na stronie
 - ✅ Supabase SSR automatycznie parsuje z URL → cookies
 - ✅ httpOnly = JavaScript nie ma dostępu
 - ✅ Bezpieczne przed XSS
 
 ### 3. Token Expiry
+
 - ✅ Domyślnie: 60 minut
 - ✅ Po wygaśnięciu: 401 Unauthorized
 - ✅ User musi zresetować ponownie
 
 ### 4. Password Strength
+
 - ✅ Min. 8 znaków
 - ✅ Wielka litera
 - ✅ Cyfra
@@ -614,6 +658,7 @@ return new Response(
 - ✅ Client-side real-time feedback
 
 ### 5. HTTPS Only (Production)
+
 - ✅ secure: true w cookies
 - ✅ Links w emailu używają HTTPS
 
@@ -622,6 +667,7 @@ return new Response(
 ## 📊 Status Compliance
 
 ### Auth Spec (Faza 5):
+
 - ✅ POST /api/auth/forgot-password - **COMPLETE**
 - ✅ POST /api/auth/reset-password - **COMPLETE**
 - ✅ ForgotPasswordForm.tsx - **COMPLETE**
@@ -630,6 +676,7 @@ return new Response(
 - ✅ reset-password.astro - **COMPLETE**
 
 ### Security Best Practices:
+
 - ✅ Email enumeration prevention
 - ✅ Token w httpOnly cookies
 - ✅ Token expiry (60 min)
@@ -641,9 +688,11 @@ return new Response(
 ## 🐛 Common Issues & Solutions
 
 ### Issue 1: Email nie przychodzi
+
 **Symptoms**: Formularz wysłany, success screen, ale brak emaila
 
 **Solutions**:
+
 1. Sprawdź folder spam
 2. Supabase Dashboard → Logs → Email logs
 3. Sprawdź czy email istnieje w Users table
@@ -652,9 +701,11 @@ return new Response(
 ---
 
 ### Issue 2: "Invalid or expired reset token"
+
 **Symptoms**: 401 error na /api/auth/reset-password
 
 **Solutions**:
+
 1. Token wygasł (> 60 min) - użyj nowego linku
 2. Token użyty już raz - można użyć tylko raz
 3. Cookies blocked - sprawdź browser settings
@@ -663,9 +714,11 @@ return new Response(
 ---
 
 ### Issue 3: Reset page pokazuje się bez formularza
+
 **Symptoms**: Blank page lub redirect loop
 
 **Solutions**:
+
 1. Token nie w cookies - sprawdź DevTools → Cookies
 2. Supabase SSR nie działa - sprawdź middleware
 3. Redirect URL whitelist - dodaj w Supabase Dashboard
@@ -673,9 +726,11 @@ return new Response(
 ---
 
 ### Issue 4: Password validation nie działa
+
 **Symptoms**: Button disabled mimo poprawnego hasła
 
 **Solutions**:
+
 1. Sprawdź wszystkie 4 wymagania
 2. Confirm password musi być identyczny
 3. Sprawdź console errors
@@ -714,4 +769,3 @@ return new Response(
 **Status**: ✅ **PRIORYTET 2 ZAKOŃCZONY - GOTOWE DO TESTOWANIA**
 
 Kompletny system resetowania hasła zgodny ze specyfikacją i security best practices!
-

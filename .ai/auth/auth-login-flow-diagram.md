@@ -488,6 +488,6 @@ Future: Auto Refresh (TODO)
 **Koniec diagramów**
 
 Dla lepszego zrozumienia implementacji, przejrzyj również:
+
 - `.ai/auth-login-implementation-summary.md` - szczegółowa dokumentacja
 - `.ai/auth-login-quick-start.md` - instrukcja testowania
-
